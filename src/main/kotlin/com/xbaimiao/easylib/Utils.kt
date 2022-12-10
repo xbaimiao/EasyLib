@@ -56,3 +56,11 @@ fun CommandSender.sendLang(key: String, vararg args: Any) {
 fun Player.giveItem(item: ItemStack) {
     ItemUtil.giveItem(this, item)
 }
+
+fun info(vararg any: Any) {
+    Plugin.getPlugin().logger.info(any.joinToString(" "))
+}
+
+fun warn(vararg any: Any) {
+    Plugin.getPlugin().logger.warning(any.joinToString(" "))
+}
