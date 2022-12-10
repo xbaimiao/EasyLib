@@ -1,7 +1,12 @@
 package com.xbaimiao.easylib
 
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import top.mcplugin.lib.Plugin
+import top.mcplugin.lib.module.item.ItemUtil
+import top.mcplugin.lib.module.lang.Lang
 
 fun submit(
     delay: Long = 0,
@@ -26,7 +31,7 @@ fun submit(
         } else if (delay > 0) {
             runnable.runTaskLaterAsynchronously(Plugin.getPlugin(), delay)
         } else {
-            runnable.runTask(Plugin.getPlugin())
+            runnable.runTaskAsynchronously(Plugin.getPlugin())
         }
     } else {
         if (period > 0) {
@@ -42,4 +47,12 @@ fun submit(
         }
     }
 
+}
+
+fun CommandSender.sendLang(key: String, vararg args: Any) {
+    Lang.sendLang(this, key, *args)
+}
+
+fun Player.giveItem(item: ItemStack) {
+    ItemUtil.giveItem(this, item)
 }
