@@ -5,13 +5,17 @@ plugins {
 }
 
 group = 'com.xbaimiao'
-version = '1.4'
+version = '1.5.0'
 
 repositories {
     mavenCentral()
     maven {
         name "repo-xbaimiao"
         url "https://repo.xbaimiao.com/nexus/content/repositories/releases/"
+    }
+    maven{
+        name = 'codemc-repo'
+        url = 'https://repo.codemc.org/repository/maven-public/'
     }
 }
 
@@ -21,10 +25,12 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 dependencies {
-    compileOnly "top.mcplugin.lib:module-main:1.0.4-beta32"
-    compileOnly "top.mcplugin.lib:module-lang:1.0.4-beta32"
+//    compileOnly "top.mcplugin.lib:module-main:1.0.4-beta32"
+//    compileOnly "top.mcplugin.lib:module-lang:1.0.4-beta32"
     compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:1.7.20'
     compileOnly("public:paper:1.16.5")
+    compileOnly("public:papi:1.0.0")
+    compileOnly(fileTree("libs"))
 }
 
 compileKotlin {
