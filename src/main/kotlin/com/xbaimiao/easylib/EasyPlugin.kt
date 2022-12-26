@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib
 
+import com.xbaimiao.easylib.module.command.CommandModule
 import com.xbaimiao.easylib.module.ui.InventoryModule
 import com.xbaimiao.easylib.module.utils.Module
 import org.bukkit.plugin.java.JavaPlugin
@@ -10,6 +11,7 @@ abstract class EasyPlugin : JavaPlugin() {
 
     override fun onLoad() {
         modules.add(InventoryModule())
+        modules.add(CommandModule())
 
         modules.forEach {
             it.load(this)

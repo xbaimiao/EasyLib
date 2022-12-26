@@ -49,3 +49,7 @@ fun info(vararg any: Any) {
 fun warn(vararg any: Any) {
     EasyPlugin.getPlugin<EasyPlugin>().logger.warning(any.joinToString(" "))
 }
+
+fun severe(vararg any: Any) {
+    EasyPlugin.getPlugin<EasyPlugin>().logger.severe(any.joinToString(" "))
+}

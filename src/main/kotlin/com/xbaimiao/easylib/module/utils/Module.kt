@@ -8,8 +8,12 @@ interface Module<T : EasyPlugin> {
 
     }
 
-    fun enable(plugin: T)
+    fun enable(plugin: T){
 
-    fun disable(plugin: T)
+    }
+
+    fun disable(plugin: T){
+
+    }
 
 }
