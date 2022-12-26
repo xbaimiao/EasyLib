@@ -28,6 +28,9 @@ class InventoryModule : Listener, Module<EasyPlugin> {
     @EventHandler
     fun onClick(event: InventoryClickEvent) {
         val builder = MenuHolder.fromInventory(event.inventory) ?: return
+        if (builder.player.name != event.whoClicked.name) {
+            return
+        }
         // 锁定主手
         if (builder.handLocked && (event.rawSlot - event.inventory.size - 27 == event.whoClicked.inventory.heldItemSlot || event.click == org.bukkit.event.inventory.ClickType.NUMBER_KEY && event.hotbarButton == event.whoClicked.inventory.heldItemSlot)) {
             event.isCancelled = true
@@ -44,15 +47,21 @@ class InventoryModule : Listener, Module<EasyPlugin> {
     @EventHandler
     fun onDrag(e: InventoryDragEvent) {
         val builder = MenuHolder.fromInventory(e.inventory) ?: return
-        builder.clickCallback.forEach { it.invoke(e) }
+        if (builder.player.name != e.whoClicked.name) {
+            return
+        }
+        builder.dragCallback.forEach { it.invoke(e) }
     }
 
     @EventHandler
     fun close(event: InventoryCloseEvent) {
-        val close = MenuHolder.fromInventory(event.inventory)
-        close?.closeCallback?.invoke(event)
+        val close = MenuHolder.fromInventory(event.inventory) ?: return
+        if (close.player.name != event.player.name) {
+            return
+        }
+        close.closeCallback.invoke(event)
         // 只触发一次
-        if (close?.onceCloseCallback == true) {
+        if (close.onceCloseCallback) {
             close.closeCallback = {}
         }
     }

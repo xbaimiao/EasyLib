@@ -5,13 +5,14 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryInteractEvent
+import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
-open class Basic(player: Player, title: String = "chest") : Menu(title, player) {
+@Suppress("unused")
+class Basic(player: Player, title: String = "chest") : Menu(title, player) {
 
     /** 行数 **/
     internal var rows = -1
@@ -23,7 +24,10 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
     internal var holderCallback: ((menu: Basic) -> MenuHolder) = { MenuHolder(it) }
 
     /** 点击回调 **/
-    internal val clickCallback = CopyOnWriteArrayList<(event: InventoryInteractEvent) -> Unit>()
+    internal val clickCallback = CopyOnWriteArrayList<(event: InventoryClickEvent) -> Unit>()
+
+
+    internal val dragCallback = CopyOnWriteArrayList<(event: InventoryDragEvent) -> Unit>()
 
     /** 关闭回调 **/
     internal var closeCallback: ((event: InventoryCloseEvent) -> Unit) = {}
@@ -41,7 +45,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
      * 行数
      * 为 1 - 6 之间的整数，并非原版 9 的倍数
      */
-    open fun rows(rows: Int) {
+    fun rows(rows: Int) {
         this.rows = rows
     }
 
@@ -52,8 +56,12 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
      *
      * @param handLocked 锁定
      */
-    open fun handLocked(handLocked: Boolean) {
+    fun handLocked(handLocked: Boolean) {
         this.handLocked = handLocked
+    }
+
+    fun onDrag(callback: (event: InventoryDragEvent) -> Unit) {
+        dragCallback += callback
     }
 
 
@@ -61,7 +69,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
      * 页面关闭时触发回调
      * 只能触发一次（玩家客户端强制关闭时会触发两次原版 InventoryCloseEvent 事件）
      */
-    open fun onClose(once: Boolean = true, callback: (event: InventoryCloseEvent) -> Unit) {
+    fun onClose(once: Boolean = true, callback: (event: InventoryCloseEvent) -> Unit) {
         closeCallback = callback
         onceCloseCallback = once
     }
@@ -70,9 +78,18 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
      * 点击事件回调
      * 仅在特定位置下触发
      */
-    open fun onClick(bind: Int, callback: (event: InventoryInteractEvent) -> Unit = {}) {
+    fun onClick(bind: Int, callback: (event: InventoryClickEvent) -> Unit) {
         onClick {
-            if (it is InventoryClickEvent && it.rawSlot == bind) {
+            if (it.rawSlot == bind) {
+                it.isCancelled = true
+                callback(it)
+            }
+        }
+    }
+
+    fun onClick(bind: Char, callback: (event: InventoryClickEvent) -> Unit) {
+        onClick {
+            if (this.getSlot(it.rawSlot) == bind) {
                 it.isCancelled = true
                 callback(it)
             }
@@ -83,14 +100,14 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
      * 整页点击事件回调
      * 可选是否自动锁定点击位置
      */
-    open fun onClick(callback: (event: InventoryInteractEvent) -> Unit = {}) {
+    fun onClick(callback: (event: InventoryClickEvent) -> Unit) {
         clickCallback += callback
     }
 
     /**
      * 使用抽象字符页面布局
      */
-    open fun map(vararg slots: String) {
+    fun map(vararg slots: String) {
         this.slots.clear()
         this.slots.addAll(slots.map { it.toCharArray().toList() })
         // 自动修改行数
@@ -99,7 +116,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         }
     }
 
-    open fun map(slots: List<String>) {
+    fun map(slots: List<String>) {
         this.slots.clear()
         this.slots.addAll(slots.map { it.toCharArray().toList() })
         // 自动修改行数
@@ -111,14 +128,14 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
     /**
      * 根据抽象符号设置物品
      */
-    open fun set(slot: Char, itemStack: ItemStack) {
+    fun set(slot: Char, itemStack: ItemStack) {
         items[slot] = itemStack
     }
 
     /**
      * 获取位置对应的抽象字符
      */
-    open fun getSlot(slot: Int): Char {
+    fun getSlot(slot: Int): Char {
         var row = 0
         while (row < slots.size) {
             val line = slots[row]
@@ -137,7 +154,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
     /**
      * 获取抽象字符对应的位置
      */
-    open fun getSlots(slot: Char): List<Int> {
+    fun getSlots(slot: Char): List<Int> {
         val list = mutableListOf<Int>()
         var row = 0
         while (row < slots.size) {
@@ -154,7 +171,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         return list
     }
 
-    protected open fun createTitle(): String {
+    private fun createTitle(): String {
         return title
     }
 
