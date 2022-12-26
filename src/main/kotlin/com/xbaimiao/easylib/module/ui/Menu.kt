@@ -6,5 +6,14 @@ import org.bukkit.inventory.Inventory
 abstract class Menu(var title: String, val player: Player) {
 
     abstract fun build(): Inventory
+
+    abstract fun open()
+
+}
+
+fun Player.openMenu(title: String = "chest", func: (Basic) -> Unit) {
+    val basic = Basic(this, title)
+    func(basic)
+    basic.open()
 }
 

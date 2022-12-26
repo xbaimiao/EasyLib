@@ -10,7 +10,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import java.text.MessageFormat
 
 @Suppress("unused")
 object Lang {
@@ -59,10 +58,10 @@ object Lang {
         }
         if (obj is List<*>) {
             obj.forEach { msg ->
-                this.sendMessage(MessageFormat.format((msg as String?).colored(), args))
+                this.sendMessage((msg as String?).colored().formats(*args))
             }
         } else {
-            this.sendMessage(MessageFormat.format((obj as String?).colored(), args))
+            this.sendMessage((obj as String?).colored().formats(*args))
         }
     }
 
@@ -76,11 +75,20 @@ object Lang {
             save()
         }
         return if (obj is List<*>) {
-            obj.map { msg -> MessageFormat.format((msg as String?).colored(), args) }.toList() as T
+            obj.map { (it as String?).colored().formats(*args) }.toList() as T
         } else {
-            val string: String = (obj as String?).colored()
-            MessageFormat.format(string, args) as T
+            (obj as String?).colored().formats(*args) as T
         }
+    }
+
+    private fun String.formats(vararg args: Any): String {
+        var index = 0
+        var result = this
+        args.forEach {
+            result = result.replace("{$index}", it.toString())
+            index++
+        }
+        return result
     }
 
 }

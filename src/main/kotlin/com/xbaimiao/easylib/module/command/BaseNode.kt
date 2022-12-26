@@ -129,7 +129,14 @@ abstract class BaseNode<T> : ExecSpec<T> {
             ctx.sender.sendMessage(prefix!!.append(Component.text(" // ${cmd.description}").color(NamedTextColor.GOLD)))
             stack.pop()
         } else {
+            val tokens = ArrayList<String>()
             subNodes.forEach {
+                it.token?.let { token ->
+                    if (tokens.contains(token)) {
+                        return@forEach
+                    }
+                    tokens.add(token)
+                }
                 stack.push(this)
                 it.showHelp(ctx, root, stack)
                 stack.pop()

@@ -194,4 +194,8 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
         return inventory
     }
 
+    override fun open() {
+        player.openInventory(build())
+    }
+
 }
