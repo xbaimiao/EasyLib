@@ -18,6 +18,7 @@ class OrmliteSQLite(private val name: String) : Ormlite {
         com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING)
     }
 
+    @JvmName("getConnectionSource1")
     private fun getConnectionSource(): ConnectionSource {
         val url = "jdbc:sqlite:" + File(EasyPlugin.getPlugin<EasyPlugin>().dataFolder, name).path
         return JdbcConnectionSource(url)

@@ -39,6 +39,7 @@ class OrmliteMysql(
         hikariCP = hikariCP
     )
 
+    @JvmName("getConnectionSource1")
     private fun getConnectionSource(): ConnectionSource {
         val url = String.format(
             "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true",
