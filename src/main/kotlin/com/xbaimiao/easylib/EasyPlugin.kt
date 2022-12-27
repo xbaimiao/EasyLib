@@ -7,7 +7,18 @@ import org.bukkit.plugin.java.JavaPlugin
 
 abstract class EasyPlugin : JavaPlugin() {
 
-    private val modules = ArrayList<Module<EasyPlugin>>()
+    init {
+        init()
+    }
+
+    private lateinit var modules: ArrayList<Module<EasyPlugin>>
+
+    private fun init() {
+        instance = this
+        modules = ArrayList()
+        modules.add(InventoryModule())
+        modules.add(CommandModule())
+    }
 
     open fun load() {}
 
@@ -16,10 +27,6 @@ abstract class EasyPlugin : JavaPlugin() {
     open fun disable() {}
 
     override fun onLoad() {
-        instance = this
-        modules.add(InventoryModule())
-        modules.add(CommandModule())
-
         modules.forEach {
             it.load(this)
         }
