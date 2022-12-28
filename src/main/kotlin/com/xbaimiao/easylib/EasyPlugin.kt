@@ -38,7 +38,7 @@ abstract class EasyPlugin : JavaPlugin() {
             it.enable(this)
         }
         enable()
-    }aa
+    }
 
     override fun onDisable() {
         modules.forEach {
