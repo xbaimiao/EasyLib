@@ -1,6 +1,8 @@
 package com.xbaimiao.easylib.module.utils
 
 import com.xbaimiao.easylib.EasyPlugin
+import org.bukkit.event.HandlerList
+import org.bukkit.event.Listener
 import org.bukkit.scheduler.BukkitRunnable
 
 fun submit(
@@ -40,6 +42,15 @@ fun submit(
     }
 
     return runnable
+}
+
+fun registerListener(listener: Listener): Listener {
+    EasyPlugin.getPlugin<EasyPlugin>().server.pluginManager.registerEvents(listener, EasyPlugin.getPlugin())
+    return listener
+}
+
+fun unregisterListener(listener: Listener) {
+    HandlerList.unregisterAll(listener)
 }
 
 fun info(vararg any: Any) {
