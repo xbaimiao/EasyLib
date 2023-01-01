@@ -81,14 +81,14 @@ class CommandLauncher(
         }
         val context = CommandContext(sender, cmd.name, args.toMutableList())
 
-        if (argNodes.isNotEmpty()) {
-            if (context.args.size < argNodes.size) {
-                val argNode = argNodes.getOrNull(args.size - 1) ?: return emptyList()
-                val string = context.args.getOrNull(context.args.size - 1) ?: ""
-                return argNode.exec.invoke(string, string)
-            }
+        // 判断参数是否足够 不足够使用 ArgNode 补全
+        if (argNodes.isNotEmpty() && context.args.size < argNodes.size) {
+            val argNode = argNodes.getOrNull(args.size - 1) ?: return emptyList()
+            val string = context.args.getOrNull(context.args.size - 1) ?: ""
+            return argNode.exec.invoke(string, string)
         }
 
+        // 判断是否有子命令
         if (args.isNotEmpty()) {
             val sub = args[0]
             return if (subCommands.containsKey(sub)) {
@@ -114,11 +114,10 @@ class CommandLauncher(
         }
         val context = CommandContext(sender, cmd.name, args.toMutableList())
 
-        if (argNodes.isNotEmpty()) {
-            if (args.size < argNodes.size) {
-                showHelp(sender)
-                return true
-            }
+        // 判断参数是否足够
+        if (argNodes.isNotEmpty() && args.size < argNodes.size) {
+            showHelp(sender)
+            return true
         }
 
         val common = {
