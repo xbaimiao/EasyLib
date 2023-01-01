@@ -24,10 +24,14 @@ class CommandLauncher(
     fun sub(launcher: CommandHandler) {
         if (tab == null) {
             tab = {
-                if (args.size <= 1) {
+                if (args.isEmpty()) {
                     subCommands.keys.toList()
                 } else {
-                    subCommands[args[0]]?.tab?.invoke(this) ?: emptyList()
+                    if (subCommands.containsKey(args[0])) {
+                        subCommands[args[0]]!!.tab?.invoke(this) ?: emptyList()
+                    } else {
+                        subCommands.keys.toList().filter { it.startsWith(args[0]) }
+                    }
                 }
             }
         }
@@ -35,10 +39,14 @@ class CommandLauncher(
         subCommands[launcher.command] = launcher
     }
 
-    fun arg(argNode: ArgNode, block: CommandLauncher.() -> Unit = {}): CommandHandler {
+    fun onlinePlayers(block: CommandLauncher.() -> Unit = {}) {
+        arg(onlinePlayers, block)
+    }
+
+    @JvmOverloads
+    fun arg(argNode: ArgNode, block: CommandLauncher.() -> Unit = {}) {
         argNodes.add(argNode)
         block.invoke(this)
-        return this
     }
 
     fun exec(exec: CommandContext.() -> Unit) {
@@ -75,8 +83,9 @@ class CommandLauncher(
 
         if (argNodes.isNotEmpty()) {
             if (context.args.size < argNodes.size) {
-                val argNode = argNodes[args.size - 1]
-                return argNode.exec.invoke(context)
+                val argNode = argNodes.getOrNull(args.size - 1) ?: return emptyList()
+                val string = context.args.getOrNull(context.args.size - 1) ?: ""
+                return argNode.exec.invoke(string, string)
             }
         }
 
@@ -136,16 +145,12 @@ class CommandLauncher(
     }
 
     override fun showHelp(sender: CommandSender) {
-        root?.let {
-            it.showHelp(sender)
-            return
-        }
         sender.sendMessage(" ")
         val argNodeDescription = argNodes.joinToString(" ") { "<${it.usage}>" }
-        sender.sendMessage("§a/$command $argNodeDescription §7- §f${description ?: "无描述"} ")
+        sender.sendMessage("§a$command $argNodeDescription §7- §f${description ?: "无描述"} ")
         subCommands.values.forEach { handler ->
             val argNodeDescription = handler.argNodes.joinToString(" ") { "<${it.usage}>" }
-            sender.sendMessage("§a/$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: "无描述"}")
+            sender.sendMessage("§a$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: "无描述"}")
         }
     }
 

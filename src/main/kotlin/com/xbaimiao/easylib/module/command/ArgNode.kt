@@ -4,12 +4,10 @@ import org.bukkit.Bukkit
 
 data class ArgNode(
     val usage: String,
-    val exec: CommandContext.() -> List<String>
+    val exec: String.(String) -> List<String>
 ) {
 }
 
-fun onlinePlayers(): ArgNode {
-    return ArgNode("player", exec = {
-        Bukkit.getOnlinePlayers().map { it.name }
-    })
-}
+val onlinePlayers: ArgNode = ArgNode("player", exec = { token ->
+    Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+})

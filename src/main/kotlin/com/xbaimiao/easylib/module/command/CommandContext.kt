@@ -16,6 +16,10 @@ data class CommandContext(
         }
     }
 
+    fun error(any: Any) {
+        sender.sendMessage("$any")
+    }
+
     val player get() = sender as? Player
 
     fun findIntOrNull(index: Int): Int? = args.getOrNull(index)?.toInt()
@@ -25,6 +29,8 @@ data class CommandContext(
     fun findFloatOrNull(index: Int): Float? = args.getOrNull(index)?.toFloat()
 
     fun findLongOrNull(index: Int): Long? = args.getOrNull(index)?.toLong()
+
+    fun findBooleanOrNull(index: Int): Boolean? = args.getOrNull(index)?.toBoolean()
 
     fun findShortOrNull(index: Int): Short? = args.getOrNull(index)?.toShort()
 
