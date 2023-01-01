@@ -1,16 +1,15 @@
 package com.xbaimiao.easylib.module.command
 
-open class ArgNode<O, T>(private val parser: CommandExecutor.(O) -> T) : BaseNode<T>(), ExecSpec<T> {
-    override val literalToken: String
-        get() = "<${token ?: " "}>"
+import org.bukkit.Bukkit
 
-    override fun accept(ctx: CommandContext): Boolean = true
+data class ArgNode(
+    val usage: String,
+    val exec: CommandContext.() -> List<String>
+) {
+}
 
-    @Suppress("UNCHECKED_CAST")
-    override fun step(ctx: CommandContext): T {
-        val v = parser.invoke(ctx, ctx.args.first() as O)
-        ctx._args = ctx._args.subList(1, ctx._args.size)
-        ctx.fullArgsIndex++
-        return v
-    }
+fun onlinePlayers(): ArgNode {
+    return ArgNode("player", exec = {
+        Bukkit.getOnlinePlayers().map { it.name }
+    })
 }

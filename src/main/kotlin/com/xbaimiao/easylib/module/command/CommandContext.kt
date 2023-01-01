@@ -1,55 +1,37 @@
 package com.xbaimiao.easylib.module.command
 
-import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import kotlin.math.min
 
-class CommandContext(
-    override val sender: CommandSender,
-    override val cmd: String,
-    internal var _args: MutableList<String>
-) : CommandExecutor {
-    override var async: Boolean = false
-    override val args: List<String>
-        get() = _args
+data class CommandContext(
+    val sender: CommandSender, val cmd: String, val args: MutableList<String>
+) {
 
-    override val player: Player?
-        get() = if (sender is Player) sender else null
-
-    internal val fullArgs: List<String> = _args
-    internal var fullArgsIndex = 0
-
-    val literalTokenMap: MutableMap<String, Any> = mutableMapOf()
-    val hashTokenMap: MutableMap<Int, Any> = mutableMapOf()
-
-    override fun argError(message: String): Nothing = argError(-1, message)
-
-    override fun argError(argIndex: Int, message: String): Nothing {
-        val pref = fullArgs.subList(0, fullArgsIndex + min(args.size, argIndex) + 1).joinToString(" ")
-        throw CommandException("$pref← $message")
-    }
-
-    override fun valueOf(token: String): Any? = literalTokenMap[token]
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T> valueOf(token: ArgToken<T>): T {
-        val v = hashTokenMap[(token as BaseNode.HashCodeToken<T>).hashCode]
-        return if (v == null) kotlin.error("value not found") else v as T
-    }
-
-    fun showHelp() {
-        sender.sendMessage(Component.empty())
-        closestCommandNode()?.let {
-            it.showHelp(
-                this, valueOf<String>(BaseNode.HashCodeToken(it.hashCode()))
-            )
+    init {
+        if (args.isNotEmpty()) {
+            if (args[args.size - 1] == "") {
+                args.removeAt(args.size - 1)
+            }
         }
     }
 
-    internal var parsedNodes: MutableList<BaseNode<*>> = mutableListOf()
+    val player get() = sender as? Player
 
-    private fun closestCommandNode(): CommandNode? =
-        parsedNodes.lastOrNull { it is CommandNode }?.let { it as CommandNode }
+    fun findIntOrNull(index: Int): Int? = args.getOrNull(index)?.toInt()
+
+    fun findDoubleOrNull(index: Int): Double? = args.getOrNull(index)?.toDouble()
+
+    fun findFloatOrNull(index: Int): Float? = args.getOrNull(index)?.toFloat()
+
+    fun findLongOrNull(index: Int): Long? = args.getOrNull(index)?.toLong()
+
+    fun findShortOrNull(index: Int): Short? = args.getOrNull(index)?.toShort()
+
+    fun findPlayerOrNull(index: Int): Player? = args.getOrNull(index)?.let { Bukkit.getPlayerExact(it) }
+
+    fun findArgOrNull(index: Int): String? = args.getOrNull(index)
+
+    fun findArg(index: Int): String = args.getOrNull(index) ?: throw IllegalArgumentException("参数不存在")
 
 }
