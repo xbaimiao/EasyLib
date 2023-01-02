@@ -22,17 +22,17 @@ data class CommandContext(
 
     val player get() = sender as? Player
 
-    fun findIntOrNull(index: Int): Int? = args.getOrNull(index)?.toInt()
+    fun findIntOrNull(index: Int): Int? = kotlin.runCatching { args[index].toInt() }.getOrNull()
 
-    fun findDoubleOrNull(index: Int): Double? = args.getOrNull(index)?.toDouble()
+    fun findDoubleOrNull(index: Int): Double? = kotlin.runCatching { args.getOrNull(index)?.toDouble() }.getOrNull()
 
-    fun findFloatOrNull(index: Int): Float? = args.getOrNull(index)?.toFloat()
+    fun findFloatOrNull(index: Int): Float? = kotlin.runCatching { args.getOrNull(index)?.toFloat() }.getOrNull()
 
-    fun findLongOrNull(index: Int): Long? = args.getOrNull(index)?.toLong()
+    fun findLongOrNull(index: Int): Long? = kotlin.runCatching { args.getOrNull(index)?.toLong() }.getOrNull()
+
+    fun findShortOrNull(index: Int): Short? = kotlin.runCatching { args.getOrNull(index)?.toShort() }.getOrNull()
 
     fun findBooleanOrNull(index: Int): Boolean? = args.getOrNull(index)?.toBoolean()
-
-    fun findShortOrNull(index: Int): Short? = args.getOrNull(index)?.toShort()
 
     fun findPlayerOrNull(index: Int): Player? = args.getOrNull(index)?.let { Bukkit.getPlayerExact(it) }
 

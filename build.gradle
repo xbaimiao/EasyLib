@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.xbaimiao'
-version = '1.5.8'
+version = '1.6.0'
 
 repositories {
     mavenCentral()
@@ -53,14 +53,14 @@ compileTestKotlin {
 
 publishing {
     repositories {
-//        mavenLocal()
-        maven {
-            credentials {
-                username = project.findProperty("user").toString()
-                password = project.findProperty("password").toString()
-            }
-            url("https://repo.xbaimiao.com/nexus/content/repositories/releases")
-        }
+        mavenLocal()
+//        maven {
+//            credentials {
+//                username = project.findProperty("user").toString()
+//                password = project.findProperty("password").toString()
+//            }
+//            url("https://repo.xbaimiao.com/nexus/content/repositories/releases")
+//        }
     }
     publications {
         mavenJava(MavenPublication) {

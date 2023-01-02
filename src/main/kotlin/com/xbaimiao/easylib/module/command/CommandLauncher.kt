@@ -8,49 +8,11 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class CommandLauncher(
     override val command: String
-) : CommandHandler {
+) : CommandSpec() {
 
-    override var description: String? = null
-    override var permission: String? = null
-    override var permissionMessage: String? = null
-
-    override var exec: (CommandContext.() -> Unit)? = null
-    override var tab: (CommandContext.() -> List<String>)? = null
-    override var root: CommandHandler? = null
-
-    override val argNodes = ArrayList<ArgNode>()
-    private val subCommands = mutableMapOf<String, CommandHandler>()
-
-    fun sub(launcher: CommandHandler) {
-        if (tab == null) {
-            tab = {
-                if (args.isEmpty()) {
-                    subCommands.keys.toList()
-                } else {
-                    if (subCommands.containsKey(args[0])) {
-                        subCommands[args[0]]!!.tab?.invoke(this) ?: emptyList()
-                    } else {
-                        subCommands.keys.toList().filter { it.startsWith(args[0]) }
-                    }
-                }
-            }
-        }
-        launcher.root = this
-        subCommands[launcher.command] = launcher
-    }
-
-    fun onlinePlayers(block: CommandLauncher.() -> Unit = {}) {
-        arg(onlinePlayers, block)
-    }
-
-    @JvmOverloads
-    fun arg(argNode: ArgNode, block: CommandLauncher.() -> Unit = {}) {
-        argNodes.add(argNode)
-        block.invoke(this)
-    }
-
-    fun exec(exec: CommandContext.() -> Unit) {
-        this.exec = exec
+    private companion object {
+        const val NOT_PERMISSION_MESSAGE = "§c你没有权限执行此命令"
+        const val NOT_DESCRIPTION_MESSAGE = "无描述"
     }
 
     override fun register(plugin: JavaPlugin) {
@@ -76,15 +38,15 @@ class CommandLauncher(
         args: Array<out String>,
     ): List<String>? {
         if (permission != null && !sender.hasPermission(permission!!)) {
-            sender.sendMessage(permissionMessage ?: "§c你没有权限执行该命令")
+            sender.sendMessage(permissionMessage ?: NOT_PERMISSION_MESSAGE)
             return null
         }
         val context = CommandContext(sender, cmd.name, args.toMutableList())
 
         // 判断参数是否足够 不足够使用 ArgNode 补全
-        if (argNodes.isNotEmpty() && context.args.size < argNodes.size) {
+        if (argNodes.isNotEmpty() && context.args.size <= argNodes.size) {
             val argNode = argNodes.getOrNull(args.size - 1) ?: return emptyList()
-            val string = context.args.getOrNull(context.args.size - 1) ?: ""
+            val string = args.getOrNull(args.size - 1) ?: ""
             return argNode.exec.invoke(string, string)
         }
 
@@ -109,7 +71,7 @@ class CommandLauncher(
         args: Array<out String>,
     ): Boolean {
         if (permission != null && !sender.hasPermission(permission!!)) {
-            sender.sendMessage(permissionMessage ?: "§c你没有权限执行该命令")
+            sender.sendMessage(permissionMessage ?: NOT_PERMISSION_MESSAGE)
             return true
         }
         val context = CommandContext(sender, cmd.name, args.toMutableList())
@@ -145,11 +107,11 @@ class CommandLauncher(
 
     override fun showHelp(sender: CommandSender) {
         sender.sendMessage(" ")
-        val argNodeDescription = argNodes.joinToString(" ") { "<${it.usage}>" }
-        sender.sendMessage("§a$command $argNodeDescription §7- §f${description ?: "无描述"} ")
+        var argNodeDescription = argNodes.joinToString(" ") { "<${it.usage}>" }
+        sender.sendMessage("§a$command $argNodeDescription §7- §f${description ?: NOT_DESCRIPTION_MESSAGE} ")
         subCommands.values.forEach { handler ->
-            val argNodeDescription = handler.argNodes.joinToString(" ") { "<${it.usage}>" }
-            sender.sendMessage("§a$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: "无描述"}")
+            argNodeDescription = handler.argNodes.joinToString(" ") { "<${it.usage}>" }
+            sender.sendMessage("§a$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: NOT_DESCRIPTION_MESSAGE}")
         }
     }
 
