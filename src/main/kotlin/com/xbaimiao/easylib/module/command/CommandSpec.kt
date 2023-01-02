@@ -11,11 +11,11 @@ abstract class CommandSpec : CommandHandler {
     override var permissionMessage: String? = null
 
     var root: CommandSpec? = null
+    val argNodes = ArrayList<ArgNode>()
 
     protected var exec: (CommandContext.() -> Unit)? = null
     protected var tab: (CommandContext.() -> List<String>)? = null
     protected val subCommands = mutableMapOf<String, CommandSpec>()
-    protected val argNodes = ArrayList<ArgNode>()
 
     /**
      * 添加子命令
