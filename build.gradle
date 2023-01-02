@@ -53,14 +53,14 @@ compileTestKotlin {
 
 publishing {
     repositories {
-        mavenLocal()
-//        maven {
-//            credentials {
-//                username = project.findProperty("user").toString()
-//                password = project.findProperty("password").toString()
-//            }
-//            url("https://repo.xbaimiao.com/nexus/content/repositories/releases")
-//        }
+//        mavenLocal()
+        maven {
+            credentials {
+                username = project.findProperty("user").toString()
+                password = project.findProperty("password").toString()
+            }
+            url("https://repo.xbaimiao.com/nexus/content/repositories/releases")
+        }
     }
     publications {
         mavenJava(MavenPublication) {

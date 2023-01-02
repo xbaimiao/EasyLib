@@ -11,11 +11,6 @@ interface CommandHandler : CommandExecutor, TabCompleter {
     var description: String?
     var permission: String?
     var permissionMessage: String?
-    var exec: (CommandContext.() -> Unit)?
-    var tab: (CommandContext.() -> List<String>)?
-    var root: CommandHandler?
-
-    val argNodes: ArrayList<ArgNode>
 
     fun register(plugin: JavaPlugin)
 

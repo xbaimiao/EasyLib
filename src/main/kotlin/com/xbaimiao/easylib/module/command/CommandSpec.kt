@@ -6,22 +6,21 @@ abstract class CommandSpec : CommandHandler {
         val newCommandSpec: (String) -> CommandSpec = { command: String -> CommandLauncher(command) }
     }
 
-    protected val subCommands = mutableMapOf<String, CommandHandler>()
-
     override var description: String? = null
     override var permission: String? = null
     override var permissionMessage: String? = null
 
-    override var exec: (CommandContext.() -> Unit)? = null
-    override var tab: (CommandContext.() -> List<String>)? = null
-    override var root: CommandHandler? = null
+    var root: CommandSpec? = null
 
-    override val argNodes = ArrayList<ArgNode>()
+    protected var exec: (CommandContext.() -> Unit)? = null
+    protected var tab: (CommandContext.() -> List<String>)? = null
+    protected val subCommands = mutableMapOf<String, CommandSpec>()
+    protected val argNodes = ArrayList<ArgNode>()
 
     /**
      * 添加子命令
      */
-    fun sub(launcher: CommandHandler) {
+    fun sub(launcher: CommandSpec) {
         if (tab == null) {
             tab = {
                 if (args.isEmpty()) {
