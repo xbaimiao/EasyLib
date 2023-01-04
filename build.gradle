@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.xbaimiao'
-version = '1.6.0'
+version = '1.6.1'
 
 repositories {
     mavenCentral()
@@ -53,7 +53,7 @@ compileTestKotlin {
 
 publishing {
     repositories {
-//        mavenLocal()
+        mavenLocal()
         maven {
             credentials {
                 username = project.findProperty("user").toString()

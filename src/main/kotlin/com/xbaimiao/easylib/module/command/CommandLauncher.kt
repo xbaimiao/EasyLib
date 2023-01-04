@@ -27,8 +27,12 @@ class CommandLauncher(
             cmdMap.register(plugin.name, cmd)
             plugin.server::class.java.getDeclaredMethod("syncCommands").invoke(plugin.server)
         }
-        cmd!!.setExecutor(this)
-        cmd.tabCompleter = this
+        cmd!!.let { c ->
+            permission?.let { c.permission = it }
+            description?.let { c.description = it }
+            c.setExecutor(this)
+            c.tabCompleter = this
+        }
     }
 
     override fun onTabComplete(

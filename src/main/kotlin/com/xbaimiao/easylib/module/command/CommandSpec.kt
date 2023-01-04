@@ -48,6 +48,11 @@ abstract class CommandSpec : CommandHandler {
         block.invoke(this)
     }
 
+    fun arg(usage: String, block: CommandSpec.() -> Unit = {}) {
+        argNodes.add(ArgNode(usage, exec = { emptyList() }))
+        block.invoke(this)
+    }
+
     fun exec(exec: CommandContext.() -> Unit) {
         this.exec = exec
     }
