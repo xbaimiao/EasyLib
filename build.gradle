@@ -1,11 +1,11 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'org.jetbrains.kotlin.jvm' version '1.7.20'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.0'
 }
 
 group = 'com.xbaimiao'
-version = '1.6.1'
+version = '1.6.2'
 
 repositories {
     mavenCentral()
@@ -33,7 +33,7 @@ tasks{
 dependencies {
 //    compileOnly "top.mcplugin.lib:module-main:1.0.4-beta32"
 //    compileOnly "top.mcplugin.lib:module-lang:1.0.4-beta32"
-    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:1.7.20'
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0'
     compileOnly("public:paper:1.16.5")
     compileOnly("public:papi:1.0.0")
     compileOnly(fileTree("libs"))
