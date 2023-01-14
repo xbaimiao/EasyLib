@@ -1,10 +1,10 @@
 package com.xbaimiao.easylib.module.command
 
+import com.xbaimiao.easylib.EasyPlugin
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginCommand
 import org.bukkit.plugin.Plugin
-import org.bukkit.plugin.java.JavaPlugin
 
 class CommandLauncher(
     override val command: String
@@ -15,7 +15,8 @@ class CommandLauncher(
         const val NOT_DESCRIPTION_MESSAGE = "无描述"
     }
 
-    override fun register(plugin: JavaPlugin) {
+    override fun register() {
+        val plugin = EasyPlugin.getPlugin<EasyPlugin>()
         var cmd = plugin.getCommand(command)
         if (cmd == null) {
             val constructor = kotlin.run {
@@ -51,7 +52,7 @@ class CommandLauncher(
         if (argNodes.isNotEmpty() && context.args.size <= argNodes.size) {
             val argNode = argNodes.getOrNull(args.size - 1) ?: return emptyList()
             val string = args.getOrNull(args.size - 1) ?: ""
-            return argNode.exec.invoke(string, string)
+            return argNode.exec.invoke(sender, string)
         }
 
         // 判断是否有子命令
