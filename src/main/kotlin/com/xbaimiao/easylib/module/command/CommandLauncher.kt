@@ -1,7 +1,9 @@
 package com.xbaimiao.easylib.module.command
 
 import com.xbaimiao.easylib.EasyPlugin
+import com.xbaimiao.easylib.module.utils.invokeMethod
 import org.bukkit.command.Command
+import org.bukkit.command.CommandMap
 import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginCommand
 import org.bukkit.plugin.Plugin
@@ -24,9 +26,15 @@ class CommandLauncher(
             }
             constructor.isAccessible = true
             cmd = constructor.newInstance(command, plugin)
-            val cmdMap = plugin.server.commandMap
+
+            val cmdMap = kotlin.runCatching {
+                plugin.server.commandMap
+            }.getOrElse { plugin.server.invokeMethod<Any>("getCommandMap") as CommandMap }
+
             cmdMap.register(plugin.name, cmd)
-            plugin.server::class.java.getDeclaredMethod("syncCommands").invoke(plugin.server)
+
+            kotlin.runCatching { plugin.server::class.java.getDeclaredMethod("syncCommands").invoke(plugin.server) }
+                .getOrNull()
         }
         cmd!!.let { c ->
             permission?.let { c.permission = it }

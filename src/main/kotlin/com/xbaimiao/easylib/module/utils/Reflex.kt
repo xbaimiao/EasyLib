@@ -60,7 +60,7 @@ fun Any.setProperty(fieldName: String, value: Any) {
 fun <T> Any.invokeMethod(methodName: String, vararg args: Any): T? {
     try {
         val classes = args.map { it.javaClass }.toTypedArray()
-        val method = this.javaClass.getMethod(methodName, *classes)
+        val method = this.javaClass.getDeclaredMethod(methodName, *classes)
         method.isAccessible = true
         return method.invoke(this, *args) as T
     } catch (e: Exception) {
