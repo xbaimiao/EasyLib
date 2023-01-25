@@ -38,6 +38,8 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
     /** 物品与对应抽象字符关系 **/
     var items = ConcurrentHashMap<Char, ItemStack>()
 
+    var slotItems = ConcurrentHashMap<Int, ItemStack>()
+
     /** 抽象字符布局 **/
     var slots = CopyOnWriteArrayList<List<Char>>()
 
@@ -63,7 +65,6 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
     fun onDrag(callback: (event: InventoryDragEvent) -> Unit) {
         dragCallback += callback
     }
-
 
     /**
      * 页面关闭时触发回调
@@ -132,6 +133,10 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
         items[slot] = itemStack
     }
 
+    fun set(slot: Int, itemStack: ItemStack) {
+        slotItems[slot] = itemStack
+    }
+
     /**
      * 获取位置对应的抽象字符
      */
@@ -190,6 +195,9 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
                 cel++
             }
             row++
+        }
+        slotItems.forEach { (k, v) ->
+            inventory.setItem(k, v)
         }
         return inventory
     }
