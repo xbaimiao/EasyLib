@@ -1,7 +1,7 @@
 package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.module.ui.InventoryModule
-import com.xbaimiao.easylib.module.utils.Module
+import com.xbaimiao.easylib.module.utils.ModuleManager
 import org.bukkit.plugin.java.JavaPlugin
 
 abstract class EasyPlugin : JavaPlugin() {
@@ -10,12 +10,12 @@ abstract class EasyPlugin : JavaPlugin() {
         init()
     }
 
-    private lateinit var modules: ArrayList<Module<EasyPlugin>>
+    lateinit var moduleManager: ModuleManager<EasyPlugin>
 
     private fun init() {
         instance = this
-        modules = ArrayList()
-        modules.add(InventoryModule())
+        moduleManager = ModuleManager()
+        moduleManager.addModule(InventoryModule())
     }
 
     open fun load() {}
@@ -25,24 +25,18 @@ abstract class EasyPlugin : JavaPlugin() {
     open fun disable() {}
 
     override fun onLoad() {
-        modules.forEach {
-            it.load(this)
-        }
         load()
+        moduleManager.loadAll()
     }
 
     override fun onEnable() {
-        modules.forEach {
-            it.enable(this)
-        }
         enable()
+        moduleManager.enableAll()
     }
 
     override fun onDisable() {
-        modules.forEach {
-            it.disable(this)
-        }
         disable()
+        moduleManager.disableAll()
     }
 
     companion object {
