@@ -48,6 +48,11 @@ object Lang {
         configuration!!.save(file!!)
     }
 
+    fun reload(){
+        init = false
+        init(EasyPlugin.getPlugin())
+    }
+
     fun CommandSender.sendLang(path: String, vararg args: Any) {
         init(EasyPlugin.getPlugin())
         var obj = configuration!![path]
