@@ -51,7 +51,6 @@ class CommandLauncher(
         args: Array<out String>,
     ): List<String>? {
         if (permission != null && !sender.hasPermission(permission!!)) {
-            sender.sendMessage(permissionMessage ?: NOT_PERMISSION_MESSAGE)
             return null
         }
         val context = CommandContext(sender, cmd.name, args.toMutableList())
