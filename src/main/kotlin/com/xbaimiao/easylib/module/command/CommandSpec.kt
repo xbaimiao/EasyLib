@@ -38,7 +38,7 @@ abstract class CommandSpec : CommandHandler {
         subCommands[launcher.command] = launcher
     }
 
-    fun sunCommand(token: String, block: CommandSpec.() -> Unit = {}) {
+    fun subCommand(token: String, block: CommandSpec.() -> Unit = {}) {
         sub(command(token) {
             block.invoke(this)
         })
