@@ -38,6 +38,12 @@ abstract class CommandSpec : CommandHandler {
         subCommands[launcher.command] = launcher
     }
 
+    fun sunCommand(token: String, block: CommandSpec.() -> Unit = {}) {
+        sub(command(token) {
+            block.invoke(this)
+        })
+    }
+
     fun onlinePlayers(block: CommandSpec.() -> Unit = {}) {
         arg(onlinePlayers, block)
     }
