@@ -1,21 +1,20 @@
 package com.xbaimiao.easylib
 
-import com.xbaimiao.easylib.module.ui.InventoryModule
 import com.xbaimiao.easylib.module.utils.ModuleManager
 import org.bukkit.plugin.java.JavaPlugin
 
 abstract class EasyPlugin : JavaPlugin() {
 
+    protected lateinit var moduleManager: ModuleManager<EasyPlugin>
+        private set
+
     init {
         init()
     }
 
-    lateinit var moduleManager: ModuleManager<EasyPlugin>
-
     private fun init() {
         instance = this
         moduleManager = ModuleManager()
-        moduleManager.addModule(InventoryModule())
     }
 
     open fun load() {}
