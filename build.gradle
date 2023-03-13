@@ -5,13 +5,13 @@ plugins {
 }
 
 group = 'com.xbaimiao'
-version = '1.7.6'
+version = '1.7.7'
 
 repositories {
     mavenCentral()
     maven {
         name "repo-xbaimiao"
-        url "https://repo.xbaimiao.com/nexus/content/repositories/releases/"
+        url "https://maven.xbaimiao.com/repository/releases/"
     }
     maven{
         name = 'codemc-repo'
@@ -59,7 +59,7 @@ publishing {
                 username = project.findProperty("user").toString()
                 password = project.findProperty("password").toString()
             }
-            url("https://repo.xbaimiao.com/nexus/content/repositories/releases")
+            url("https://maven.xbaimiao.com/repository/releases/")
         }
     }
     publications {
