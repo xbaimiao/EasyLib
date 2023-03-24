@@ -42,7 +42,7 @@ abstract class EasyPlugin : JavaPlugin() {
     companion object {
 
         @Suppress("UNCHECKED_CAST")
-        private fun ModuleManager<EasyPlugin>.addModule(module: Module<out EasyPlugin>) {
+        fun ModuleManager<EasyPlugin>.addModule(module: Module<out EasyPlugin>) {
             this.addModule(module as Module<EasyPlugin>)
         }
 
