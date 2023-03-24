@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib
 
+import com.xbaimiao.easylib.module.utils.Module
 import com.xbaimiao.easylib.module.utils.ModuleManager
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -39,6 +40,12 @@ abstract class EasyPlugin : JavaPlugin() {
     }
 
     companion object {
+
+        @Suppress("UNCHECKED_CAST")
+        private fun ModuleManager<EasyPlugin>.addModule(module: Module<out EasyPlugin>) {
+            this.addModule(module as Module<EasyPlugin>)
+        }
+
 
         private lateinit var instance: EasyPlugin
 
