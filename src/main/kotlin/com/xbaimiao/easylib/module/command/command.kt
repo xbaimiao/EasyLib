@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.command
 
+import com.xbaimiao.easylib.module.utils.warn
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
@@ -19,13 +20,24 @@ val onlinePlayers: ArgNode = ArgNode("player", exec = { token ->
 })
 
 fun registerCommand(clazz: Class<*>): Boolean {
-    val header = clazz.getAnnotation(CommandHeader::class.java) ?: return false
+    val header = clazz.getAnnotation(CommandHeader::class.java)
+    if (header == null) {
+        warn("The class ${clazz.name} is not a command class")
+        return false
+    }
 
     val subCommands = ArrayList<CommandSpec>()
 
+    val instance = runCatching {
+        val instance = clazz.getDeclaredField("INSTANCE")
+        instance.isAccessible = true
+        instance.get(clazz)
+    }.getOrElse { clazz.newInstance() }
+
     for (declaredField in clazz.declaredFields) {
         if (declaredField.getAnnotation(CommandBody::class.java) != null) {
-            val commandSpec = declaredField.get(clazz) as CommandSpec
+            declaredField.isAccessible = true
+            val commandSpec = declaredField.get(instance) as CommandSpec
             subCommands.add(commandSpec)
         }
     }

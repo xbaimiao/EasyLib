@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.xbaimiao'
-version = '1.8.0'
+version = '1.8.2'
 
 repositories {
     mavenCentral()
@@ -41,6 +41,7 @@ dependencies {
     compileOnly 'com.j256.ormlite:ormlite-core:6.1'
     compileOnly 'com.j256.ormlite:ormlite-jdbc:6.1'
     compileOnly 'com.zaxxer:HikariCP:4.0.3'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.0"
 }
 
 compileKotlin {
