@@ -3,7 +3,10 @@ package com.xbaimiao.easylib.module.utils
 import java.lang.reflect.Field
 
 
-private fun Class<*>.getFields(fieldName: String): Field? {
+private fun Class<*>.getFields(fieldName: String, deep: Int, currentDeep: Int = 0): Field? {
+    if (currentDeep > deep) {
+        return null
+    }
     return try {
         val field = this.getDeclaredField(fieldName)
         field.apply { isAccessible = true }
@@ -16,7 +19,7 @@ private fun Class<*>.getFields(fieldName: String): Field? {
             ex.printStackTrace()
             return null
         }
-        this.javaClass.superclass.getFields(fieldName)
+        this.javaClass.superclass.getFields(fieldName, deep, currentDeep + 1)
     }
 }
 
@@ -25,9 +28,9 @@ private fun Class<*>.getFields(fieldName: String): Field? {
  * 获取这个字段的值
  */
 @Suppress("Unchecked_cast")
-fun <T> Any.getProperty(fieldName: String): T? {
+fun <T> Any.getProperty(fieldName: String, deep: Int = 8): T? {
     try {
-        val field = this.javaClass.getFields(fieldName) ?: return null
+        val field = this.javaClass.getFields(fieldName, deep) ?: return null
         field.isAccessible = true
         return field[this] as T
     } catch (e: IllegalAccessException) {
@@ -41,9 +44,9 @@ fun <T> Any.getProperty(fieldName: String): T? {
 /**
  * 设置一个属性为对应的值
  */
-fun Any.setProperty(fieldName: String, value: Any) {
+fun Any.setProperty(fieldName: String, value: Any, deep: Int = 8) {
     try {
-        val field = this.javaClass.getFields(fieldName) ?: return
+        val field = this.javaClass.getFields(fieldName, deep) ?: return
         field.isAccessible = true
         field[this] = value
     } catch (e: IllegalAccessException) {
