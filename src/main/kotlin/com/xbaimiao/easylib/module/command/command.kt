@@ -4,8 +4,17 @@ import com.xbaimiao.easylib.module.utils.warn
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
-fun command(command: String, block: CommandSpec.() -> Unit = {}): CommandSpec {
+fun commandLegacy(command: String, block: CommandSpec.() -> Unit = {}): CommandSpec {
     val launcher = CommandSpec.newCommandSpec.invoke(command)
+    block.invoke(launcher)
+    return launcher
+}
+
+inline fun <reified T : CommandSender> command(
+    command: String,
+    block: CommandSpec.() -> Unit = {}
+): CommandSpec {
+    val launcher = CommandSpec.tNewCommandSpec<T>(command)
     block.invoke(launcher)
     return launcher
 }
@@ -17,6 +26,18 @@ data class ArgNode(
 
 val onlinePlayers: ArgNode = ArgNode("player", exec = { token ->
     Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+})
+
+val worlds: ArgNode = ArgNode("world", exec = { token ->
+    Bukkit.getWorlds().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+})
+
+val booleans: ArgNode = ArgNode("boolean", exec = { token ->
+    arrayOf("true", "false").filter { it.uppercase().startsWith(token.uppercase()) }
+})
+
+val times: ArgNode = ArgNode("time", exec = { token ->
+    arrayOf("1ms", "1s", "1m", "1h", "1d").filter { it.uppercase().startsWith(token.uppercase()) }
 })
 
 fun registerCommand(clazz: Class<*>): Boolean {
@@ -42,7 +63,7 @@ fun registerCommand(clazz: Class<*>): Boolean {
         }
     }
 
-    command(header.command) {
+    command<CommandSender>(header.command) {
         if (header.description.isNotEmpty()) {
             description = header.description
         }

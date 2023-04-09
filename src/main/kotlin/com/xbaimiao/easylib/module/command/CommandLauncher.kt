@@ -2,6 +2,7 @@ package com.xbaimiao.easylib.module.command
 
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.module.utils.invokeMethod
+import com.xbaimiao.easylib.module.utils.isSuperClassOf
 import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
 import org.bukkit.command.CommandSender
@@ -9,11 +10,11 @@ import org.bukkit.command.PluginCommand
 import org.bukkit.plugin.Plugin
 
 class CommandLauncher(
-    override val command: String
+    override val command: String,
+    private val execClass: Class<out CommandSender>
 ) : CommandSpec() {
 
     private companion object {
-        const val NOT_PERMISSION_MESSAGE = "§c你没有权限执行此命令"
         const val NOT_DESCRIPTION_MESSAGE = "无描述"
     }
 
@@ -50,6 +51,9 @@ class CommandLauncher(
         label: String,
         args: Array<out String>,
     ): List<String>? {
+        if (!execClass.isSuperClassOf(sender::class.java)) {
+            return null
+        }
         if (permission != null && !sender.hasPermission(permission!!)) {
             return null
         }
@@ -82,8 +86,12 @@ class CommandLauncher(
         label: String,
         args: Array<out String>,
     ): Boolean {
+        if (!execClass.isSuperClassOf(sender::class.java)) {
+            sender.sendMessage(senderErrorMessage)
+            return true
+        }
         if (permission != null && !sender.hasPermission(permission!!)) {
-            sender.sendMessage(permissionMessage ?: NOT_PERMISSION_MESSAGE)
+            sender.sendMessage(permissionMessage)
             return true
         }
         val context = CommandContext(sender, cmd.name, args.toMutableList())

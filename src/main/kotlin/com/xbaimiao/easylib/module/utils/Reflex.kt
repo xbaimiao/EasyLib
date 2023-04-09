@@ -2,6 +2,15 @@ package com.xbaimiao.easylib.module.utils
 
 import java.lang.reflect.Field
 
+/**
+ * 检查这个类是否是另一个类的父类
+ */
+fun Class<*>.isSuperClassOf(clazz: Class<*>): Boolean {
+    if (this.isAssignableFrom(clazz)) {
+        return true
+    }
+    return this == clazz
+}
 
 private fun Class<*>.getFields(fieldName: String, deep: Int, currentDeep: Int = 0): Field? {
     if (currentDeep > deep) {

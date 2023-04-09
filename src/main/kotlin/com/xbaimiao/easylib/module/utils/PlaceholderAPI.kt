@@ -1,6 +1,7 @@
 package com.xbaimiao.easylib.module.utils
 
 import me.clip.placeholderapi.PlaceholderAPI
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 
@@ -14,7 +15,13 @@ fun String.replacePlaceholder(player: Player): String {
 }
 fun String.replacePlaceholder(player: OfflinePlayer): String {
     return try {
-        PlaceholderAPI.setPlaceholders(player, this)
+        if (player.isOnline) {
+            PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(player.uniqueId), this)
+        } else if (Bukkit.getPlayer(player.uniqueId) != null) {
+            PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(player.uniqueId), this)
+        } else {
+            PlaceholderAPI.setPlaceholders(player, this)
+        }
     } catch (ex: NoClassDefFoundError) {
         this
     }
