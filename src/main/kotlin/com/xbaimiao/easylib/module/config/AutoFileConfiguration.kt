@@ -1,6 +1,5 @@
 package com.xbaimiao.easylib.module.config
 
-import com.xbaimiao.easylib.module.utils.warn
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -37,13 +36,10 @@ interface AutoFileConfiguration {
                         field.isAccessible = true
                         field.set(instance, value)
                     }.onFailure {
-                        it.printStackTrace()
-                        warn(
-                            "无法读取ConfigNode ${field.name} 请检查配置文件或联系开发者"
-                        )
+                        error("无法读取ConfigNode ${field.name} 请检查配置文件或联系开发者")
                     }
                 } else {
-                    warn("无法读取ConfigNode ${annotation.path} 不存在 ")
+                    error("无法读取ConfigNode ${annotation.path} 不存在 ")
                 }
             }
 
