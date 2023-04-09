@@ -20,17 +20,20 @@ data class CommandContext(
         sender.sendMessage("$any")
     }
 
-    val player get() = sender as? Player
+    val player by lazy { sender as Player }
 
     fun findIntOrNull(index: Int): Int? = kotlin.runCatching { args[index].toInt() }.getOrNull()
 
-    fun findDoubleOrNull(index: Int): Double? = kotlin.runCatching { args.getOrNull(index)?.toDouble() }.getOrNull()
+    fun findDoubleOrNull(index: Int): Double? =
+        kotlin.runCatching { args.getOrNull(index)?.toDouble() }.getOrNull()
 
-    fun findFloatOrNull(index: Int): Float? = kotlin.runCatching { args.getOrNull(index)?.toFloat() }.getOrNull()
+    fun findFloatOrNull(index: Int): Float? =
+        kotlin.runCatching { args.getOrNull(index)?.toFloat() }.getOrNull()
 
     fun findLongOrNull(index: Int): Long? = kotlin.runCatching { args.getOrNull(index)?.toLong() }.getOrNull()
 
-    fun findShortOrNull(index: Int): Short? = kotlin.runCatching { args.getOrNull(index)?.toShort() }.getOrNull()
+    fun findShortOrNull(index: Int): Short? =
+        kotlin.runCatching { args.getOrNull(index)?.toShort() }.getOrNull()
 
     fun findBooleanOrNull(index: Int): Boolean? = args.getOrNull(index)?.toBoolean()
 
