@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.config
 
+import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -14,6 +15,10 @@ interface AutoFileConfiguration {
 
     fun load() {
         load(this, javaClass)
+    }
+
+    fun save() {
+        save(this, javaClass)
     }
 
     companion object {
@@ -44,6 +49,28 @@ interface AutoFileConfiguration {
             }
 
             return instance as T
+        }
+
+        // 保存配置文件
+        @Suppress("UNCHECKED_CAST")
+        fun <T : AutoFileConfiguration> save(instance: AutoFileConfiguration, clazz: Class<T>) {
+            val data = clazz.declaredFields
+                .asSequence()
+                .filter { it.isAnnotationPresent(ConfigNode::class.java)}
+                .associateWith { it.getAnnotation(ConfigNode::class.java)!! }
+
+            val configuration = YamlConfiguration.loadConfiguration(instance.file)
+
+            data.forEach { (field, annotation) ->
+                if (annotation.onlyRead) return@forEach
+                runCatching {
+                    field.isAccessible = true
+                    configuration.set(annotation.path, field.get(instance))
+                }.onFailure {
+                    error("无法保存ConfigNode ${field.name} 请检查配置文件或联系开发者")
+                }
+            }
+            configuration.save(instance.file)
         }
 
         private fun <T> ConfigurationSection.getCast(clazz: Class<T>, path: String): Any? {
