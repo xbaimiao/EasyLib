@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.xbaimiao'
+version = '1.8.7'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":easylib-api"))
+    compileOnly("public:paper:1.16.5")
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.xbaimiao'
+version = '1.8.7'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+test {
+    useJUnitPlatform()
+}

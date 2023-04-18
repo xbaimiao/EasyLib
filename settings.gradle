@@ -1,3 +1,5 @@
-
 rootProject.name = 'EasyLib'
+include 'easylib-api'
+include 'easylib-folia'
+include 'easylib-bukkit'
 

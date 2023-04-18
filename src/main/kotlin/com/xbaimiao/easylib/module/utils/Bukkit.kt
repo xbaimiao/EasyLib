@@ -1,43 +1,69 @@
 package com.xbaimiao.easylib.module.utils
 
 import com.xbaimiao.easylib.EasyPlugin
+import com.xbaimiao.easylib.FoliaChecker
+import com.xbaimiao.easylib.task.EasyLibBukkitTask
+import com.xbaimiao.easylib.task.EasyLibFoliaTask
+import com.xbaimiao.easylib.task.EasyLibTask
+import org.bukkit.Location
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
-import org.bukkit.scheduler.BukkitRunnable
 
+/**
+ * 使用调度器执行一段代码
+ * @param delay 延迟执行的时间
+ * @param period 重复执行的时间
+ * @param async 是否异步执行
+ * @param location 位置(仅在folia核心中生效)
+ * @param task 任务
+ */
 fun submit(
-    delay: Long = 0, period: Long = 0, async: Boolean = false, task: BukkitRunnable.() -> Unit
-): BukkitRunnable {
+    delay: Long = 0,
+    period: Long = 0,
+    async: Boolean = false,
+    location: Location? = null,
+    task: EasyLibTask.() -> Unit
+): EasyLibTask {
 
-    val runnable = object : BukkitRunnable() {
-        override fun run() {
-            task()
+    val runnable by lazy {
+        if (FoliaChecker.isFolia()) {
+            object : EasyLibFoliaTask(location, EasyPlugin.getPlugin()) {
+                override fun run() {
+                    task()
+                }
+            }
+        } else {
+            object : EasyLibBukkitTask(EasyPlugin.getPlugin()) {
+                override fun run() {
+                    task()
+                }
+            }
         }
     }
 
     if (async) {
         if (period > 0) {
             if (delay > 0) {
-                runnable.runTaskTimerAsynchronously(EasyPlugin.getPlugin(), delay, period)
+                runnable.runTaskTimerAsynchronously(delay, period)
             } else {
-                runnable.runTaskTimerAsynchronously(EasyPlugin.getPlugin(), period, period)
+                runnable.runTaskTimerAsynchronously(period, period)
             }
         } else if (delay > 0) {
-            runnable.runTaskLaterAsynchronously(EasyPlugin.getPlugin(), delay)
+            runnable.runTaskLaterAsynchronously(delay)
         } else {
-            runnable.runTaskAsynchronously(EasyPlugin.getPlugin())
+            runnable.runTaskAsynchronously()
         }
     } else {
         if (period > 0) {
             if (delay > 0) {
-                runnable.runTaskTimer(EasyPlugin.getPlugin(), delay, period)
+                runnable.runTaskTimer(delay, period)
             } else {
-                runnable.runTaskTimer(EasyPlugin.getPlugin(), period, period)
+                runnable.runTaskTimer(period, period)
             }
         } else if (delay > 0) {
-            runnable.runTaskLater(EasyPlugin.getPlugin(), delay)
+            runnable.runTaskLater(delay)
         } else {
-            runnable.runTask(EasyPlugin.getPlugin())
+            runnable.runTask()
         }
     }
 
