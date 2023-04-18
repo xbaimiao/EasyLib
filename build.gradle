@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '1.8.8'
+    version = '1.9.1'
 
     repositories {
         mavenCentral()
@@ -24,12 +24,6 @@ allprojects {
             name 'PaperMC'
             url 'https://repo.papermc.io/repository/maven-snapshots/'
         }
-    }
-
-    tasks.register('sourcesJar', Jar) {
-        dependsOn classes
-        classifier = 'sources'
-        from sourceSets.main.allSource
     }
 
     dependencies {
@@ -58,6 +52,15 @@ dependencies {
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
     implementation(project(":easylib-bukkit"))
+}
+
+tasks.register('sourcesJar', Jar) {
+    it.group("build")
+    classifier = 'sources'
+    subprojects {
+        from sourceSets.main.allSource
+    }
+    from sourceSets.main.allSource
 }
 
 tasks {
