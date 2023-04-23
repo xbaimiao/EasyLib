@@ -33,4 +33,23 @@ object TimeUtil {
         return argument.toLongOrNull() ?: 0L
     }
 
+    /**
+     * 将毫秒转为 xx时xx分xx秒
+     */
+    fun formatTime(time: Long): String {
+        val day = time / 86400000
+        val hour = time % 86400000 / 3600000
+        val minute = time % 3600000 / 60000
+        val second = time % 60000 / 1000
+        return if (day > 0) {
+            "${day}天${hour}时${minute}分${second}秒"
+        } else if (hour > 0) {
+            "${hour}时${minute}分${second}秒"
+        } else if (minute > 0) {
+            "${minute}分${second}秒"
+        } else {
+            "${second}秒"
+        }
+    }
+
 }

@@ -170,7 +170,7 @@ open class ItemBuilder {
         }
         if (profile != null && !profile.properties["textures"].isEmpty()) {
             for (property in profile.properties["textures"]) {
-                if (!property.value.isEmpty()) {
+                if (property.value.isNotEmpty()) {
                     return SkullTexture(property.value, profile.id)
                 }
             }
