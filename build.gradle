@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '1.9.3'
+    version = '1.9.4'
 
     repositories {
         mavenCentral()
@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
     implementation(project(":easylib-bukkit"))
+    implementation 'public:ik:1.0.0'
 }
 
 tasks.register('sourcesJar', Jar) {
@@ -82,6 +83,7 @@ tasks {
             exclude(dependency("org.jetbrains.kotlin:"))
             exclude(dependency("org.jetbrains:"))
         }
+        relocate("org.wltea.expression","com.xbaimiao.easylib.expression")
     }
 }
 
