@@ -4,7 +4,7 @@ import com.xbaimiao.easylib.EasyPlugin
 
 class ModuleManager<T : EasyPlugin> {
 
-    private val modules = ArrayList<Module<T>>()
+    val modules = ArrayList<Module<T>>()
 
     fun addModule(module: Module<T>) {
         modules.add(module)

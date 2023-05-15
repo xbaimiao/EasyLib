@@ -2,6 +2,7 @@ package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.module.utils.Module
 import com.xbaimiao.easylib.module.utils.ModuleManager
+import com.xbaimiao.easylib.module.utils.submit
 import org.bukkit.plugin.java.JavaPlugin
 
 abstract class EasyPlugin : JavaPlugin() {
@@ -22,6 +23,8 @@ abstract class EasyPlugin : JavaPlugin() {
 
     open fun enable() {}
 
+    open fun active() {}
+
     open fun disable() {}
 
     override fun onLoad() {
@@ -32,6 +35,10 @@ abstract class EasyPlugin : JavaPlugin() {
     override fun onEnable() {
         enable()
         moduleManager.enableAll()
+        submit {
+            moduleManager.modules.forEach { it.active(this@EasyPlugin) }
+            active()
+        }
     }
 
     override fun onDisable() {
