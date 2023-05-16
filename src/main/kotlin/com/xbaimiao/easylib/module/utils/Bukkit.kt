@@ -1,13 +1,18 @@
 package com.xbaimiao.easylib.module.utils
 
+import com.cryptomorin.xseries.XMaterial
+import com.cryptomorin.xseries.messages.ActionBar
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.FoliaChecker
 import com.xbaimiao.easylib.task.EasyLibBukkitTask
 import com.xbaimiao.easylib.task.EasyLibFoliaTask
 import com.xbaimiao.easylib.task.EasyLibTask
 import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * 使用调度器执行一段代码
@@ -79,6 +84,14 @@ fun unregisterListener(listener: Listener) {
     HandlerList.unregisterAll(listener)
 }
 
+fun String.parseToMaterial(): Material {
+    return Material.getMaterial(this.uppercase()) ?: throw NullPointerException("$this is not a material")
+}
+
+fun String.parseToXMaterial(): XMaterial {
+    return XMaterial.matchXMaterial(this).getOrNull() ?: throw NullPointerException("$this is not a XMaterial")
+}
+
 fun info(vararg any: Any) {
     EasyPlugin.getPlugin<EasyPlugin>().logger.info(any.joinToString(" "))
 }
@@ -89,4 +102,18 @@ fun warn(vararg any: Any) {
 
 fun severe(vararg any: Any) {
     EasyPlugin.getPlugin<EasyPlugin>().logger.severe(any.joinToString(" "))
+}
+
+fun Player.sendActionBar(message: String, plugin: EasyPlugin = EasyPlugin.getPlugin()) {
+    ActionBar.sendActionBar(plugin, this, message)
+}
+
+fun Player.sendActionBarWhile(
+    message: String,
+    plugin: EasyPlugin = EasyPlugin.getPlugin(),
+    action: () -> Boolean = { false }
+) {
+    ActionBar.sendActionBarWhile(plugin, this, message) {
+        action()
+    }
 }

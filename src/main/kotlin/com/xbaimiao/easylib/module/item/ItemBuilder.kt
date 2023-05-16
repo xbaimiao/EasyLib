@@ -1,10 +1,11 @@
 package com.xbaimiao.easylib.module.item
 
+import com.cryptomorin.xseries.XMaterial
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import com.xbaimiao.easylib.module.utils.colored
 import com.xbaimiao.easylib.module.utils.getProperty
 import com.xbaimiao.easylib.module.utils.invokeMethod
-import com.xbaimiao.easylib.module.utils.colored
 import com.xbaimiao.easylib.module.utils.setProperty
 import org.bukkit.ChatColor
 import org.bukkit.Color
@@ -49,6 +50,22 @@ fun buildItem(material: Material, builder: ItemBuilder.() -> Unit = {}): ItemSta
         error("air")
     }
     return ItemBuilder(material).also(builder).build()
+}
+
+/**
+ * 通过 [XMaterial] 材质构建新的物品
+ *
+ * @param material 材质
+ * @param builder 构建器
+ * @return 新的物品
+ * @throws IllegalArgumentException 如果材质为空气
+ */
+fun buildItem(material: XMaterial, builder: ItemBuilder.() -> Unit = {}): ItemStack {
+    // 在低版本, 并没有 Material.isAir() 方法
+    if (material == XMaterial.AIR) {
+        error("air")
+    }
+    return ItemBuilder(material.parseMaterial() ?: error("material.parseMaterial() is null")).also(builder).build()
 }
 
 open class ItemBuilder {

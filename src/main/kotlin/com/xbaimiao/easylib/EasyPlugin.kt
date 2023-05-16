@@ -1,5 +1,7 @@
 package com.xbaimiao.easylib
 
+import com.xbaimiao.easylib.module.protocol.ProtocolLibModule
+import com.xbaimiao.easylib.module.ui.InventoryModule
 import com.xbaimiao.easylib.module.utils.Module
 import com.xbaimiao.easylib.module.utils.ModuleManager
 import com.xbaimiao.easylib.module.utils.submit
@@ -17,6 +19,14 @@ abstract class EasyPlugin : JavaPlugin() {
     private fun init() {
         instance = this
         moduleManager = ModuleManager()
+    }
+
+    fun useUIModule() {
+        moduleManager.addModule(InventoryModule())
+    }
+
+    fun useProtocolModule() {
+        moduleManager.addModule(ProtocolLibModule())
     }
 
     open fun load() {}
