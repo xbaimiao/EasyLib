@@ -1,4 +1,4 @@
-package com.xbaimiao.easylib.module.utils
+package com.xbaimiao.easylib.bridge
 
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit

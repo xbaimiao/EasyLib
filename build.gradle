@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '1.9.7'
+    version = '1.9.8'
 
     repositories {
         mavenCentral()
