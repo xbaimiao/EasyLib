@@ -6,8 +6,6 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import com.xbaimiao.easylib.EasyPlugin
-import com.xbaimiao.easylib.event.PacketReceiveEvent
-import com.xbaimiao.easylib.event.PacketSendEvent
 import com.xbaimiao.easylib.module.utils.Module
 
 /**

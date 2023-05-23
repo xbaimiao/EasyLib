@@ -4,6 +4,7 @@ import com.xbaimiao.easylib.module.utils.warn
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
+@Deprecated("Use command instead", replaceWith = ReplaceWith("command(command, block)"))
 fun commandLegacy(command: String, block: CommandSpec.() -> Unit = {}): CommandSpec {
     val launcher = CommandSpec.newCommandSpec.invoke(command)
     block.invoke(launcher)
@@ -40,6 +41,11 @@ val times: ArgNode = ArgNode("time", exec = { token ->
     arrayOf("1ms", "1s", "1m", "1h", "1d").filter { it.uppercase().startsWith(token.uppercase()) }
 })
 
+val numbers: ArgNode = ArgNode("number", exec = { token ->
+    arrayOf("1", "2", "3", "4", "5", "number").filter { it.uppercase().startsWith(token.uppercase()) }
+})
+
+@Suppress("unused")
 fun registerCommand(clazz: Class<*>): Boolean {
     val header = clazz.getAnnotation(CommandHeader::class.java)
     if (header == null) {

@@ -70,6 +70,10 @@ abstract class CommandSpec : CommandHandler {
         arg(times, block)
     }
 
+    fun number(block: CommandSpec.() -> Unit = {}) {
+        arg(numbers, block)
+    }
+
     @JvmOverloads
     fun arg(argNode: ArgNode, block: CommandSpec.() -> Unit = {}) {
         argNodes.add(argNode)

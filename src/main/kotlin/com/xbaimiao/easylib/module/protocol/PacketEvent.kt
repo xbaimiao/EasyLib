@@ -1,4 +1,6 @@
-package com.xbaimiao.easylib.event
+package com.xbaimiao.easylib.module.protocol
+
+import com.xbaimiao.easylib.event.BukkitProxyEvent
 
 
 /**
