@@ -33,6 +33,10 @@ open class BukkitProxyEvent(async: Boolean = !Bukkit.isPrimaryThread()) : Event(
         }
     }
 
+    /**
+     * 广播这个事件
+     * @return 如果事件未被取消则为true
+     */
     fun call(): Boolean {
         Bukkit.getPluginManager().callEvent(this)
         return !isCancelled

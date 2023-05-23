@@ -9,7 +9,6 @@ import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.event.PacketReceiveEvent
 import com.xbaimiao.easylib.event.PacketSendEvent
 import com.xbaimiao.easylib.module.utils.Module
-import org.bukkit.Bukkit
 
 /**
  * @author 小白
@@ -36,9 +35,7 @@ class ProtocolLibModule :
 
     override fun onPacketSending(p0: PacketEvent?) {
         p0?.let {
-            val event = PacketSendEvent(p0)
-            Bukkit.getPluginManager().callEvent(event)
-            if (event.isCancelled) {
+            if (!PacketSendEvent(p0).call()) {
                 p0.isCancelled = true
             }
         }
@@ -46,9 +43,7 @@ class ProtocolLibModule :
 
     override fun onPacketReceiving(p0: PacketEvent?) {
         p0?.let {
-            val event = PacketReceiveEvent(p0)
-            Bukkit.getPluginManager().callEvent(event)
-            if (event.isCancelled) {
+            if (!PacketReceiveEvent(p0).call()) {
                 p0.isCancelled = true
             }
         }
