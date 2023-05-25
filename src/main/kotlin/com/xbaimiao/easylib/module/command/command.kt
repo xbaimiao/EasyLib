@@ -3,6 +3,7 @@ package com.xbaimiao.easylib.module.command
 import com.xbaimiao.easylib.module.utils.warn
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 @Deprecated("Use command instead", replaceWith = ReplaceWith("command(command, block)"))
 fun commandLegacy(command: String, block: CommandSpec.() -> Unit = {}): CommandSpec {
@@ -44,6 +45,30 @@ val times: ArgNode = ArgNode("time", exec = { token ->
 val numbers: ArgNode = ArgNode("number", exec = { token ->
     arrayOf("1", "2", "3", "4", "5", "number").filter { it.uppercase().startsWith(token.uppercase()) }
 })
+
+val x: ArgNode = ArgNode("x") {
+    if (this is Player) {
+        listOf(this.location.x.toString())
+    } else {
+        listOf("1", "2", "3", "4", "5")
+    }
+}
+
+val y: ArgNode = ArgNode("y") {
+    if (this is Player) {
+        listOf(this.location.y.toString())
+    } else {
+        listOf("1", "2", "3", "4", "5")
+    }
+}
+
+val z: ArgNode = ArgNode("z") {
+    if (this is Player) {
+        listOf(this.location.z.toString())
+    } else {
+        listOf("1", "2", "3", "4", "5")
+    }
+}
 
 @Suppress("unused")
 fun registerCommand(clazz: Class<*>): Boolean {

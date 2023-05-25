@@ -74,6 +74,18 @@ abstract class CommandSpec : CommandHandler {
         arg(numbers, block)
     }
 
+    fun x(block: CommandSpec.() -> Unit = {}) {
+        arg(x, block)
+    }
+
+    fun y(block: CommandSpec.() -> Unit = {}) {
+        arg(y, block)
+    }
+
+    fun z(block: CommandSpec.() -> Unit = {}) {
+        arg(z, block)
+    }
+
     @JvmOverloads
     fun arg(argNode: ArgNode, block: CommandSpec.() -> Unit = {}) {
         argNodes.add(argNode)
