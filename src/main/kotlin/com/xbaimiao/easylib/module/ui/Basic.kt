@@ -216,4 +216,15 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
         }
     }
 
+    companion object {
+        fun asyncBuildAndOpen(player: Player, title: String, build: Basic.() -> Unit) {
+            submit(async = true) {
+                val basic = Basic(player, title)
+                build.invoke(basic)
+                basic.openAsync()
+            }
+        }
+
+    }
+
 }
