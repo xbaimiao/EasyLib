@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.ui
 
+import com.xbaimiao.easylib.module.utils.submit
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -204,6 +205,15 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
 
     override fun open() {
         player.openInventory(build())
+    }
+
+    override fun openAsync() {
+        submit(async = true) {
+            val inventory = build()
+            submit {
+                player.openInventory(inventory)
+            }
+        }
     }
 
 }

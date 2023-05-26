@@ -9,6 +9,8 @@ abstract class Menu(var title: String, val player: Player) {
 
     abstract fun open()
 
+    abstract fun openAsync()
+
 }
 
 fun Player.openMenu(title: String = "chest", func: (Basic) -> Unit) {
