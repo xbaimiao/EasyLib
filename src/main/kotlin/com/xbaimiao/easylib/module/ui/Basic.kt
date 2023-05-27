@@ -99,6 +99,19 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
     }
 
     /**
+     * 点击事件回调
+     * 仅在特点位置列表出触发
+     */
+    fun onClick(bind: List<Int>, callback: (event: InventoryClickEvent) -> Unit) {
+        onClick {
+            if (bind.contains(it.rawSlot)) {
+                it.isCancelled = true
+                callback(it)
+            }
+        }
+    }
+
+    /**
      * 整页点击事件回调
      * 可选是否自动锁定点击位置
      */
