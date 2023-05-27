@@ -138,6 +138,12 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
         slotItems[slot] = itemStack
     }
 
+    fun set(slot:List<Int>,itemStack: ItemStack){
+        slot.forEach {
+            slotItems[it] = itemStack
+        }
+    }
+
     /**
      * 获取位置对应的抽象字符
      */
