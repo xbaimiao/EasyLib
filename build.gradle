@@ -90,6 +90,10 @@ tasks {
         relocate("org.wltea.expression","com.xbaimiao.easylib.expression")
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
     }
+    // UTF-8
+    compileJava {
+        options.encoding = "UTF-8"
+    }
 }
 
 publishing {
