@@ -2,6 +2,7 @@ package com.xbaimiao.easylib.bridge.permission
 
 import net.luckperms.api.LuckPermsProvider
 import net.luckperms.api.model.user.User
+import net.luckperms.api.node.Node
 import org.bukkit.entity.Player
 
 
@@ -38,6 +39,17 @@ class LuckPermsPermission : Permission {
             user = api.userManager.loadUser(player.uniqueId).get()
         }
         return user!!
+    }
+
+    override fun hasPermission(player: Player, permission: String): Boolean {
+        val user = getUser(player)
+        return user.cachedData.permissionData.checkPermission(permission).asBoolean()
+    }
+
+    override fun addPermission(player: Player, permission: String) {
+        api.userManager.modifyUser(player.uniqueId) { user ->
+            user.data().add(Node.builder(permission).build())
+        }
     }
 
 }

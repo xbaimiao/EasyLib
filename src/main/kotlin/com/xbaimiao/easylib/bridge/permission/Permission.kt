@@ -28,4 +28,14 @@ interface Permission {
      */
     fun getGroups(): Array<String>
 
+    /**
+     * 玩家是否有对应权限
+     */
+    fun hasPermission(player: Player, permission: String): Boolean
+
+    /**
+     * 给予玩家权限
+     */
+    fun addPermission(player: Player, permission: String)
+
 }
