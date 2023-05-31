@@ -3,7 +3,7 @@ package com.xbaimiao.easylib.module.utils
 import com.cryptomorin.xseries.XMaterial
 import com.cryptomorin.xseries.messages.ActionBar
 import com.xbaimiao.easylib.EasyPlugin
-import com.xbaimiao.easylib.FoliaChecker
+import com.xbaimiao.easylib.ServerChecker
 import com.xbaimiao.easylib.task.EasyLibBukkitTask
 import com.xbaimiao.easylib.task.EasyLibFoliaTask
 import com.xbaimiao.easylib.task.EasyLibTask
@@ -33,7 +33,7 @@ fun submit(
 ): EasyLibTask {
 
     val runnable by lazy {
-        if (FoliaChecker.isFolia()) {
+        if (ServerChecker.isFolia) {
             object : EasyLibFoliaTask(location, EasyPlugin.getPlugin()) {
                 override fun run() {
                     task()
@@ -125,26 +125,6 @@ fun warn(vararg any: Any) {
  */
 fun severe(vararg any: Any) {
     EasyPlugin.getPlugin<EasyPlugin>().logger.severe(any.joinToString(" "))
-}
-
-/**
- * 发送ActionBar
- */
-fun Player.sendActionBar(message: String, plugin: EasyPlugin = EasyPlugin.getPlugin()) {
-    ActionBar.sendActionBar(plugin, this, message)
-}
-
-/**
- * 发送ActionBar
- */
-fun Player.sendActionBarWhile(
-    message: String,
-    plugin: EasyPlugin = EasyPlugin.getPlugin(),
-    action: () -> Boolean = { false }
-) {
-    ActionBar.sendActionBarWhile(plugin, this, message) {
-        action()
-    }
 }
 
 fun String?.colored(): String {
