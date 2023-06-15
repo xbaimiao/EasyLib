@@ -14,6 +14,12 @@ class ModuleManager<T : EasyPlugin> {
         modules.remove(module)
     }
 
+    fun reloadAll() {
+        disableAll()
+        loadAll()
+        enableAll()
+    }
+
     fun loadAll() {
         modules.forEach { it.load(EasyPlugin.getPlugin()) }
     }

@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.item
 
+import com.xbaimiao.easylib.module.utils.colored
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -18,6 +19,17 @@ fun ItemStack?.isAir(): Boolean {
  */
 fun ItemStack?.isNotAir(): Boolean {
     return !this.isAir()
+}
+
+fun ItemStack.hasName(name: String): Boolean {
+    if (this.isAir()) {
+        return false
+    }
+    val itemMeta = itemMeta ?: return false
+    if (!itemMeta.hasDisplayName()) {
+        return false
+    }
+    return itemMeta.displayName.contains(name.colored())
 }
 
 fun ItemStack.hasLore(lore: String): Boolean {
