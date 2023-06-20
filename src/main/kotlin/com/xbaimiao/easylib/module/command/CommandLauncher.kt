@@ -57,7 +57,7 @@ class CommandLauncher(
         if (permission != null && !sender.hasPermission(permission!!)) {
             return null
         }
-        val context = CommandContext(sender, cmd.name, args.toMutableList())
+        val context = CommandContext(sender, cmd.name, args.toMutableList(), argNodes)
 
         // 判断参数是否足够 不足够使用 ArgNode 补全
         if (argNodes.isNotEmpty() && context.args.size <= argNodes.size) {
@@ -94,7 +94,7 @@ class CommandLauncher(
             sender.sendMessage(permissionMessage)
             return true
         }
-        val context = CommandContext(sender, cmd.name, args.toMutableList())
+        val context = CommandContext(sender, cmd.name, args.toMutableList(), argNodes)
 
         // 判断参数是否足够
         if (argNodes.isNotEmpty() && args.size < argNodes.size) {

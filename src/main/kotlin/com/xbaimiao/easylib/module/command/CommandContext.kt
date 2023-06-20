@@ -5,7 +5,10 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 data class CommandContext(
-    val sender: CommandSender, val cmd: String, val args: MutableList<String>
+    val sender: CommandSender,
+    val cmd: String,
+    val args: MutableList<String>,
+    val argNodes: List<ArgNode<*>>
 ) {
 
     init {
@@ -14,6 +17,10 @@ data class CommandContext(
                 args.removeAt(args.size - 1)
             }
         }
+    }
+
+    fun <T> valueOf(argNode: ArgNode<T>): T {
+        return argNode.parse.invoke(sender, args[argNode.index])
     }
 
     fun error(any: Any) {
