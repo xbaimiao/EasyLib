@@ -91,15 +91,15 @@ abstract class CommandSpec : CommandHandler {
         arg(numbers, block)
     }
 
-    fun x(block: CommandSpec.(ArgNode<Int>) -> Unit = {}) {
+    fun x(block: CommandSpec.(ArgNode<Double>) -> Unit = {}) {
         arg(x, block)
     }
 
-    fun y(block: CommandSpec.(ArgNode<Int>) -> Unit = {}) {
+    fun y(block: CommandSpec.(ArgNode<Double>) -> Unit = {}) {
         arg(y, block)
     }
 
-    fun z(block: CommandSpec.(ArgNode<Int>) -> Unit = {}) {
+    fun z(block: CommandSpec.(ArgNode<Double>) -> Unit = {}) {
         arg(z, block)
     }
 
@@ -108,6 +108,7 @@ abstract class CommandSpec : CommandHandler {
         block.invoke(this, argNodes.append(argNode))
     }
 
+    @JvmOverloads
     fun arg(usage: String, block: CommandSpec.(ArgNode<String>) -> Unit = {}) {
         val argNode = ArgNode<String>(usage, exec = { emptyList() })
         block.invoke(this, argNodes.append(argNode))

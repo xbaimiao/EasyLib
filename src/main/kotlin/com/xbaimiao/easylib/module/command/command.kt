@@ -79,31 +79,31 @@ val numbers: ArgNode<Double> = ArgNode("number", exec = { token ->
     it.toDouble()
 })
 
-val x: ArgNode<Int> = ArgNode("x", {
+val x: ArgNode<Double> = ArgNode("x", {
     if (this is Player) {
         listOf(this.location.x.toString())
     } else {
         listOf("1", "2", "3", "4", "5")
     }
 }, {
-    it.toInt()
+    it.toDouble()
 })
 
-val y: ArgNode<Int> = ArgNode("y", {
+val y: ArgNode<Double> = ArgNode("y", {
     if (this is Player) {
         listOf(this.location.y.toString())
     } else {
         listOf("1", "2", "3", "4", "5")
     }
-}, { it.toInt() })
+}, { it.toDouble() })
 
-val z: ArgNode<Int> = ArgNode("z", {
+val z: ArgNode<Double> = ArgNode("z", {
     if (this is Player) {
         listOf(this.location.z.toString())
     } else {
         listOf("1", "2", "3", "4", "5")
     }
-}, { it.toInt() })
+}, { it.toDouble() })
 
 @Suppress("unused")
 fun registerCommand(clazz: Class<*>): Boolean {
