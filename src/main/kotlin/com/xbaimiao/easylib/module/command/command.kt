@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.command
 
+import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.module.utils.TimeUtil
 import com.xbaimiao.easylib.module.utils.warn
 import org.bukkit.Bukkit
@@ -7,17 +8,24 @@ import org.bukkit.World
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-@Deprecated("Use command instead", replaceWith = ReplaceWith("command(command, block)"))
-fun commandLegacy(command: String, block: CommandSpec.() -> Unit = {}): CommandSpec {
-    val launcher = CommandSpec.newCommandSpec.invoke(command)
-    block.invoke(launcher)
-    return launcher
+inline fun <reified C : CommandSender> mainCommand(
+    block: CommandSpec<C>.() -> Unit
+): CommandSpec<C> {
+    return mainCommand(EasyPlugin.getPlugin<EasyPlugin>().description.name, block)
 }
 
-inline fun <reified T : CommandSender> command(
-    command: String, block: CommandSpec.() -> Unit = {}
-): CommandSpec {
-    val launcher = CommandSpec.tNewCommandSpec<T>(command)
+inline fun <reified C : CommandSender> mainCommand(
+    command: String, block: CommandSpec<C>.() -> Unit
+): CommandSpec<C> {
+    val commandSpec = command<C>(command, block)
+    commandSpec.register()
+    return commandSpec
+}
+
+inline fun <reified C : CommandSender> command(
+    command: String, block: CommandSpec<C>.() -> Unit
+): CommandSpec<C> {
+    val launcher = CommandSpec.tNewCommandSpec<C>(command)
     block.invoke(launcher)
     return launcher
 }
@@ -25,10 +33,13 @@ inline fun <reified T : CommandSender> command(
 data class ArgNode<T>(
     val usage: String,
     val exec: CommandSender.(String) -> List<String>,
-    @Suppress("UNCHECKED_CAST")
-    val parse: (CommandSender.(String) -> T) = { it as T }
+    val parse: (CommandSender.(String) -> T)
 ) {
+
     var index = 0
+
+    // 此参数是否可选
+    var optional = false
 
     fun clone(): ArgNode<T> {
         return ArgNode(usage, exec, parse)
@@ -113,7 +124,7 @@ fun registerCommand(clazz: Class<*>): Boolean {
         return false
     }
 
-    val subCommands = ArrayList<CommandSpec>()
+    val subCommands = ArrayList<CommandSpec<*>>()
 
     val instance = runCatching {
         val instance = clazz.getDeclaredField("INSTANCE")
@@ -124,7 +135,7 @@ fun registerCommand(clazz: Class<*>): Boolean {
     for (declaredField in clazz.declaredFields) {
         if (declaredField.getAnnotation(CommandBody::class.java) != null) {
             declaredField.isAccessible = true
-            val commandSpec = declaredField.get(instance) as CommandSpec
+            val commandSpec = declaredField.get(instance) as CommandSpec<*>
             subCommands.add(commandSpec)
         }
     }

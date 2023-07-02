@@ -4,8 +4,8 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-data class CommandContext(
-    val sender: CommandSender,
+data class CommandContext<S : CommandSender>(
+    val sender: S,
     val cmd: String,
     val args: MutableList<String>,
     val argNodes: List<ArgNode<*>>
@@ -19,15 +19,18 @@ data class CommandContext(
         }
     }
 
-    fun <T> valueOf(argNode: ArgNode<T>): T {
+    fun <T> valueOf(argNode: ArgNode<T>): T? {
+        if (argNode.optional) {
+            if (args.size <= argNode.index) {
+                return null
+            }
+        }
         return argNode.parse.invoke(sender, args[argNode.index])
     }
 
     fun error(any: Any) {
         sender.sendMessage("$any")
     }
-
-    val player by lazy { sender as Player }
 
     fun findIntOrNull(index: Int): Int? = kotlin.runCatching { args[index].toInt() }.getOrNull()
 

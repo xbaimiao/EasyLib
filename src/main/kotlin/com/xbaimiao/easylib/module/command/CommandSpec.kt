@@ -4,15 +4,13 @@ import org.bukkit.World
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-abstract class CommandSpec : CommandHandler {
+@Suppress("unused")
+abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     companion object {
-        val newCommandSpec: (String) -> CommandSpec = { command: String ->
-            CommandLauncher(command, CommandSender::class.java)
-        }
 
-        inline fun <reified T : CommandSender> tNewCommandSpec(command: String): CommandSpec {
-            return CommandLauncher(command, T::class.java)
+        inline fun <reified S : CommandSender> tNewCommandSpec(command: String): CommandSpec<S> {
+            return CommandLauncher(command, S::class.java)
         }
 
     }
@@ -23,9 +21,10 @@ abstract class CommandSpec : CommandHandler {
             error("not support")
         }
 
-        fun <T> append(argNode: ArgNode<T>): ArgNode<T> {
+        fun <T> append(argNode: ArgNode<T>, optional: Boolean): ArgNode<T> {
             val new = argNode.clone()
             new.index = this.size
+            new.optional = optional
             super.add(new)
             return new
         }
@@ -37,17 +36,17 @@ abstract class CommandSpec : CommandHandler {
     override var permissionMessage: String = "§c你没有权限执行此命令"
     override var senderErrorMessage: String = "Incorrect sender for command"
 
-    var root: CommandSpec? = null
+    private var root: CommandSpec<out CommandSender>? = null
     val argNodes = ArgNodeArrayList()
 
-    protected var exec: (CommandContext.() -> Unit)? = null
-    protected var tab: (CommandContext.() -> List<String>)? = null
-    protected val subCommands = mutableMapOf<String, CommandSpec>()
+    protected var exec: (CommandContext<S>.() -> Unit)? = null
+    protected var tab: (CommandContext<out CommandSender>.() -> List<String>)? = null
+    protected val subCommands = mutableMapOf<String, CommandSpec<out CommandSender>>()
 
     /**
      * 添加子命令
      */
-    fun sub(launcher: CommandSpec) {
+    fun sub(launcher: CommandSpec<out CommandSender>) {
         if (tab == null) {
             tab = {
                 if (args.isEmpty()) {
@@ -65,65 +64,76 @@ abstract class CommandSpec : CommandHandler {
         subCommands[launcher.command] = launcher
     }
 
-    inline fun <reified T : CommandSender> subCommand(token: String, block: CommandSpec.() -> Unit = {}) {
+    @JvmOverloads
+    inline fun <reified T : CommandSender> subCommand(token: String, block: CommandSpec<T>.() -> Unit = {}) {
         sub(command<T>(token) {
             block.invoke(this)
         })
     }
 
-    fun onlinePlayers(block: CommandSpec.(ArgNode<Collection<Player>>) -> Unit = {}) {
-        arg(onlinePlayers, block)
-    }
-
-    fun worlds(block: CommandSpec.(ArgNode<World>) -> Unit = {}) {
-        arg(worlds, block)
-    }
-
-    fun booleans(block: CommandSpec.(ArgNode<Boolean>) -> Unit = {}) {
-        arg(booleans, block)
-    }
-
-    fun times(block: CommandSpec.(ArgNode<Long>) -> Unit = {}) {
-        arg(times, block)
-    }
-
-    fun number(block: CommandSpec.(ArgNode<Double>) -> Unit = {}) {
-        arg(numbers, block)
-    }
-
-    fun x(block: CommandSpec.(ArgNode<Double>) -> Unit = {}) {
-        arg(x, block)
-    }
-
-    fun y(block: CommandSpec.(ArgNode<Double>) -> Unit = {}) {
-        arg(y, block)
-    }
-
-    fun z(block: CommandSpec.(ArgNode<Double>) -> Unit = {}) {
-        arg(z, block)
+    @JvmOverloads
+    fun onlinePlayers(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Collection<Player>>) -> Unit = {}) {
+        arg(onlinePlayers, optional, block)
     }
 
     @JvmOverloads
-    fun <T> arg(argNode: ArgNode<T>, block: CommandSpec.(ArgNode<T>) -> Unit = {}) {
-        block.invoke(this, argNodes.append(argNode))
+    fun worlds(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<World>) -> Unit = {}) {
+        arg(worlds, optional, block)
     }
 
     @JvmOverloads
-    fun arg(usage: String, block: CommandSpec.(ArgNode<String>) -> Unit = {}) {
-        val argNode = ArgNode<String>(usage, exec = { emptyList() })
-        block.invoke(this, argNodes.append(argNode))
+    fun booleans(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Boolean>) -> Unit = {}) {
+        arg(booleans, optional, block)
     }
 
-    fun <T> arg(argNode: ArgNode<T>): ArgNode<T> {
-        return argNodes.append(argNode)
+    @JvmOverloads
+    fun times(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Long>) -> Unit = {}) {
+        arg(times, optional, block)
     }
 
-    fun arg(usage: String): ArgNode<String> {
-        val argNode = ArgNode<String>(usage, exec = { emptyList() })
-        return argNodes.append(argNode)
+    @JvmOverloads
+    fun number(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(numbers, optional, block)
     }
 
-    fun exec(exec: CommandContext.() -> Unit) {
+    @JvmOverloads
+    fun x(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(x, optional, block)
+    }
+
+    @JvmOverloads
+    fun y(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(y, optional, block)
+    }
+
+    @JvmOverloads
+    fun z(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(z, optional, block)
+    }
+
+    @JvmOverloads
+    fun <T> arg(argNode: ArgNode<T>, optional: Boolean = false, block: CommandSpec<S>.(ArgNode<T>) -> Unit) {
+        block.invoke(this, argNodes.append(argNode, optional))
+    }
+
+    @JvmOverloads
+    fun arg(usage: String, optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit) {
+        val argNode = ArgNode(usage, exec = { emptyList() }, parse = { it })
+        block.invoke(this, argNodes.append(argNode, optional))
+    }
+
+    @JvmOverloads
+    fun <T> arg(argNode: ArgNode<T>, optional: Boolean = false): ArgNode<T> {
+        return argNodes.append(argNode, optional)
+    }
+
+    @JvmOverloads
+    fun arg(usage: String, optional: Boolean = false): ArgNode<String> {
+        val argNode = ArgNode(usage, exec = { emptyList() }, parse = { it })
+        return argNodes.append(argNode, optional)
+    }
+
+    fun exec(exec: CommandContext<S>.() -> Unit) {
         this.exec = exec
     }
 

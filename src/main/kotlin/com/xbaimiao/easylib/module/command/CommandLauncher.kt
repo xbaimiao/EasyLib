@@ -9,10 +9,10 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginCommand
 import org.bukkit.plugin.Plugin
 
-class CommandLauncher(
+class CommandLauncher<T : CommandSender>(
     override val command: String,
     private val execClass: Class<out CommandSender>
-) : CommandSpec() {
+) : CommandSpec<T>() {
 
     private companion object {
         const val NOT_DESCRIPTION_MESSAGE = "无描述"
@@ -45,6 +45,7 @@ class CommandLauncher(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onTabComplete(
         sender: CommandSender,
         cmd: Command,
@@ -57,7 +58,7 @@ class CommandLauncher(
         if (permission != null && !sender.hasPermission(permission!!)) {
             return null
         }
-        val context = CommandContext(sender, cmd.name, args.toMutableList(), argNodes)
+        val context = CommandContext(sender as T, cmd.name, args.toMutableList(), argNodes)
 
         // 判断参数是否足够 不足够使用 ArgNode 补全
         if (argNodes.isNotEmpty() && context.args.size <= argNodes.size) {
@@ -80,6 +81,7 @@ class CommandLauncher(
         return tab?.invoke(context)
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onCommand(
         sender: CommandSender,
         cmd: Command,
@@ -94,12 +96,16 @@ class CommandLauncher(
             sender.sendMessage(permissionMessage)
             return true
         }
-        val context = CommandContext(sender, cmd.name, args.toMutableList(), argNodes)
+        val context = CommandContext(sender as T, cmd.name, args.toMutableList(), argNodes)
 
         // 判断参数是否足够
         if (argNodes.isNotEmpty() && args.size < argNodes.size) {
-            showHelp(sender)
-            return true
+            for ((index, argNode) in argNodes.withIndex()) {
+                if (!argNode.optional && args.getOrNull(index) == null) {
+                    showHelp(sender)
+                    return true
+                }
+            }
         }
 
         val common = {
