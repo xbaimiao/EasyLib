@@ -133,11 +133,19 @@ class CommandLauncher<T : CommandSender>(
 
     override fun showHelp(sender: CommandSender) {
         sender.sendMessage(" ")
-        var argNodeDescription = argNodes.joinToString(" ") { "<${it.usage}>" }
+        var argNodeDescription = argNodes.joinToString(" ") { it.toDesc() }
         sender.sendMessage("§a$command $argNodeDescription §7- §f${description ?: NOT_DESCRIPTION_MESSAGE} ")
         subCommands.values.forEach { handler ->
-            argNodeDescription = handler.argNodes.joinToString(" ") { "<${it.usage}>" }
+            argNodeDescription = handler.argNodes.joinToString(" ") { it.toDesc() }
             sender.sendMessage("§a$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: NOT_DESCRIPTION_MESSAGE}")
+        }
+    }
+
+    private fun ArgNode<*>.toDesc(): String {
+        return if (optional) {
+            "<可选:${usage}>"
+        } else {
+            "<必须:${usage}>"
         }
     }
 

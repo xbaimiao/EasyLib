@@ -19,10 +19,19 @@ data class CommandContext<S : CommandSender>(
         }
     }
 
-    fun <T> valueOf(argNode: ArgNode<T>): T? {
+    fun <T> valueOfOrNull(argNode: ArgNode<T>): T? {
         if (argNode.optional) {
             if (args.size <= argNode.index) {
                 return null
+            }
+        }
+        return argNode.parse.invoke(sender, args[argNode.index])
+    }
+
+    fun <T> valueOf(argNode: ArgNode<T>): T {
+        if (argNode.optional) {
+            if (args.size <= argNode.index) {
+                error("${argNode.usage} is optional but not found")
             }
         }
         return argNode.parse.invoke(sender, args[argNode.index])
