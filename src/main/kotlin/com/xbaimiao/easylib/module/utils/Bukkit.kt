@@ -1,7 +1,6 @@
 package com.xbaimiao.easylib.module.utils
 
 import com.cryptomorin.xseries.XMaterial
-import com.cryptomorin.xseries.messages.ActionBar
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.ServerChecker
 import com.xbaimiao.easylib.task.EasyLibBukkitTask
@@ -10,7 +9,6 @@ import com.xbaimiao.easylib.task.EasyLibTask
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -29,20 +27,33 @@ fun submit(
     period: Long = 0,
     async: Boolean = false,
     location: Location? = null,
+    maxRunningNum: Long = 0,
     task: EasyLibTask.() -> Unit
 ): EasyLibTask {
+
+    var currentRunningNum = 0
+
+    val runningTask = runningTask@{ easyLibTask: EasyLibTask ->
+        // 如果设置了最大运行数量, 则在达到最大运行数量时取消任务
+        if (maxRunningNum > 0 && currentRunningNum++ >= maxRunningNum) {
+            easyLibTask.cancel()
+            return@runningTask
+        }
+        task(easyLibTask)
+    }
+
 
     val runnable by lazy {
         if (ServerChecker.isFolia) {
             object : EasyLibFoliaTask(location, EasyPlugin.getPlugin()) {
                 override fun run() {
-                    task()
+                    runningTask(this)
                 }
             }
         } else {
             object : EasyLibBukkitTask(EasyPlugin.getPlugin()) {
                 override fun run() {
-                    task()
+                    runningTask(this)
                 }
             }
         }
