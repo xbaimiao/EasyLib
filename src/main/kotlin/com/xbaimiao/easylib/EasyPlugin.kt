@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib
 
+import com.xbaimiao.easylib.loader.KotlinLoader
 import com.xbaimiao.easylib.module.ui.InventoryModule
 import com.xbaimiao.easylib.module.utils.Module
 import com.xbaimiao.easylib.module.utils.ModuleManager
@@ -12,6 +13,7 @@ abstract class EasyPlugin : JavaPlugin() {
         private set
 
     init {
+        KotlinLoader.loader(this)
         init()
     }
 
