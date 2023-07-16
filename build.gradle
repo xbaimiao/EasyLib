@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '2.1.4'
+    version = '2.1.6'
 
     repositories {
         mavenCentral()
@@ -61,7 +61,7 @@ dependencies {
     implementation(project(":easylib-bukkit-common"))
     implementation(project(":easylib-gson"))
     implementation 'public:ik:1.0.0'
-    implementation 'com.github.cryptomorin:XSeries:9.3.1'
+    implementation 'com.github.cryptomorin:XSeries:9.4.0'
 }
 
 tasks.register('sourcesJar', Jar) {

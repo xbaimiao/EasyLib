@@ -59,6 +59,7 @@ class OrmliteMysql(
             config.jdbcUrl = url
             config.username = user
             config.password = passwd
+            config.maxLifetime = 60000
             DataSourceConnectionSource(HikariDataSource(config), config.jdbcUrl)
         } else {
             JdbcConnectionSource(url, user, passwd)

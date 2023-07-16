@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 @Suppress("unused")
-class Basic(player: Player, title: String = "chest") : Menu(title, player) {
+open class Basic(player: Player, title: String = "chest") : Menu(title, player) {
 
     /** 行数 **/
     internal var rows = -1
@@ -239,6 +239,15 @@ class Basic(player: Player, title: String = "chest") : Menu(title, player) {
         fun asyncBuildAndOpen(player: Player, title: String, build: Basic.() -> Unit) {
             submit(async = true) {
                 val basic = Basic(player, title)
+                build.invoke(basic)
+                basic.openAsync()
+            }
+        }
+
+        inline fun <reified T : Basic> asyncOpen(player: Player, title: String, crossinline build: T.() -> Unit) {
+            submit(async = true) {
+                val basic = T::class.java.getConstructor(Player::class.java, String::class.java)
+                    .newInstance(player, title) as T
                 build.invoke(basic)
                 basic.openAsync()
             }
