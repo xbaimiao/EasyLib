@@ -11,6 +11,8 @@ abstract class EasyPlugin : JavaPlugin() {
     protected lateinit var moduleManager: ModuleManager<EasyPlugin>
         private set
 
+    var debug = false
+
     init {
         init()
     }

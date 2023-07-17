@@ -6,9 +6,11 @@ import com.xbaimiao.easylib.ServerChecker
 import com.xbaimiao.easylib.task.EasyLibBukkitTask
 import com.xbaimiao.easylib.task.EasyLibFoliaTask
 import com.xbaimiao.easylib.task.EasyLibTask
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -136,6 +138,33 @@ fun warn(vararg any: Any) {
  */
 fun severe(vararg any: Any) {
     EasyPlugin.getPlugin<EasyPlugin>().logger.severe(any.joinToString(" "))
+}
+
+private val debugPlayers = mutableSetOf<String>()
+
+var Player.debug: Boolean
+    get() {
+        return debugPlayers.contains(name)
+    }
+    set(value) {
+        if (value && !debugPlayers.contains(name)) {
+            debugPlayers.add(name)
+        } else {
+            debugPlayers.remove(name)
+        }
+    }
+
+/**
+ * 输出debug信息
+ */
+fun debug(vararg any: Any) {
+    val message = "[DEBUG] ${any.joinToString(" ")}"
+    debugPlayers.forEach {
+        Bukkit.getPlayerExact(it)?.sendMessage(message)
+    }
+    if (EasyPlugin.getPlugin<EasyPlugin>().debug) {
+        EasyPlugin.getPlugin<EasyPlugin>().logger.info(message)
+    }
 }
 
 fun String?.colored(): String {

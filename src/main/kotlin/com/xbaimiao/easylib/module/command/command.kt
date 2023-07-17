@@ -2,11 +2,30 @@ package com.xbaimiao.easylib.module.command
 
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.module.utils.TimeUtil
+import com.xbaimiao.easylib.module.utils.debug
 import com.xbaimiao.easylib.module.utils.warn
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+
+val debugCommand = command<CommandSender>("debug") {
+    permission = "op"
+    description = "debug"
+    onlinePlayers(optional = true) { playerArg ->
+        exec {
+            val players = valueOfOrNull(playerArg)
+            if (players == null) {
+                EasyPlugin.getPlugin<EasyPlugin>().debug = !EasyPlugin.getPlugin<EasyPlugin>().debug
+                sender.sendMessage("§a已${if (EasyPlugin.getPlugin<EasyPlugin>().debug) "开启" else "关闭"}debug模式")
+            } else {
+                players.forEach {
+                    it.debug = !it.debug
+                }
+            }
+        }
+    }
+}
 
 inline fun <reified C : CommandSender> mainCommand(
     block: CommandSpec<C>.() -> Unit
@@ -15,9 +34,25 @@ inline fun <reified C : CommandSender> mainCommand(
 }
 
 inline fun <reified C : CommandSender> mainCommand(
+    debug: Boolean,
+    block: CommandSpec<C>.() -> Unit
+): CommandSpec<C> {
+    return mainCommand(EasyPlugin.getPlugin<EasyPlugin>().description.name, debug, block)
+}
+
+inline fun <reified C : CommandSender> mainCommand(
     command: String, block: CommandSpec<C>.() -> Unit
 ): CommandSpec<C> {
+    return mainCommand(command, false, block)
+}
+
+inline fun <reified C : CommandSender> mainCommand(
+    command: String, debug: Boolean, block: CommandSpec<C>.() -> Unit
+): CommandSpec<C> {
     val commandSpec = command<C>(command, block)
+    if (debug) {
+        commandSpec.sub(debugCommand)
+    }
     commandSpec.register()
     return commandSpec
 }
