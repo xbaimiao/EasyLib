@@ -4,6 +4,7 @@ import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.module.utils.colored
 import com.xbaimiao.easylib.module.utils.info
 import org.bukkit.command.CommandSender
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.BufferedReader
@@ -14,7 +15,12 @@ import java.nio.charset.StandardCharsets
 @Suppress("unused")
 object Lang {
 
-    private var configuration: YamlConfiguration? = null
+    var configuration: ConfigurationSection? = null
+        set(value) {
+            init = true
+            file = File(EasyPlugin.getPlugin<EasyPlugin>().dataFolder, "lang.yml")
+            field = value
+        }
     private var jarLang: YamlConfiguration? = null
     private var file: File? = null
     private var init = false
@@ -45,7 +51,9 @@ object Lang {
     }
 
     private fun save() {
-        configuration!!.save(file!!)
+        if (configuration is YamlConfiguration) {
+            (configuration as YamlConfiguration).save(file!!)
+        }
     }
 
     fun reload(){

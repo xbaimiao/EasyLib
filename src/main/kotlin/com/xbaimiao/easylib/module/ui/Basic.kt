@@ -40,10 +40,9 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
     var items = ConcurrentHashMap<Char, ItemStack>()
 
     var slotItems = ConcurrentHashMap<Int, ItemStack>()
-
     /** 抽象字符布局 **/
     var slots = CopyOnWriteArrayList<List<Char>>()
-
+    var slotList = CopyOnWriteArrayList<Slot>()
     /**
      * 行数
      * 为 1 - 6 之间的整数，并非原版 9 的倍数
@@ -140,6 +139,13 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         }
     }
 
+    fun slot(slot: Int, apply: Slot.() -> Unit) {
+        Slot(slot, this).also {
+            slotList.add(it)
+            it.apply()
+        }
+    }
+
     /**
      * 根据抽象符号设置物品
      */
@@ -218,6 +224,9 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         }
         slotItems.forEach { (k, v) ->
             inventory.setItem(k, v)
+        }
+        slotList.forEach {
+            inventory.setItem(it.slot, it.buildItem())
         }
         return inventory
     }
