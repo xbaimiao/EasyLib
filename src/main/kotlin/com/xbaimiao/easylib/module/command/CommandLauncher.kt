@@ -132,20 +132,27 @@ class CommandLauncher<T : CommandSender>(
     }
 
     override fun showHelp(sender: CommandSender) {
-        sender.sendMessage(" ")
+        sender.sendMessage("§c<XX>为必填参数, [XX]为可选参数")
         var argNodeDescription = argNodes.joinToString(" ") { it.toDesc() }
         sender.sendMessage("§a$command $argNodeDescription §7- §f${description ?: NOT_DESCRIPTION_MESSAGE} ")
-        subCommands.values.forEach { handler ->
-            argNodeDescription = handler.argNodes.joinToString(" ") { it.toDesc() }
-            sender.sendMessage("§a$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: NOT_DESCRIPTION_MESSAGE}")
-        }
+        subCommands.values
+            .filter {
+                if (it.permission != null) {
+                    return@filter sender.hasPermission(it.permission!!)
+                }
+                return@filter true
+            }
+            .forEach { handler ->
+                argNodeDescription = handler.argNodes.joinToString(" ") { it.toDesc() }
+                sender.sendMessage("§a$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: NOT_DESCRIPTION_MESSAGE}")
+            }
     }
 
     private fun ArgNode<*>.toDesc(): String {
         return if (optional) {
-            "<可选:${usage}>"
+            "[${usage}]"
         } else {
-            "<必须:${usage}>"
+            "<${usage}>"
         }
     }
 

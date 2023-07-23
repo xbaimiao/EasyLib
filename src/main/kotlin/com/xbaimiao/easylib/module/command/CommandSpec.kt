@@ -50,12 +50,13 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
         if (tab == null) {
             tab = {
                 if (args.isEmpty()) {
-                    subCommands.keys.toList()
+                    subCommands.filter { it.value.permission == null || sender.hasPermission(it.value.permission!!) }.keys.toList()
                 } else {
                     if (subCommands.containsKey(args[0])) {
                         subCommands[args[0]]!!.tab?.invoke(this) ?: emptyList()
                     } else {
-                        subCommands.keys.toList().filter { it.startsWith(args[0]) }
+                        subCommands.filter { it.value.permission == null || sender.hasPermission(it.value.permission!!) }.keys.toList()
+                            .filter { it.startsWith(args[0]) }
                     }
                 }
             }
