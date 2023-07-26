@@ -14,6 +14,8 @@ fun ItemStack?.isAir(): Boolean {
     return this == null || this.type == Material.AIR || this.type.name.endsWith("_AIR")
 }
 
+val ItemStack.displayName get() = kotlin.runCatching { itemMeta.displayName }.getOrDefault(type.name)
+
 /**
  * 判断是否不是空气
  */
@@ -58,7 +60,7 @@ fun ItemStack.hasLore(): Boolean {
     return itemMeta.hasLore() && itemMeta.lore != null
 }
 
-fun Inventory.hasItem(matcher: ItemStack.() -> Boolean, amount: Int): Boolean {
+fun Inventory.hasItem(amount: Int = 1, matcher: ItemStack.() -> Boolean): Boolean {
     var checkAmount = amount
     for (itemStack in this.contents) {
         if (itemStack.isNotAir() && matcher.invoke(itemStack!!)) {
@@ -71,10 +73,10 @@ fun Inventory.hasItem(matcher: ItemStack.() -> Boolean, amount: Int): Boolean {
     return false
 }
 
-fun Inventory.takeItem(matcher: ItemStack.() -> Boolean, amount: Int): Boolean {
+fun Inventory.takeItem(amount: Int = 1, matcher: ItemStack.() -> Boolean): Boolean {
     var takeAmount = amount
     for (i in this.contents.indices) {
-        val itemStack = this.contents[i]!!
+        val itemStack = this.contents.getOrNull(i) ?: continue
         if (itemStack.isNotAir() && matcher.invoke(itemStack)) {
             takeAmount -= itemStack.amount
             if (takeAmount < 0) {
@@ -92,5 +94,5 @@ fun Inventory.takeItem(matcher: ItemStack.() -> Boolean, amount: Int): Boolean {
 }
 
 fun Inventory.hasItem(itemStack: ItemStack, amount: Int): Boolean {
-    return this.hasItem({ this.isSimilar(itemStack) }, amount)
+    return this.hasItem(amount) { this.isSimilar(itemStack) }
 }
