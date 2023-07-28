@@ -14,7 +14,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
-import kotlin.jvm.optionals.getOrNull
+import java.util.*
 
 /**
  * 使用调度器执行一段代码
@@ -117,6 +117,14 @@ fun String.parseToMaterial(): Material {
  */
 fun String.parseToXMaterial(): XMaterial {
     return XMaterial.matchXMaterial(this).getOrNull() ?: throw NullPointerException("$this is not a XMaterial")
+}
+
+fun <T> Optional<T>.getOrNull(): T? {
+    return if (this.isPresent) {
+        this.get()
+    } else {
+        null
+    }
 }
 
 /**
