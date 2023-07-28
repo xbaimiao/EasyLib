@@ -20,9 +20,6 @@ abstract class EasyPlugin : JavaPlugin() {
     private fun init() {
         instance = this
         moduleManager = ModuleManager()
-    }
-
-    fun useUIModule() {
         moduleManager.addModule(InventoryModule())
     }
 
