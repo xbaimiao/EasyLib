@@ -7,9 +7,6 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Level
 import com.j256.ormlite.support.ConnectionSource
 import com.j256.ormlite.table.TableUtils
-import com.xbaimiao.easylib.EasyPlugin
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import org.bukkit.configuration.ConfigurationSection
 
 class OrmliteMysql(
@@ -49,18 +46,7 @@ class OrmliteMysql(
             ssl
         )
         return if (hikariCP) {
-            val config = HikariConfig()
-            config.poolName = EasyPlugin.getPlugin<EasyPlugin>().name + "-MySQLConnectionPool"
-            config.minimumIdle = 4
-            config.maximumPoolSize = 16
-            config.addDataSourceProperty("cachePrepStmts", "true")
-            config.addDataSourceProperty("prepStmtCacheSize", "250")
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
-            config.jdbcUrl = url
-            config.username = user
-            config.password = passwd
-            config.maxLifetime = 60000
-            DataSourceConnectionSource(HikariDataSource(config), config.jdbcUrl)
+            DataSourceConnectionSource(HikariDatabase(host, port, database, user, passwd, ssl).dataSource, url)
         } else {
             JdbcConnectionSource(url, user, passwd)
         }
