@@ -193,6 +193,10 @@ fun List<String>.uncolored(): List<String> {
     return this.map { it.uncolored() }
 }
 
+fun onlinePlayers(): List<Player> {
+    return Bukkit.getOnlinePlayers().toList()
+}
+
 /**
  * 打印堆栈信息
  */

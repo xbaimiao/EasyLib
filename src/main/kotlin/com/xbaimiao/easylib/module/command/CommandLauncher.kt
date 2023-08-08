@@ -1,6 +1,7 @@
 package com.xbaimiao.easylib.module.command
 
 import com.xbaimiao.easylib.EasyPlugin
+import com.xbaimiao.easylib.module.chat.TellrawJson
 import com.xbaimiao.easylib.module.utils.invokeMethod
 import com.xbaimiao.easylib.module.utils.isSuperClassOf
 import org.bukkit.command.Command
@@ -15,7 +16,7 @@ class CommandLauncher<T : CommandSender>(
 ) : CommandSpec<T>() {
 
     private companion object {
-        const val NOT_DESCRIPTION_MESSAGE = "无描述"
+        const val NOT_DESCRIPTION_MESSAGE = "没有描述"
     }
 
     override fun register() {
@@ -132,9 +133,13 @@ class CommandLauncher<T : CommandSender>(
     }
 
     override fun showHelp(sender: CommandSender) {
-        sender.sendMessage("§c<XX>为必填参数, [XX]为可选参数")
-        var argNodeDescription = argNodes.joinToString(" ") { it.toDesc() }
-        sender.sendMessage("§a$command $argNodeDescription §7- §f${description ?: NOT_DESCRIPTION_MESSAGE} ")
+        TellrawJson()
+            .append("  §7命令: ").append("§f/$command §8[...]")
+            .hoverText("§f/$command §8[...]")
+            .suggestCommand("/$command ")
+            .sendTo(sender)
+        sender.sendMessage("  §7参数: ${argNodes.joinToString(" ") { it.toDesc() }}")
+
         subCommands.values
             .filter {
                 if (it.permission != null) {
@@ -142,17 +147,24 @@ class CommandLauncher<T : CommandSender>(
                 }
                 return@filter true
             }
-            .forEach { handler ->
-                argNodeDescription = handler.argNodes.joinToString(" ") { it.toDesc() }
-                sender.sendMessage("§a$command ${handler.command} $argNodeDescription §7- §f${handler.description ?: NOT_DESCRIPTION_MESSAGE}")
+            .forEach { sub ->
+                val name = sub.command
+                val usage = sub.argNodes.joinToString(" ") { it.toDesc() }
+                val description = sub.description ?: NOT_DESCRIPTION_MESSAGE
+                TellrawJson()
+                    .append("    §8- ").append("§f$name").append(" $usage")
+                    .hoverText("§f/$command $name $usage§8- §7$description")
+                    .suggestCommand("/$command $name")
+                    .sendTo(sender)
+                sender.sendMessage("      §7$description")
             }
     }
 
     private fun ArgNode<*>.toDesc(): String {
         return if (optional) {
-            "[${usage}]"
+            "§a<${usage}>"
         } else {
-            "<${usage}>"
+            "§c<${usage}>"
         }
     }
 

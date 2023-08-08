@@ -151,6 +151,7 @@ data class ArgNode<T>(
         return ArgNode(usage, exec, parse)
     }
 }
+
 @Suppress("unused")
 fun registerCommand(clazz: Class<*>): Boolean {
     val header = clazz.getAnnotation(CommandHeader::class.java)
