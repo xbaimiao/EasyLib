@@ -165,7 +165,7 @@ class CommandLauncher<T : CommandSender>(
                 sender.sendMessage(" ")
                 sender.sendMessage("§7指令 §f$displayCommand §7参数不足.")
                 sender.sendMessage("§7正确用法:")
-                sender.sendMessage("§f/$displayCommand $usage §8- §7$description")
+                sender.sendMessage("§f/$displayCommand $usage §8- §7${description ?: NOT_DESCRIPTION_MESSAGE}")
                 showAll = false
             }
 
