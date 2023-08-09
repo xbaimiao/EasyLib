@@ -1,6 +1,7 @@
 package com.xbaimiao.easylib.module.command
 
 import com.xbaimiao.easylib.EasyPlugin
+import com.xbaimiao.easylib.Strings
 import com.xbaimiao.easylib.module.chat.TellrawJson
 import com.xbaimiao.easylib.module.utils.invokeMethod
 import com.xbaimiao.easylib.module.utils.isSuperClassOf
@@ -56,7 +57,7 @@ class CommandLauncher<T : CommandSender>(
         if (!execClass.isSuperClassOf(sender::class.java)) {
             return null
         }
-        if (permission != null && !sender.hasPermission(permission!!)) {
+        if (!hasPermissionExec(sender)) {
             return null
         }
         val context = CommandContext(sender as T, cmd.name, args.toMutableList(), argNodes)
@@ -93,7 +94,7 @@ class CommandLauncher<T : CommandSender>(
             sender.sendMessage(senderErrorMessage)
             return true
         }
-        if (permission != null && !sender.hasPermission(permission!!)) {
+        if (!hasPermissionExec(sender)) {
             sender.sendMessage(permissionMessage)
             return true
         }
@@ -103,17 +104,17 @@ class CommandLauncher<T : CommandSender>(
         if (argNodes.isNotEmpty() && args.size < argNodes.size) {
             for ((index, argNode) in argNodes.withIndex()) {
                 if (!argNode.optional && args.getOrNull(index) == null) {
-                    showHelp(sender)
+                    showHelp(CommandHandler.ShowHelpReason.PARAMETER, sender, context)
                     return true
                 }
             }
         }
 
-        val common = {
+        val common = { reason: CommandHandler.ShowHelpReason ->
             if (exec != null) {
                 exec!!.invoke(context)
             } else {
-                showHelp(sender)
+                showHelp(reason, sender, context)
             }
         }
 
@@ -124,40 +125,79 @@ class CommandLauncher<T : CommandSender>(
                 newArgs.removeAt(0)
                 return subCommands[sub]!!.onCommand(sender, cmd, label, newArgs.toTypedArray())
             } else {
-                common.invoke()
+                common.invoke(CommandHandler.ShowHelpReason.SUB_COMMAND_NOT_FOUND)
             }
         } else {
-            common.invoke()
+            common.invoke(CommandHandler.ShowHelpReason.NORMAL)
         }
         return true
     }
 
-    override fun showHelp(sender: CommandSender) {
-        TellrawJson()
-            .append("  §7命令: ").append("§f/$command §8[...]")
-            .hoverText("§f/$command §8[...]")
-            .suggestCommand("/$command ")
-            .sendTo(sender)
-        sender.sendMessage("  §7参数: ${argNodes.joinToString(" ") { it.toDesc() }}")
+    override fun showHelp(reason: CommandHandler.ShowHelpReason, sender: CommandSender, context: CommandContext<*>) {
+        val roots = this.getRootCommands()
+        val displayCommand = (roots.joinToString(" ") { it.command } + " $command").trim()
 
-        subCommands.values
-            .filter {
-                if (it.permission != null) {
-                    return@filter sender.hasPermission(it.permission!!)
+        val showAll: Boolean
+
+        when (reason) {
+            CommandHandler.ShowHelpReason.SUB_COMMAND_NOT_FOUND -> {
+                if (context.args.size > 1) {
+                    sender.sendMessage(" ")
+                    sender.sendMessage("§7指令 §f$displayCommand §7参数有误.")
+                    sender.sendMessage("§7正确用法:")
+                    showAll = true
+                } else {
+                    val arg0 = context.args[0]
+                    val similar = subCommands
+                        .values
+                        .asSequence()
+                        .filter { it.hasPermissionExec(sender) }
+                        .maxByOrNull { Strings.similarDegree(it.command, context.args[0]) }
+                    sender.sendMessage("§7指令 §f$displayCommand $arg0 §7不存在.")
+                    sender.sendMessage("§7你可能想要:")
+                    sender.sendMessage("§7/$displayCommand ${similar?.command}")
+                    showAll = false
                 }
-                return@filter true
             }
-            .forEach { sub ->
-                val name = sub.command
-                val usage = sub.argNodes.joinToString(" ") { it.toDesc() }
-                val description = sub.description ?: NOT_DESCRIPTION_MESSAGE
-                TellrawJson()
-                    .append("    §8- ").append("§f$name").append(" $usage")
-                    .hoverText("§f/$command $name $usage§8- §7$description")
-                    .suggestCommand("/$command $name")
-                    .sendTo(sender)
-                sender.sendMessage("      §7$description")
+
+            CommandHandler.ShowHelpReason.PARAMETER -> {
+                val usage = argNodes.joinToString(" ") { it.toDesc() }
+                sender.sendMessage(" ")
+                sender.sendMessage("§7指令 §f$displayCommand §7参数不足.")
+                sender.sendMessage("§7正确用法:")
+                sender.sendMessage("§f/$displayCommand $usage §8- §7$description")
+                showAll = false
             }
+
+            CommandHandler.ShowHelpReason.NORMAL -> {
+                showAll = true
+            }
+        }
+
+        if (showAll) {
+            TellrawJson()
+                .append("  §7命令: ").append("§f/$displayCommand §8[...]")
+                .hoverText("§f/$displayCommand §8[...]")
+                .suggestCommand("/$displayCommand ")
+                .sendTo(sender)
+            sender.sendMessage("  §7参数: ${argNodes.joinToString(" ") { it.toDesc() }}")
+
+            subCommands.values
+                .filter { it.hasPermissionExec(sender) }
+                .forEach { sub ->
+                    val name = sub.command
+                    val usage = sub.argNodes.joinToString(" ") { it.toDesc() }
+                    val description = sub.description ?: NOT_DESCRIPTION_MESSAGE
+                    TellrawJson()
+                        .append("    §8- §f$name $usage")
+                        .hoverText("§f/$command $name $usage §8- §7$description")
+                        .suggestCommand("/$command $name ")
+                        .sendTo(sender)
+
+                    sender.sendMessage("      §7$description")
+                }
+        }
+
     }
 
     private fun ArgNode<*>.toDesc(): String {
@@ -166,6 +206,17 @@ class CommandLauncher<T : CommandSender>(
         } else {
             "§c<${usage}>"
         }
+    }
+
+    private fun getRootCommands(): List<CommandSpec<*>> {
+        val list = mutableListOf<CommandSpec<*>>()
+        this.root?.let {
+            if (it is CommandLauncher) {
+                list.addAll(it.getRootCommands())
+            }
+            list.add(it)
+        }
+        return list
     }
 
 }

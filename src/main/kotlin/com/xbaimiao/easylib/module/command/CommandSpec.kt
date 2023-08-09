@@ -33,15 +33,26 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     override var description: String? = null
     override var permission: String? = null
-    override var permissionMessage: String = "§c你没有权限执行此命令"
-    override var senderErrorMessage: String = "Incorrect sender for command"
+    override var permissionMessage: String = "§cYou do not have permission to execute this command"
+    override var senderErrorMessage: String = "§cIncorrect sender for command"
 
-    private var root: CommandSpec<out CommandSender>? = null
+    protected var root: CommandSpec<out CommandSender>? = null
     val argNodes = ArgNodeArrayList()
 
     protected var exec: (CommandContext<S>.() -> Unit)? = null
     protected var tab: (CommandContext<out CommandSender>.() -> List<String>)? = null
     protected val subCommands = mutableMapOf<String, CommandSpec<out CommandSender>>()
+
+    /**
+     * 检查命令执行者是否有权限执行这个命令
+     * @return true 有权限 false 没有权限
+     */
+    fun hasPermissionExec(sender: CommandSender): Boolean {
+        if (permission == null) {
+            return true
+        }
+        return sender.hasPermission(permission!!)
+    }
 
     /**
      * 添加子命令
@@ -50,12 +61,12 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
         if (tab == null) {
             tab = {
                 if (args.isEmpty()) {
-                    subCommands.filter { it.value.permission == null || sender.hasPermission(it.value.permission!!) }.keys.toList()
+                    subCommands.filter { it.value.hasPermissionExec(sender) }.keys.toList()
                 } else {
                     if (subCommands.containsKey(args[0])) {
                         subCommands[args[0]]!!.tab?.invoke(this) ?: emptyList()
                     } else {
-                        subCommands.filter { it.value.permission == null || sender.hasPermission(it.value.permission!!) }.keys.toList()
+                        subCommands.filter { it.value.hasPermissionExec(sender) }.keys.toList()
                             .filter { it.startsWith(args[0]) }
                     }
                 }

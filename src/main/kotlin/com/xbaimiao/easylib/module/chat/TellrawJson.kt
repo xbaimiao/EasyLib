@@ -26,7 +26,7 @@ class TellrawJson {
     fun sendTo(target: CommandSender, builder: TellrawJson.() -> Unit = {}) {
         builder(this)
         if (target is Player) {
-            target.sendRawMessage(toRawMessage())
+            target.spigot().sendMessage(*componentsAll.toTypedArray())
         } else {
             target.sendMessage(toLegacyText())
         }

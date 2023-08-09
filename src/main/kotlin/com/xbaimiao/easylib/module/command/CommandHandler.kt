@@ -14,6 +14,17 @@ interface CommandHandler : CommandExecutor, TabCompleter {
 
     fun register()
 
-    fun showHelp(sender: CommandSender)
+    fun showHelp(reason: ShowHelpReason, sender: CommandSender, context: CommandContext<*>)
+
+    enum class ShowHelpReason {
+        // 参数不足
+        PARAMETER,
+
+        // 普通
+        NORMAL,
+
+        // 子命令不存在
+        SUB_COMMAND_NOT_FOUND
+    }
 
 }
