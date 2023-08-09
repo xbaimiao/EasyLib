@@ -33,8 +33,8 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     override var description: String? = null
     override var permission: String? = null
-    override var permissionMessage: String = "§cYou do not have permission to execute this command"
-    override var senderErrorMessage: String = "§cIncorrect sender for command"
+    override var permissionMessage: String = "§c你没有权限执行此命令"
+    override var senderErrorMessage: String = "§c此命令只能由 §6{sender} §c执行"
 
     protected var root: CommandSpec<out CommandSender>? = null
     val argNodes = ArgNodeArrayList()

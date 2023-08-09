@@ -91,7 +91,7 @@ class CommandLauncher<T : CommandSender>(
         args: Array<out String>,
     ): Boolean {
         if (!execClass.isSuperClassOf(sender::class.java)) {
-            sender.sendMessage(senderErrorMessage)
+            sender.sendMessage(senderErrorMessage.replace("{sender}", execClass.simpleName))
             return true
         }
         if (!hasPermissionExec(sender)) {
