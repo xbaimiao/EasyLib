@@ -50,12 +50,17 @@ object MinecraftVersion {
         ),
         V1_18_1(18010), V1_18_2(18020), V1_19(19000), V1_19_1(19100), V1_19_2(19200), V1_19_3(19300), V1_19_4(
             19400
-        );
+        ),
+        V1_20_0(20000), V1_20_1(20001), UNKNOWN(0);
 
         companion object {
             fun formString(version: String): Version {
-                return valueOf(String.format("V%s", version.replace(".", "_")))
+                return runCatching { valueOf(String.format("V%s", version.replace(".", "_"))) }.getOrElse { UNKNOWN }
             }
+        }
+
+        override fun toString(): String {
+            return this.name.replace("V", "").replace("_", ".")
         }
 
     }

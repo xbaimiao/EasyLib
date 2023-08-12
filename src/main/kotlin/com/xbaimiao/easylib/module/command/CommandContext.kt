@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.command
 
+import com.xbaimiao.easylib.module.utils.colored
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -37,8 +38,12 @@ data class CommandContext<S : CommandSender>(
         return argNode.parse.invoke(sender, args[argNode.index])
     }
 
-    fun error(any: Any) {
-        sender.sendMessage("$any")
+    fun valueToString(argNode: ArgNode<*>): String {
+        return args[argNode.index]
+    }
+
+    fun error(any: Any?) {
+        sender.sendMessage("§c${any.toString()}".colored())
     }
 
     fun findIntOrNull(index: Int): Int? = kotlin.runCatching { args[index].toInt() }.getOrNull()

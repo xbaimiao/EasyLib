@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.command
 
+import com.xbaimiao.easylib.module.utils.CaseInsensitiveMap
 import org.bukkit.World
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -41,7 +42,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     protected var exec: (CommandContext<S>.() -> Unit)? = null
     protected var tab: (CommandContext<out CommandSender>.() -> List<String>)? = null
-    protected val subCommands = mutableMapOf<String, CommandSpec<out CommandSender>>()
+    protected val subCommands = CaseInsensitiveMap<CommandSpec<out CommandSender>>()
 
     /**
      * 检查命令执行者是否有权限执行这个命令

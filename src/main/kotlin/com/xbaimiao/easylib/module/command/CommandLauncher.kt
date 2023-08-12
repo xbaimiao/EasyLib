@@ -3,6 +3,8 @@ package com.xbaimiao.easylib.module.command
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.Strings
 import com.xbaimiao.easylib.module.chat.TellrawJson
+import com.xbaimiao.easylib.module.utils.MinecraftVersion
+import com.xbaimiao.easylib.module.utils.colored
 import com.xbaimiao.easylib.module.utils.invokeMethod
 import com.xbaimiao.easylib.module.utils.isSuperClassOf
 import org.bukkit.command.Command
@@ -175,6 +177,20 @@ class CommandLauncher<T : CommandSender>(
         }
 
         if (showAll) {
+            sender.sendMessage(" ")
+            val plugin = EasyPlugin.getPlugin<EasyPlugin>()
+            val pluginVersion = plugin.description.version
+            TellrawJson()
+                .append("  ").append(" §7${plugin.name}")
+                .hoverText("§7${plugin.name} ${if (roots.isEmpty()) description else roots[0].description}")
+                .append(" ").append(" §f${pluginVersion}")
+                .hoverText(
+                    """
+                §7插件版本: §2${pluginVersion}
+                §7游戏版本: §b${MinecraftVersion.currentVersion}
+                    """.trimIndent()
+                ).sendTo(sender)
+            sender.sendMessage(" ")
             TellrawJson()
                 .append("  §7命令: ").append("§f/$displayCommand §8[...]")
                 .hoverText("§f/$displayCommand §8[...]")
