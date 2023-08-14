@@ -3,11 +3,12 @@ package com.xbaimiao.easylib.module.utils
 import com.cryptomorin.xseries.XMaterial
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.ServerChecker
+import com.xbaimiao.easylib.module.chat.colored
+import com.xbaimiao.easylib.module.chat.uncolored
 import com.xbaimiao.easylib.task.EasyLibBukkitTask
 import com.xbaimiao.easylib.task.EasyLibFoliaTask
 import com.xbaimiao.easylib.task.EasyLibTask
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -175,22 +176,36 @@ fun debug(vararg any: Any) {
     }
 }
 
+@Deprecated(
+    "use com.xbaimiao.easylib.module.chat.UtilKt",
+    ReplaceWith("this?.colored() ?: \"\"", "com.xbaimiao.easylib.module.chat.colored")
+)
 fun String?.colored(): String {
-    return this?.let { ChatColor.translateAlternateColorCodes('&', it) } ?: ""
+    return this?.colored() ?: ""
 }
 
-private val uncoloredRegex = Regex("§[a-z0-9]")
-
+@Deprecated(
+    "use com.xbaimiao.easylib.module.chat.UtilKt",
+    ReplaceWith("this?.uncolored() ?: \"\"", "com.xbaimiao.easylib.module.chat.uncolored")
+)
 fun String?.uncolored(): String {
-    return this?.replace(uncoloredRegex, "") ?: ""
+    return this?.uncolored() ?: ""
 }
 
+@Deprecated(
+    "use com.xbaimiao.easylib.module.chat.UtilKt",
+    ReplaceWith("this.colored()", "com.xbaimiao.easylib.module.chat.colored")
+)
 fun List<String>.colored(): List<String> {
-    return this.map { it.colored() }
+    return this.colored()
 }
 
+@Deprecated(
+    "use com.xbaimiao.easylib.module.chat.UtilKt",
+    ReplaceWith("this.uncolored()", "com.xbaimiao.easylib.module.chat.uncolored")
+)
 fun List<String>.uncolored(): List<String> {
-    return this.map { it.uncolored() }
+    return this.uncolored()
 }
 
 fun onlinePlayers(): List<Player> {
