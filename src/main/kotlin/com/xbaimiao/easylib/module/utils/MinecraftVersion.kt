@@ -29,6 +29,20 @@ object MinecraftVersion {
         return version.major > currentVersion.major
     }
 
+    /**
+     * 当前版本是否高于等于你输入的版本
+     */
+    fun isHigherOrEqual(version: Version): Boolean {
+        return version.major <= currentVersion.major
+    }
+
+    /**
+     * 是否为 1.17 以上版本
+     */
+    val isUniversal by lazy {
+        isHigherOrEqual(Version.V1_17)
+    }
+
     enum class Version(val major: Int) {
         V1_7_10(1710), V1_8_0(1800), V1_8_1(1810), V1_8_2(1820), V1_8_3(1830), V1_8_4(1840), V1_8_5(1850), V1_8_6(
             1860

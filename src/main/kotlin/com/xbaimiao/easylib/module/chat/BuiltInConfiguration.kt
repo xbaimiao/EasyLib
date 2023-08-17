@@ -11,7 +11,7 @@ import java.io.File
 @Suppress("unused")
 class BuiltInConfiguration(fileName: String) : YamlConfiguration() {
 
-    private val file: File
+    val file: File
 
     init {
         file = File(EasyPlugin.getPlugin<EasyPlugin>().dataFolder, fileName)

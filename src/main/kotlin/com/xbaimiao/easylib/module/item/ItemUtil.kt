@@ -5,6 +5,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 
 
 /**
@@ -95,4 +96,11 @@ fun Inventory.takeItem(amount: Int = 1, matcher: ItemStack.() -> Boolean): Boole
 
 fun Inventory.hasItem(itemStack: ItemStack, amount: Int): Boolean {
     return this.hasItem(amount) { this.isSimilar(itemStack) }
+}
+
+fun <T : ItemMeta> ItemStack.modifyMeta(apply: T.() -> Unit): ItemStack {
+    if (isAir()) {
+        error("air")
+    }
+    return also { itemMeta = ((itemMeta as? T)?.also(apply) ?: itemMeta) }
 }
