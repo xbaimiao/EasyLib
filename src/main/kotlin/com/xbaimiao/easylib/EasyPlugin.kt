@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib
 
+import com.xbaimiao.easylib.module.chat.Lang
 import com.xbaimiao.easylib.module.ui.InventoryModule
 import com.xbaimiao.easylib.module.utils.Module
 import com.xbaimiao.easylib.module.utils.ModuleManager
@@ -33,6 +34,7 @@ abstract class EasyPlugin : JavaPlugin() {
 
     override fun onLoad() {
         load()
+        Lang.check(this)
         moduleManager.loadAll()
     }
 

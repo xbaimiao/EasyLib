@@ -21,9 +21,31 @@ object Lang {
             file = File(EasyPlugin.getPlugin<EasyPlugin>().dataFolder, "lang.yml")
             field = value
         }
+
     private var jarLang: YamlConfiguration? = null
     private var file: File? = null
     private var init = false
+
+    fun check(plugin: JavaPlugin) {
+        val inputStream = plugin.getResource("lang.yml")
+        if (inputStream != null) {
+            val langFile = File(plugin.dataFolder, "lang.yml")
+            if (!langFile.exists()) {
+                plugin.saveResource("lang.yml", false)
+            }
+
+            val langFileConfiguration = YamlConfiguration.loadConfiguration(langFile)
+            val jarLang = YamlConfiguration.loadConfiguration(
+                BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8))
+            )
+            for (key in jarLang.getKeys(true)) {
+                if (!langFileConfiguration.contains(key)) {
+                    langFileConfiguration[key] = jarLang[key]
+                }
+            }
+            langFileConfiguration.save(langFile)
+        }
+    }
 
     private fun init(plugin: JavaPlugin) {
         if (init) {
@@ -56,7 +78,7 @@ object Lang {
         }
     }
 
-    fun reload(){
+    fun reload() {
         init = false
         init(EasyPlugin.getPlugin())
     }
