@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '2.2.8'
+    version = '2.2.9'
 
     repositories {
         mavenCentral()
@@ -36,7 +36,7 @@ allprojects {
         compileOnly("public:vault:1.0.0")
         compileOnly("public:points:1.0.0")
         compileOnly("net.luckperms:api:5.4")
-
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
     }
 
     compileKotlin {

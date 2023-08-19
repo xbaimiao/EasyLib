@@ -3,37 +3,14 @@ package com.xbaimiao.easylib.module.database
 import com.xbaimiao.easylib.EasyPlugin
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.bukkit.configuration.ConfigurationSection
+import java.sql.Connection
 
-class HikariDatabase(
-    private val host: String,
-    private val port: Int,
-    private val database: String,
-    private val user: String,
-    private val passwd: String,
-    private val ssl: Boolean
-) {
-
-    constructor(configuration: ConfigurationSection) : this(
-        host = configuration.getString("host")!!,
-        port = configuration.getInt("port"),
-        database = configuration.getString("database")!!,
-        user = configuration.getString("user")!!,
-        passwd = configuration.getString("passwd")!!,
-        ssl = configuration.getBoolean("ssl"),
-    )
+abstract class HikariDatabase(url: String, user: String?, passwd: String?) : SQLDatabase {
 
     val config: HikariConfig
     val dataSource: HikariDataSource
 
     init {
-        val url = String.format(
-            "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true",
-            host,
-            port,
-            database,
-            ssl
-        )
         config = HikariConfig()
         config.poolName = EasyPlugin.getPlugin<EasyPlugin>().name + "-MySQLConnectionPool"
         config.minimumIdle = 4
@@ -46,6 +23,12 @@ class HikariDatabase(
         config.password = passwd
         config.maxLifetime = 60000
         dataSource = HikariDataSource(config)
+    }
+
+    override fun useConnection(block: (Connection) -> Unit) {
+        dataSource.connection.use {
+            block(it)
+        }
     }
 
 }

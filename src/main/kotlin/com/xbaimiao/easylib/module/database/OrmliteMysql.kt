@@ -1,12 +1,9 @@
 package com.xbaimiao.easylib.module.database
 
-import com.j256.ormlite.dao.Dao
-import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.jdbc.DataSourceConnectionSource
 import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Level
 import com.j256.ormlite.support.ConnectionSource
-import com.j256.ormlite.table.TableUtils
 import org.bukkit.configuration.ConfigurationSection
 
 class OrmliteMysql(
@@ -17,12 +14,24 @@ class OrmliteMysql(
     private val passwd: String,
     private val ssl: Boolean,
     private val hikariCP: Boolean
-) : Ormlite {
+) : AbstractOrmliteDatabase() {
 
-    override val connectionSource: ConnectionSource
+    override val connectionSource: ConnectionSource by lazy {
+        val url = String.format(
+            "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true",
+            host,
+            port,
+            database,
+            ssl
+        )
+        if (hikariCP) {
+            DataSourceConnectionSource(HikariDatabase(host, port, database, user, passwd, ssl).dataSource, url)
+        } else {
+            JdbcConnectionSource(url, user, passwd)
+        }
+    }
 
     init {
-        connectionSource = getConnectionSource()
         com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING)
     }
 
@@ -35,29 +44,5 @@ class OrmliteMysql(
         ssl = configuration.getBoolean("ssl"),
         hikariCP = hikariCP
     )
-
-    @JvmName("getConnectionSource1")
-    private fun getConnectionSource(): ConnectionSource {
-        val url = String.format(
-            "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true",
-            host,
-            port,
-            database,
-            ssl
-        )
-        return if (hikariCP) {
-            DataSourceConnectionSource(HikariDatabase(host, port, database, user, passwd, ssl).dataSource, url)
-        } else {
-            JdbcConnectionSource(url, user, passwd)
-        }
-    }
-
-    override fun <D : Dao<T, *>?, T> createDao(clazz: Class<T>?): D {
-        val dao: Dao<T, *> = DaoManager.createDao(connectionSource, clazz)
-        if (!dao.isTableExists) {
-            TableUtils.createTable(connectionSource, clazz)
-        }
-        return DaoManager.createDao(connectionSource, clazz)
-    }
 
 }
