@@ -25,7 +25,7 @@ class OrmliteMysql(
             ssl
         )
         if (hikariCP) {
-            DataSourceConnectionSource(HikariDatabase(host, port, database, user, passwd, ssl).dataSource, url)
+            DataSourceConnectionSource(MysqlHikariDatabase(host, port, database, user, passwd, ssl).dataSource, url)
         } else {
             JdbcConnectionSource(url, user, passwd)
         }
