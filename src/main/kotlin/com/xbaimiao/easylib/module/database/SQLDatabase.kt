@@ -13,6 +13,6 @@ interface SQLDatabase {
     /**
      * 使用一个链接，链接会自动释放
      */
-    fun useConnection(block: (Connection) -> Unit)
+    fun <T> useConnection(block: (Connection) -> T): T
 
 }

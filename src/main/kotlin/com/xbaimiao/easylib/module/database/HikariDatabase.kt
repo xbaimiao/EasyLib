@@ -25,10 +25,8 @@ abstract class HikariDatabase(url: String, user: String?, passwd: String?) : SQL
         dataSource = HikariDataSource(config)
     }
 
-    override fun useConnection(block: (Connection) -> Unit) {
-        dataSource.connection.use {
-            block(it)
-        }
+    override fun <T> useConnection(block: (Connection) -> T): T {
+        return dataSource.connection.use { block(it) }
     }
 
 }

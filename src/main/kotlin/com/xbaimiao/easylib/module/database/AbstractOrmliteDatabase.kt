@@ -21,10 +21,9 @@ abstract class AbstractOrmliteDatabase : Ormlite {
         return DaoManager.createDao(connectionSource, clazz)
     }
 
-    override fun useConnection(block: (Connection) -> Unit) {
+    override fun <T> useConnection(block: (Connection) -> T): T {
         val connection = connectionSource.getReadOnlyConnection("")
-        block(connection.underlyingConnection)
-        connectionSource.releaseConnection(connection)
+        return block(connection.underlyingConnection).also { connectionSource.releaseConnection(connection) }
     }
 
 }
