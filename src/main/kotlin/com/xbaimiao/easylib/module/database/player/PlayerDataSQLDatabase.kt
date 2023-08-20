@@ -48,14 +48,39 @@ class PlayerDataSQLDatabase(private val sqlDatabase: SQLDatabase, private val ta
     override fun set(user: String, namespace: String, value: String) {
         debug("set $user $namespace $value")
         sqlDatabase.useConnection { connection ->
-            connection.prepareStatement("INSERT INTO $tableName (playerUUID, namespace, value) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE value = ?;")
+            if (has(user, namespace)) {
+                // update
+                connection.prepareStatement("UPDATE $tableName SET value = ? WHERE playerUUID = ? AND namespace = ?;")
+                    .use {
+                        it.setBytes(1, value.toByteArray())
+                        it.setString(2, user)
+                        it.setString(3, namespace)
+                        it.executeUpdate()
+                        debug("set $user $namespace $value success")
+                    }
+            } else {
+                // insert
+                connection.prepareStatement("INSERT INTO $tableName (playerUUID, namespace, value) VALUES (?, ?, ?);")
+                    .use {
+                        it.setString(1, user)
+                        it.setString(2, namespace)
+                        it.setBytes(3, value.toByteArray())
+                        it.executeUpdate()
+                        debug("set $user $namespace $value success")
+                    }
+            }
+        }
+    }
+
+    private fun has(user: String, namespace: String): Boolean {
+        return sqlDatabase.useConnection { connection ->
+            connection.prepareStatement("SELECT value FROM $tableName WHERE playerUUID = ? AND namespace = ?;")
                 .use {
                     it.setString(1, user)
                     it.setString(2, namespace)
-                    it.setBytes(3, value.toByteArray())
-                    it.setBytes(4, value.toByteArray())
-                    it.executeUpdate()
-                    debug("set $user $namespace $value success")
+                    it.executeQuery().use { resultSet ->
+                        return@useConnection resultSet.next()
+                    }
                 }
         }
     }
