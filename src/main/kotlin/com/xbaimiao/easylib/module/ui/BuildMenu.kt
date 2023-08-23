@@ -14,7 +14,15 @@ import org.bukkit.inventory.ItemStack
  * @author xbaimiao
  * @since 2023/8/23 14:06
  */
+class Variable(val key: String, val value: String)
+
 inline fun <reified T : Basic> buildMenu(player: Player, configuration: ConfigurationSection, func: T.() -> Unit) {
+    buildMenu<T>(player, configuration, listOf(), func)
+}
+
+inline fun <reified T : Basic> buildMenu(
+    player: Player, configuration: ConfigurationSection, variables: List<Variable>, func: T.() -> Unit
+) {
     val title = configuration.getString("title", " ")!!.colored()
     val sort = configuration.getStringList("sort").map { it.toCharArray().toList() }
 
@@ -28,7 +36,14 @@ inline fun <reified T : Basic> buildMenu(player: Player, configuration: Configur
             }
             val name = section.getString("$key.name", " ")!!.colored()
             val material = section.getString("$key.material", "STONE")!!.parseToXMaterial()
-            val lore = section.getStringList("$key.lore").colored()
+            val lore = section.getStringList("$key.lore").colored().toMutableList()
+            lore.replaceAll {
+                var result = it
+                for (variable in variables) {
+                    result = result.replace(variable.key, variable.value)
+                }
+                result
+            }
             val customModelData = section.getInt("$key.custom_model_data")
 
             items[key[0]] = buildItem(material) {
