@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.ui
 
+import com.xbaimiao.easylib.bridge.replacePlaceholder
 import com.xbaimiao.easylib.module.utils.submit
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -40,9 +41,11 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
     var items = ConcurrentHashMap<Char, ItemStack>()
 
     var slotItems = ConcurrentHashMap<Int, ItemStack>()
+
     /** 抽象字符布局 **/
     var slots = CopyOnWriteArrayList<List<Char>>()
     var slotList = CopyOnWriteArrayList<Slot>()
+
     /**
      * 行数
      * 为 1 - 6 之间的整数，并非原版 9 的倍数
@@ -157,7 +160,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         slotItems[slot] = itemStack
     }
 
-    fun set(slot:List<Int>,itemStack: ItemStack){
+    fun set(slot: List<Int>, itemStack: ItemStack) {
         slot.forEach {
             slotItems[it] = itemStack
         }
@@ -203,7 +206,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
     }
 
     private fun createTitle(): String {
-        return title
+        return title.replacePlaceholder(player)
     }
 
     /**

@@ -238,3 +238,5 @@ fun printStackTrace(plugin: JavaPlugin = EasyPlugin.getPlugin(), e: Throwable) {
         }"
     )
 }
+
+val plugin get() = EasyPlugin.getPlugin<EasyPlugin>()

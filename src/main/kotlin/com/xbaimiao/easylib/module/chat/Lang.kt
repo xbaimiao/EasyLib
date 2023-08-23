@@ -3,6 +3,7 @@ package com.xbaimiao.easylib.module.chat
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.module.utils.colored
 import com.xbaimiao.easylib.module.utils.info
+import com.xbaimiao.easylib.module.utils.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -18,7 +19,7 @@ object Lang {
     var configuration: ConfigurationSection? = null
         set(value) {
             init = true
-            file = File(EasyPlugin.getPlugin<EasyPlugin>().dataFolder, "lang.yml")
+            file = File(plugin.dataFolder, "lang.yml")
             field = value
         }
 
