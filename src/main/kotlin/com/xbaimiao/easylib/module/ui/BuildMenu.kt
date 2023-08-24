@@ -26,31 +26,16 @@ inline fun <reified T : Basic> buildMenu(
     val title = configuration.getString("title", " ")!!.colored()
     val sort = configuration.getStringList("sort").map { it.toCharArray().toList() }
 
-    val items = HashMap<Char, ItemStack>()
+    val items = HashMap<Char, Pair<ItemStack, ConfigurationSection>>()
 
     val section = configuration.getConfigurationSection("items")
     if (section != null) {
         for (key in section.getKeys(false)) {
             if (key.length > 1) {
                 warn("buildMenu: $key is not a char")
+                continue
             }
-            val name = section.getString("$key.name", " ")!!.colored()
-            val material = section.getString("$key.material", "STONE")!!.parseToXMaterial()
-            val lore = section.getStringList("$key.lore").colored().toMutableList()
-            lore.replaceAll {
-                var result = it
-                for (variable in variables) {
-                    result = result.replace(variable.key, variable.value)
-                }
-                result
-            }
-            val customModelData = section.getInt("$key.custom_model_data")
-
-            items[key[0]] = buildItem(material) {
-                this.name = name
-                this.lore.addAll(lore)
-                this.customModelData = customModelData
-            }
+            items[key[0]] = section.convertItem(key, variables) to section.getConfigurationSection(key)!!
         }
     }
 
@@ -59,8 +44,32 @@ inline fun <reified T : Basic> buildMenu(
     basic.slots.addAll(sort)
 
     items.forEach { (k, v) ->
-        basic.set(k, v)
+        basic.set(k, v.first)
+        basic.setItemSection(k, v.second)
     }
 
     func(basic)
+}
+
+@JvmOverloads
+fun ConfigurationSection.convertItem(key: String, variables: List<Variable> = emptyList()): ItemStack {
+    var name = this.getString("$key.name", " ")!!.colored()
+    for (variable in variables) {
+        name = name.replace(variable.key, variable.value)
+    }
+    val material = this.getString("$key.material", "STONE")!!.parseToXMaterial()
+    val lore = this.getStringList("$key.lore").colored().toMutableList()
+    lore.replaceAll {
+        var result = it
+        for (variable in variables) {
+            result = result.replace(variable.key, variable.value)
+        }
+        result
+    }
+    val customModelData = this.getInt("$key.custom_model_data")
+    return buildItem(material) {
+        this.name = name
+        this.lore.addAll(lore)
+        this.customModelData = customModelData
+    }
 }
