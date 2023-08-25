@@ -16,12 +16,19 @@ import org.bukkit.inventory.ItemStack
  */
 class Variable(val key: String, val value: String)
 
-inline fun <reified T : Basic> buildMenu(player: Player, configuration: ConfigurationSection, func: T.() -> Unit) {
+inline fun <reified T : Basic> buildMenu(
+    player: Player,
+    configuration: ConfigurationSection,
+    func: T.() -> Unit
+) {
     buildMenu<T>(player, configuration, listOf(), func)
 }
 
 inline fun <reified T : Basic> buildMenu(
-    player: Player, configuration: ConfigurationSection, variables: List<Variable>, func: T.() -> Unit
+    player: Player,
+    configuration: ConfigurationSection,
+    variables: List<Variable>,
+    func: T.() -> Unit
 ) {
     val title = configuration.getString("title", " ")!!.colored()
     val sort = configuration.getStringList("sort").map { it.toCharArray().toList() }
@@ -66,10 +73,16 @@ fun ConfigurationSection.convertItem(key: String, variables: List<Variable> = em
         }
         result
     }
-    val customModelData = this.getInt("$key.custom_model_data")
+    var customModelData = this.getString("$key.custom_model_data", "0")!!
+    for (variable in variables) {
+        customModelData = customModelData.replace(variable.key, variable.value)
+    }
+
     return buildItem(material) {
         this.name = name
         this.lore.addAll(lore)
-        this.customModelData = customModelData
+        customModelData.toIntOrNull()?.let {
+            this.customModelData = it
+        }
     }
 }
