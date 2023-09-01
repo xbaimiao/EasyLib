@@ -64,7 +64,6 @@ fun ConfigurationSection.convertItem(key: String, variables: List<Variable> = em
     for (variable in variables) {
         name = name.replace(variable.key, variable.value)
     }
-    val material = this.getString("$key.material", "STONE")!!.parseToXMaterial()
     val lore = this.getStringList("$key.lore").colored().toMutableList()
     lore.replaceAll {
         var result = it
@@ -78,8 +77,11 @@ fun ConfigurationSection.convertItem(key: String, variables: List<Variable> = em
         customModelData = customModelData.replace(variable.key, variable.value)
     }
 
-    return buildItem(material) {
+    val xMaterial = this.getString("$key.material", "STONE")!!.parseToXMaterial()
+
+    return buildItem(xMaterial) {
         this.name = name
+        this.damage = this@convertItem.getInt("$key.durability")
         this.lore.addAll(lore)
         customModelData.toIntOrNull()?.let {
             this.customModelData = it
