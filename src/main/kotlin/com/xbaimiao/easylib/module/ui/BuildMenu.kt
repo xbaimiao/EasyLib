@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.module.ui
 
+import com.xbaimiao.easylib.bridge.replacePlaceholder
 import com.xbaimiao.easylib.module.chat.colored
 import com.xbaimiao.easylib.module.item.buildItem
 import com.xbaimiao.easylib.module.utils.parseToXMaterial
@@ -42,7 +43,7 @@ inline fun <reified T : Basic> buildMenu(
                 warn("buildMenu: $key is not a char")
                 continue
             }
-            items[key[0]] = section.convertItem(key, variables) to section.getConfigurationSection(key)!!
+            items[key[0]] = section.convertItem(player,key, variables) to section.getConfigurationSection(key)!!
         }
     }
 
@@ -59,12 +60,12 @@ inline fun <reified T : Basic> buildMenu(
 }
 
 @JvmOverloads
-fun ConfigurationSection.convertItem(key: String, variables: List<Variable> = emptyList()): ItemStack {
-    var name = this.getString("$key.name", " ")!!.colored()
+fun ConfigurationSection.convertItem(player: Player,key: String, variables: List<Variable> = emptyList()): ItemStack {
+    var name = this.getString("$key.name", " ")!!.colored().replacePlaceholder(player)
     for (variable in variables) {
         name = name.replace(variable.key, variable.value)
     }
-    val lore = this.getStringList("$key.lore").colored().toMutableList()
+    val lore = this.getStringList("$key.lore").colored().replacePlaceholder(player).toMutableList()
     lore.replaceAll {
         var result = it
         for (variable in variables) {

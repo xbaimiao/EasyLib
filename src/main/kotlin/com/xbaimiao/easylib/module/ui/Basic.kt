@@ -17,7 +17,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 open class Basic(player: Player, title: String = "chest") : Menu(title, player) {
 
     /** 行数 **/
-    internal var rows = -1
+    var rows = -1
+        private set
 
     /** 锁定主手 **/
     internal var handLocked = true
@@ -258,8 +259,8 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
 
         inline fun <reified T : Basic> asyncOpen(player: Player, title: String, crossinline build: T.() -> Unit) {
             submit(async = true) {
-                val basic = T::class.java.getConstructor(Player::class.java, String::class.java)
-                    .newInstance(player, title) as T
+                val basic =
+                    T::class.java.getConstructor(Player::class.java, String::class.java).newInstance(player, title) as T
                 build.invoke(basic)
                 basic.openAsync()
             }
