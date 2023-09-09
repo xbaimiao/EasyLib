@@ -1,6 +1,6 @@
 package com.xbaimiao.easylib.bridge.economy
 
-import com.xbaimiao.easylib.module.utils.warn
+import com.xbaimiao.easylib.util.warn
 import org.black_ixx.playerpoints.PlayerPoints
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer

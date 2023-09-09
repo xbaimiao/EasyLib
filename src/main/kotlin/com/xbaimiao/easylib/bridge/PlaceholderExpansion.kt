@@ -1,7 +1,7 @@
 package com.xbaimiao.easylib.bridge
 
 import com.xbaimiao.easylib.EasyPlugin
-import com.xbaimiao.easylib.module.utils.warn
+import com.xbaimiao.easylib.util.warn
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import java.util.*

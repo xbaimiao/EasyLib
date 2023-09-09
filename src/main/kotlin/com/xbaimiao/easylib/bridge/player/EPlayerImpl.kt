@@ -1,8 +1,8 @@
 package com.xbaimiao.easylib.bridge.player
 
 import com.cryptomorin.xseries.messages.ActionBar
-import com.xbaimiao.easylib.module.sound.parseToESound
-import com.xbaimiao.easylib.module.utils.parseECommand
+import com.xbaimiao.easylib.util.eu.parseECommand
+import com.xbaimiao.easylib.util.eu.parseToESound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 

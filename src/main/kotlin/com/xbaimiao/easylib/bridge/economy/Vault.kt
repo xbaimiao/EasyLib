@@ -1,7 +1,7 @@
 package com.xbaimiao.easylib.bridge.economy
 
-import com.xbaimiao.easylib.module.utils.info
-import com.xbaimiao.easylib.module.utils.warn
+import com.xbaimiao.easylib.util.info
+import com.xbaimiao.easylib.util.warn
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 

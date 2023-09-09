@@ -13,6 +13,7 @@ fun String.replacePlaceholder(player: Player): String {
         this
     }
 }
+
 fun String.replacePlaceholder(player: OfflinePlayer): String {
     return try {
         if (player.isOnline) {
