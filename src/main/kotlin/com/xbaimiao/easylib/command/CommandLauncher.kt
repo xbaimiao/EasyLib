@@ -4,13 +4,13 @@ import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.chat.TellrawJson
 import com.xbaimiao.easylib.nms.MinecraftVersion
 import com.xbaimiao.easylib.util.Strings
-import com.xbaimiao.easylib.util.invokeMethod
 import com.xbaimiao.easylib.util.isSuperClassOf
 import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
 import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginCommand
 import org.bukkit.plugin.Plugin
+import org.tabooproject.reflex.Reflex.Companion.invokeMethod
 
 class CommandLauncher<T : CommandSender>(
     override val command: String,

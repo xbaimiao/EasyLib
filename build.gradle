@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.0.0'
+    version = '3.0.1'
 
     repositories {
         mavenCentral()
@@ -105,7 +105,7 @@ tasks {
         relocate("org.wltea.expression", "com.xbaimiao.easylib.expression")
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
-        relocate("org.ow2.asm", "com.xbaimiao.easylib.asm")
+        relocate("org.objectweb.asm", "com.xbaimiao.easylib.asm")
     }
     // UTF-8
     compileJava {

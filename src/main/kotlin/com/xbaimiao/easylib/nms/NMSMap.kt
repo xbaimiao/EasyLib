@@ -233,19 +233,33 @@ class NMSMap(val image: BufferedImage, var hand: Hand = Hand.MAIN, val builder: 
 
     fun sendTo(player: Player) {
         submit(delay = 3, async = true) {
-            val container = if (MinecraftVersion.isUniversal) {
-                player.getProperty<Any>("entity/inventoryMenu")
-            } else {
-                player.getProperty<Any>("entity/defaultContainer")
-            }!!
-            val windowsId = if (MinecraftVersion.isUniversal) {
-                container.getProperty<Int>("containerId")
-            } else {
-                container.getProperty<Int>("windowId")
-            }!!
+            val container =
+                if (MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_20_0)) {
+                    player.getProperty<Any>("entity/bQ")!!
+                } else if (MinecraftVersion.isUniversal) {
+                    player.getProperty<Any>("entity/inventoryMenu")!!
+                } else {
+                    player.getProperty<Any>("entity/defaultContainer")!!
+                }
+
+            println(container.toString() + container::class.java.name)
+
+            val windowsId =
+                if (MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_20_0)) {
+                    container.getProperty<Any>("k")!!
+                } else if (MinecraftVersion.isUniversal) {
+                    container.getProperty<Int>("containerId")
+                } else {
+                    container.getProperty<Int>("windowId")
+                }!!
             val nmsItem = classCraftItemStack.invokeMethod<Any>("asNMSCopy", mapItem, isStatic = true)
-            player.sendPacket(classPacketPlayOutSetSlot.unsafeInstance().also {
-                if (MinecraftVersion.isUniversal) {
+            player.sendPacketBlocking(classPacketPlayOutSetSlot.unsafeInstance().also {
+                if (MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_20_0)) {
+                    it.setProperty("c", windowsId)
+                    it.setProperty("d", 1)
+                    it.setProperty("e", getMainHandSlot(player))
+                    it.setProperty("f", nmsItem)
+                } else if (MinecraftVersion.isUniversal) {
                     it.setProperty("containerId", windowsId)
                     it.setProperty("stateId", 1)
                     it.setProperty("slot", getMainHandSlot(player))
@@ -259,6 +273,19 @@ class NMSMap(val image: BufferedImage, var hand: Hand = Hand.MAIN, val builder: 
             val buffer = mapView.invokeMethod<Any>("render", player)!!.getProperty<ByteArray>("buffer")
             val packet = classPacketPlayOutMap.unsafeInstance()
             when {
+                MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_20_0) -> {
+                    packet.setProperty("a", (mapItem.itemMeta as MapMeta).mapId)
+                    packet.setProperty("b", mapView.scale.value)
+                    packet.setProperty("c", false)
+                    packet.setProperty("d", ArrayList<Any>())
+                    packet.setProperty("e", classMapData.unsafeInstance().also {
+                        it.setProperty("a", 0)
+                        it.setProperty("b", 0)
+                        it.setProperty("c", 128)
+                        it.setProperty("d", 128)
+                        it.setProperty("e", buffer)
+                    })
+                }
                 // 1.17+
                 MinecraftVersion.isUniversal -> {
                     packet.setProperty("mapId", (mapItem.itemMeta as MapMeta).mapId)
@@ -314,7 +341,7 @@ class NMSMap(val image: BufferedImage, var hand: Hand = Hand.MAIN, val builder: 
                     packet.setProperty("h", buffer)
                 }
             }
-            player.sendPacket(packet)
+            player.sendPacketBlocking(packet)
         }
     }
 

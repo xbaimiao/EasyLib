@@ -2,10 +2,12 @@ package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.nms.PacketSender
+import com.xbaimiao.easylib.nms.RefRemapper
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.registerListener
 import com.xbaimiao.easylib.util.submit
 import org.bukkit.plugin.java.JavaPlugin
+import org.tabooproject.reflex.Reflex
 
 abstract class EasyPlugin : JavaPlugin() {
 
@@ -28,6 +30,7 @@ abstract class EasyPlugin : JavaPlugin() {
     open fun disable() {}
 
     override fun onLoad() {
+        Reflex.remapper.add(RefRemapper)
         load()
         Lang.check(this)
     }

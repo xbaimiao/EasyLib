@@ -15,6 +15,9 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.*
 import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionEffect
+import org.tabooproject.reflex.Reflex.Companion.getProperty
+import org.tabooproject.reflex.Reflex.Companion.invokeMethod
+import org.tabooproject.reflex.Reflex.Companion.setProperty
 import java.util.*
 
 

@@ -1,6 +1,5 @@
 package com.xbaimiao.easylib.nms
 
-import com.xbaimiao.easylib.util.getProperty
 import com.xbaimiao.easylib.util.submit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -8,6 +7,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.tabooproject.reflex.ClassMethod
+import org.tabooproject.reflex.Reflex.Companion.getProperty
 import org.tabooproject.reflex.ReflexClass
 import java.util.concurrent.ConcurrentHashMap
 
@@ -28,9 +28,13 @@ object PacketSender : Listener {
             // 1.18 更名为 send 方法
             sendPacketMethod = if (MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_18)) {
                 try {
-                    reflexClass.getMethod("send", true, true, packet)
+                    reflexClass.getMethod("a", true, true, packet)
                 } catch (_: NoSuchMethodException) {
-                    reflexClass.getMethod("sendPacket", true, true, packet)
+                    try {
+                        reflexClass.getMethod("send", true, true, packet)
+                    } catch (_: NoSuchMethodException) {
+                        reflexClass.getMethod("sendPacket", true, true, packet)
+                    }
                 }
             } else {
                 reflexClass.getMethod("sendPacket", true, true, packet)
@@ -46,7 +50,9 @@ object PacketSender : Listener {
         return if (playerConnectionMap.containsKey(player.name)) {
             playerConnectionMap[player.name]!!
         } else {
-            val connection = if (MinecraftVersion.isUniversal) {
+            val connection = if (MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_20_0)) {
+                player.getProperty<Any>("entity/c")!!
+            } else if (MinecraftVersion.isUniversal) {
                 player.getProperty<Any>("entity/connection")!!
             } else {
                 player.getProperty<Any>("entity/playerConnection")!!
