@@ -11,6 +11,8 @@ abstract class EasyLibBukkitTask(
     private val plugin: JavaPlugin
 ) : EasyLibTask {
 
+    override var isSync: Boolean? = false
+
     private val bukkitRunnable: BukkitRunnable = object : BukkitRunnable() {
         override fun run() {
             this@EasyLibBukkitTask.run()
@@ -30,14 +32,17 @@ abstract class EasyLibBukkitTask(
     }
 
     override fun runTaskAsynchronously() {
+        isSync = true
         bukkitRunnable.runTaskAsynchronously(plugin)
     }
 
     override fun runTaskLaterAsynchronously(delay: Long) {
+        isSync = true
         bukkitRunnable.runTaskLaterAsynchronously(plugin, delay)
     }
 
     override fun runTaskTimerAsynchronously(delay: Long, period: Long) {
+        isSync = true
         bukkitRunnable.runTaskTimerAsynchronously(plugin, delay, period)
     }
 

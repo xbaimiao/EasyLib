@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.0.1'
+    version = '3.0.4'
 
     repositories {
         mavenCentral()
@@ -38,6 +38,7 @@ allprojects {
         compileOnly("public:points:1.0.0")
         compileOnly("net.luckperms:api:5.4")
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
+        compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     }
 
     compileKotlin {
@@ -101,6 +102,7 @@ tasks {
         dependencies {
             exclude(dependency("org.jetbrains.kotlin:"))
             exclude(dependency("org.jetbrains:"))
+            exclude(dependency("org.jetbrains.kotlinx:"))
         }
         relocate("org.wltea.expression", "com.xbaimiao.easylib.expression")
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")

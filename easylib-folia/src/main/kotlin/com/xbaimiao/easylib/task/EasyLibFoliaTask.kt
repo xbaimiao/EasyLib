@@ -15,6 +15,8 @@ abstract class EasyLibFoliaTask(
     private val plugin: JavaPlugin
 ) : EasyLibTask {
 
+    override var isSync: Boolean? = false
+
     private lateinit var scheduledTask: ScheduledTask
 
     private fun runCheck() {
@@ -25,12 +27,12 @@ abstract class EasyLibFoliaTask(
 
     override fun runTask() {
         runCheck()
-        if (location == null) {
-            scheduledTask = Bukkit.getGlobalRegionScheduler().run(plugin) {
+        scheduledTask = if (location == null) {
+            Bukkit.getGlobalRegionScheduler().run(plugin) {
                 this.run()
             }
         } else {
-            scheduledTask = Bukkit.getRegionScheduler().run(plugin, location) {
+            Bukkit.getRegionScheduler().run(plugin, location) {
                 this.run()
             }
         }
@@ -38,12 +40,12 @@ abstract class EasyLibFoliaTask(
 
     override fun runTaskLater(delay: Long) {
         runCheck()
-        if (location == null) {
-            scheduledTask = Bukkit.getGlobalRegionScheduler().runDelayed(plugin, {
+        scheduledTask = if (location == null) {
+            Bukkit.getGlobalRegionScheduler().runDelayed(plugin, {
                 this.run()
             }, delay)
         } else {
-            scheduledTask = Bukkit.getRegionScheduler().runDelayed(plugin, location, {
+            Bukkit.getRegionScheduler().runDelayed(plugin, location, {
                 this.run()
             }, delay)
         }
@@ -51,12 +53,12 @@ abstract class EasyLibFoliaTask(
 
     override fun runTaskTimer(delay: Long, period: Long) {
         runCheck()
-        if (location == null) {
-            scheduledTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, {
+        scheduledTask = if (location == null) {
+            Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, {
                 this.run()
             }, delay, period)
         } else {
-            scheduledTask = Bukkit.getRegionScheduler().runAtFixedRate(plugin, location, {
+            Bukkit.getRegionScheduler().runAtFixedRate(plugin, location, {
                 this.run()
             }, delay, period)
         }
@@ -64,6 +66,7 @@ abstract class EasyLibFoliaTask(
 
     override fun runTaskAsynchronously() {
         runCheck()
+        isSync = true
         scheduledTask = Bukkit.getAsyncScheduler().runNow(plugin) {
             this.run()
         }
@@ -71,6 +74,7 @@ abstract class EasyLibFoliaTask(
 
     override fun runTaskLaterAsynchronously(delay: Long) {
         runCheck()
+        isSync = true
         scheduledTask = Bukkit.getAsyncScheduler().runDelayed(plugin, {
             this.run()
         }, delay * 50, TimeUnit.MILLISECONDS)
@@ -78,6 +82,7 @@ abstract class EasyLibFoliaTask(
 
     override fun runTaskTimerAsynchronously(delay: Long, period: Long) {
         runCheck()
+        isSync = true
         scheduledTask = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, {
             this.run()
         }, delay * 50, period * 50, TimeUnit.MILLISECONDS)
