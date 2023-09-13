@@ -1,6 +1,7 @@
 package com.xbaimiao.easylib.nms
 
 import com.cryptomorin.xseries.XMaterial
+import com.xbaimiao.easylib.skedule.schedule
 import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -16,36 +17,10 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.lang.reflect.Array
 import java.net.URL
-import java.util.concurrent.CompletableFuture
 import javax.imageio.ImageIO
 
 /**
  * 创建地图画（堵塞）
- *
- * @param url 图像地址
- * @param width 图像宽度
- * @param height 图像高度
- */
-@Deprecated(
-    "Network I/O on main thread",
-    ReplaceWith(
-        "buildMap(URL(url), hand, width, height, builder)",
-        "java.net.URL",
-        "java.util.concurrent.CompletableFuture"
-    )
-)
-fun buildMap(
-    url: String,
-    hand: NMSMap.Hand = NMSMap.Hand.MAIN,
-    width: Int = 128,
-    height: Int = 128,
-    builder: ItemBuilder.() -> Unit = {}
-): NMSMap {
-    return NMSMap(URL(url).openStream().use { ImageIO.read(it) }.zoomed(width, height), hand, builder)
-}
-
-/**
- * 创建地图画（异步）
  *
  * @param url 图像地址
  * @param width 图像宽度
@@ -57,10 +32,8 @@ fun buildMap(
     width: Int = 128,
     height: Int = 128,
     builder: ItemBuilder.() -> Unit = {}
-): CompletableFuture<NMSMap> {
-    return CompletableFuture.supplyAsync {
-        NMSMap(url.openStream().use { ImageIO.read(it) }.zoomed(width, height), hand, builder)
-    }
+): NMSMap {
+    return NMSMap(url.openStream().use { ImageIO.read(it) }.zoomed(width, height), hand, builder)
 }
 
 /**
@@ -105,30 +78,18 @@ fun buildMap(
  * @param height 图像高度
  */
 fun Player.sendMap(
-    url: String,
-    hand: NMSMap.Hand = NMSMap.Hand.MAIN,
-    width: Int = 128,
-    height: Int = 128,
-    builder: ItemBuilder.() -> Unit = {}
-) {
-    buildMap(URL(url), hand, width, height, builder).thenAccept { it.sendTo(this) }
-}
-
-/**
- * 打开地图画（异步）
- *
- * @param url 图像地址
- * @param width 图像宽度
- * @param height 图像高度
- */
-fun Player.sendMap(
     url: URL,
     hand: NMSMap.Hand = NMSMap.Hand.MAIN,
     width: Int = 128,
     height: Int = 128,
     builder: ItemBuilder.() -> Unit = {}
 ) {
-    buildMap(url, hand, width, height, builder).thenAccept { it.sendTo(this) }
+    schedule {
+        val map = async {
+            buildMap(url, hand, width, height, builder)
+        }
+        map.sendTo(this@sendMap)
+    }
 }
 
 /**
@@ -145,7 +106,12 @@ fun Player.sendMap(
     height: Int = 128,
     builder: ItemBuilder.() -> Unit = {}
 ) {
-    buildMap(file, hand, width, height, builder).sendTo(this)
+    schedule {
+        val map = async {
+            buildMap(file, hand, width, height, builder)
+        }
+        map.sendTo(this@sendMap)
+    }
 }
 
 /**
@@ -162,7 +128,12 @@ fun Player.sendMap(
     height: Int = 128,
     builder: ItemBuilder.() -> Unit = {}
 ) {
-    buildMap(image, hand, width, height, builder).sendTo(this)
+    schedule {
+        val map = async {
+            buildMap(image, hand, width, height, builder)
+        }
+        map.sendTo(this@sendMap)
+    }
 }
 
 /**
@@ -241,8 +212,6 @@ class NMSMap(val image: BufferedImage, var hand: Hand = Hand.MAIN, val builder: 
                 } else {
                     player.getProperty<Any>("entity/defaultContainer")!!
                 }
-
-            println(container.toString() + container::class.java.name)
 
             val windowsId =
                 if (MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_20_0)) {

@@ -27,7 +27,6 @@ class NonRepeatingTaskScheduler(private val scheduler: EasyScheduler) : TaskSche
         }
     }
 
-    //TODO Be lazy if not yet started
     override fun doContextSwitch(context: SynchronizationContext, task: (Boolean) -> Unit) {
         val currentContext = currentContext()
         if (context == currentContext) {

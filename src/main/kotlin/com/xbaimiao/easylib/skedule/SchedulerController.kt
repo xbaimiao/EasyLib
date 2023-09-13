@@ -1,10 +1,14 @@
 package com.xbaimiao.easylib.skedule
 
 import com.xbaimiao.easylib.task.EasyLibTask
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlin.coroutines.*
 
-@RestrictsSuspension
-class SchedulerController(scheduler: EasyScheduler) : Continuation<Unit> {
+class SchedulerController(
+    scheduler: EasyScheduler
+) : Continuation<Unit>, CoroutineScope by CoroutineScope(EmptyCoroutineContext) {
 
     override val context: CoroutineContext
         get() = EmptyCoroutineContext
@@ -48,6 +52,32 @@ class SchedulerController(scheduler: EasyScheduler) : Continuation<Unit> {
      */
     suspend fun <T> sync(syncFunc: () -> T): T = suspendCoroutine { cont ->
         schedulerDelegate.doSync(syncFunc) { cont.resume(it) }
+    }
+
+    /**
+     * 启动协作程序运行一段代码 此方法等同于Bukkit runTaskAsynchronously 方法 但他不会等待结果而是还会接着往下运行 除非你调用 [Deferred.await] 方法
+     */
+    fun <T> runAsync(asyncFunc: suspend SchedulerController.() -> T): Deferred<T> {
+        return async(asyncDispatcher) {
+            asyncFunc(this@SchedulerController)
+        }
+    }
+
+    suspend fun <T> callAsync(asyncFunc: suspend SchedulerController.() -> T): T {
+        return runAsync(asyncFunc).await()
+    }
+
+    /**
+     * 启动协作程序运行一段代码 此方法等同于Bukkit runTask 方法 但他不会等待结果而是还会接着往下运行 除非你调用 [Deferred.await] 方法
+     */
+    fun <T> runSync(syncFunc: suspend SchedulerController.() -> T): Deferred<T> {
+        return async(syncDispatcher) {
+            syncFunc(this@SchedulerController)
+        }
+    }
+
+    suspend fun <T> callSync(syncFunc: suspend SchedulerController.() -> T): T {
+        return runSync(syncFunc).await()
     }
 
     /**

@@ -3,6 +3,7 @@ package com.xbaimiao.easylib.skedule
 import com.xbaimiao.easylib.task.EasyLibTask
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
+import java.util.concurrent.Executor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
@@ -11,7 +12,9 @@ import kotlin.coroutines.resume
 class BukkitDispatcher(
     private val async: Boolean = false,
     private val scheduler: EasyScheduler
-) : CoroutineDispatcher(), Delay {
+) : ExecutorCoroutineDispatcher(), Delay, Executor {
+
+    private var closed = false
 
     private val runTaskLater: (Runnable, Long) -> EasyLibTask =
         if (async)
@@ -35,8 +38,20 @@ class BukkitDispatcher(
         continuation.invokeOnCancellation { task.cancel() }
     }
 
+    override fun close() {
+        closed = true
+    }
+
+    override val executor: Executor = Executor {
+        if (async) {
+            scheduler.runTaskAsynchronously(it)
+        } else {
+            scheduler.runTask(it)
+        }
+    }
+
     override fun dispatch(context: CoroutineContext, block: Runnable) {
-        if (!context.isActive) {
+        if (!context.isActive || closed) {
             return
         }
 
@@ -47,11 +62,19 @@ class BukkitDispatcher(
         }
     }
 
+    override fun execute(command: java.lang.Runnable) {
+        if (closed) {
+            return
+        }
+        executor.execute(command)
+    }
+
 }
 
 fun currentContext() = if (Bukkit.isPrimaryThread()) SynchronizationContext.SYNC else SynchronizationContext.ASYNC
 
-fun dispatcher(async: Boolean = false) = BukkitDispatcher(async, EasyScheduler)
+val asyncDispatcher: ExecutorCoroutineDispatcher by lazy { BukkitDispatcher(true, EasyScheduler) }
+val syncDispatcher: ExecutorCoroutineDispatcher by lazy { BukkitDispatcher(false, EasyScheduler) }
 
 /**
  * Schedule a coroutine with the Bukkit Scheduler.
@@ -65,7 +88,7 @@ fun dispatcher(async: Boolean = false) = BukkitDispatcher(async, EasyScheduler)
 fun schedule(
     initialContext: SynchronizationContext = SynchronizationContext.SYNC,
     co: suspend SchedulerController.() -> Unit
-): CoroutineTask {
+): Job {
     val controller = SchedulerController(EasyScheduler)
 
     val block: suspend SchedulerController.() -> Unit = {
@@ -79,7 +102,13 @@ fun schedule(
         }
     }
 
-    block.createCoroutine(receiver = controller, completion = controller).resume(Unit)
+    val dispatcher = if (initialContext == SynchronizationContext.SYNC) {
+        syncDispatcher
+    } else {
+        asyncDispatcher
+    }
 
-    return CoroutineTask(controller)
+    return controller.launch(dispatcher) {
+        block.createCoroutine(receiver = controller, completion = controller).resume(Unit)
+    }
 }
