@@ -29,6 +29,18 @@ val onlinePlayers: ArgNode<Collection<Player>> = ArgNode("player", exec = { toke
     }
 }
 
+val onlinePlayerSingle = ArgNode("player", exec = { token ->
+    Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+}) { name ->
+    Bukkit.getPlayerExact(name)
+}
+
+val offlinePlayerSingle = ArgNode("player", exec = { token ->
+    Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+}) {
+    it
+}
+
 val worlds: ArgNode<World> = ArgNode("world", exec = { token ->
     Bukkit.getWorlds().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
 }, parse = { name ->

@@ -90,6 +90,16 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     }
 
     @JvmOverloads
+    fun players(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Player?>) -> Unit = {}) {
+        arg(onlinePlayerSingle, optional, block)
+    }
+
+    @JvmOverloads
+    fun offlinePlayers(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit = {}) {
+        arg(offlinePlayerSingle, optional, block)
+    }
+
+    @JvmOverloads
     fun worlds(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<World>) -> Unit = {}) {
         arg(worlds, optional, block)
     }
