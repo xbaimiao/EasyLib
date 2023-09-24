@@ -1,16 +1,14 @@
 package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.chat.Lang
-import com.xbaimiao.easylib.nms.Mapping
 import com.xbaimiao.easylib.nms.MappingFile
 import com.xbaimiao.easylib.nms.PacketSender
 import com.xbaimiao.easylib.nms.RefRemapper
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.registerListener
-import com.xbaimiao.easylib.util.submit
 import org.bukkit.plugin.java.JavaPlugin
 import org.tabooproject.reflex.Reflex
-import taboolib.common.env.RuntimeEnv
+import com.xbaimiao.easylib.taboolib.common.env.RuntimeEnv
 
 abstract class EasyPlugin : JavaPlugin() {
 
@@ -28,8 +26,6 @@ abstract class EasyPlugin : JavaPlugin() {
 
     open fun enable() {}
 
-    open fun active() {}
-
     open fun disable() {}
 
     override fun onLoad() {
@@ -43,9 +39,6 @@ abstract class EasyPlugin : JavaPlugin() {
         enable()
         UIHandler.enable(this)
         registerListener(PacketSender)
-        submit {
-            active()
-        }
     }
 
     override fun onDisable() {

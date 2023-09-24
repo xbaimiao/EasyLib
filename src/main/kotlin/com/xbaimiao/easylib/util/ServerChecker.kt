@@ -13,7 +13,7 @@ object ServerChecker {
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer")
             true
-        } catch (ignored: ClassNotFoundException) {
+        } catch (ignored: Exception) {
             false
         }
     }
@@ -22,7 +22,7 @@ object ServerChecker {
         try {
             Class.forName("com.destroystokyo.paper.PaperConfig")
             true
-        } catch (ignored: ClassNotFoundException) {
+        } catch (ignored: Exception) {
             false
         }
     }

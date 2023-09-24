@@ -1,4 +1,4 @@
-package taboolib.common.env;
+package com.xbaimiao.easylib.taboolib.common.env;
 
 import org.jetbrains.annotations.NotNull;
 
