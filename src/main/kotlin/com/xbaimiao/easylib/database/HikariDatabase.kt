@@ -21,7 +21,8 @@ abstract class HikariDatabase(url: String, user: String?, passwd: String?) : SQL
         config.jdbcUrl = url
         config.username = user
         config.password = passwd
-        config.maxLifetime = 60000
+        config.idleTimeout = 60000
+        config.maxLifetime = 1800000
         dataSource = HikariDataSource(config)
     }
 
