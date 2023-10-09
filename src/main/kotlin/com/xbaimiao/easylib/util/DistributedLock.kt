@@ -9,7 +9,17 @@ import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class DistributedLock(private val jedisPool: JedisPool) {
+class DistributedLock(private val jedisPool: JedisPool, val lockName: String) {
+
+    /**
+     * 使用分布式锁执行一段代码
+     */
+    @JvmOverloads
+    suspend fun exec(acquireTimeout: Long = 10000, timeout: Long = 10000, func: () -> Unit) {
+        val identifier = lockWithTimeout(acquireTimeout, timeout) ?: error("加锁超时 请尝试增加 acquireTimeout")
+        func.invoke()
+        releaseLock(identifier)
+    }
 
     /**
      * 加锁
@@ -19,7 +29,7 @@ class DistributedLock(private val jedisPool: JedisPool) {
      * @param timeout        锁的超时时间
      * @return 锁标识
      */
-    suspend fun lockWithTimeout(lockName: String, acquireTimeout: Long, timeout: Long): String? = suspendCoroutine {
+    suspend fun lockWithTimeout(acquireTimeout: Long, timeout: Long): String? = suspendCoroutine {
         // 当前线程
         val context = currentContext()
         // 启用异步线程
@@ -65,7 +75,7 @@ class DistributedLock(private val jedisPool: JedisPool) {
      * @param identifier 释放锁的标识
      * @return 是否释放成功
      */
-    suspend fun releaseLock(lockName: String, identifier: String): Boolean = suspendCoroutine {
+    suspend fun releaseLock(identifier: String): Boolean = suspendCoroutine {
         val context = currentContext()
         schedule(SynchronizationContext.ASYNC) {
             jedisPool.getResource().use { conn ->
