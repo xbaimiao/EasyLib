@@ -11,6 +11,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class DistributedLock(private val jedisPool: JedisPool, val lockName: String) {
 
+    init {
+        if (lockName.contains(":")) {
+            error("lockName 中不能包含 \":\"")
+        }
+    }
+
     /**
      * 使用分布式锁执行一段代码
      */

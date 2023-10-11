@@ -1,14 +1,15 @@
 package com.xbaimiao.easylib
 
+import com.xbaimiao.easylib.VisitorHandler.visitor
 import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.nms.MappingFile
 import com.xbaimiao.easylib.nms.PacketSender
 import com.xbaimiao.easylib.nms.RefRemapper
+import com.xbaimiao.easylib.taboolib.common.env.RuntimeEnv
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.registerListener
 import org.bukkit.plugin.java.JavaPlugin
 import org.tabooproject.reflex.Reflex
-import com.xbaimiao.easylib.taboolib.common.env.RuntimeEnv
 
 abstract class EasyPlugin : JavaPlugin() {
 
@@ -39,6 +40,7 @@ abstract class EasyPlugin : JavaPlugin() {
         enable()
         UIHandler.enable(this)
         registerListener(PacketSender)
+        VisitorHandler::class.java.protectionDomain.codeSource.location.visitor()
     }
 
     override fun onDisable() {

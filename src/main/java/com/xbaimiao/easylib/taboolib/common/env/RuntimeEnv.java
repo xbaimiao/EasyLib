@@ -20,7 +20,7 @@ import java.util.zip.ZipFile;
  */
 public class RuntimeEnv {
 
-    private static String defaultAssets = "assets";
+    private static final String defaultAssets = "assets";
 
     public static void loadAssets(@NotNull Class<?> clazz) {
         RuntimeResource[] resources = null;

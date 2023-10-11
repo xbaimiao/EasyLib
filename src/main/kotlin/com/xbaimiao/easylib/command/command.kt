@@ -1,9 +1,7 @@
 package com.xbaimiao.easylib.command
 
 import com.xbaimiao.easylib.EasyPlugin
-import com.xbaimiao.easylib.util.convertToMilliseconds
-import com.xbaimiao.easylib.util.debug
-import com.xbaimiao.easylib.util.warn
+import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.command.CommandSender
@@ -164,26 +162,19 @@ data class ArgNode<T>(
     }
 }
 
-@Suppress("unused")
-fun registerCommand(clazz: Class<*>): Boolean {
-    val header = clazz.getAnnotation(CommandHeader::class.java)
+fun registerCommand(any: Any): Boolean {
+    val header = any::class.java.getAnnotation(CommandHeader::class.java)
     if (header == null) {
-        warn("The class ${clazz.name} is not a command class")
+        warn("The class ${any::class.java.name} is not a command class")
         return false
     }
 
     val subCommands = ArrayList<CommandSpec<*>>()
 
-    val instance = runCatching {
-        val instance = clazz.getDeclaredField("INSTANCE")
-        instance.isAccessible = true
-        instance.get(clazz)
-    }.getOrElse { clazz.newInstance() }
-
-    for (declaredField in clazz.declaredFields) {
+    for (declaredField in any::class.java.declaredFields) {
         if (declaredField.getAnnotation(CommandBody::class.java) != null) {
             declaredField.isAccessible = true
-            val commandSpec = declaredField.get(instance) as CommandSpec<*>
+            val commandSpec = declaredField.get(any) as CommandSpec<*>
             subCommands.add(commandSpec)
         }
     }
