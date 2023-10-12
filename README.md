@@ -2,17 +2,6 @@
 
 ## 菜单
 
-> 需要在插件主类使用菜单模块
-
-```kotlin
-class EasyTemplate : EasyPlugin() {
-    init {
-        // 代表使用ui根据模块 不使用不会监听ui点击
-        useUIModule()
-    }
-}
-```
-
 ```kotlin
 
 object Menu {
@@ -50,18 +39,12 @@ object Menu {
 
 ## 命令
 
-### 第一种写法 需要执行注册
-
-```kotlin
-override fun enable() {
-    registerCommand(CommandPort::class.java)
-}
-```
+### 第一种写法 object 类 ECommandHeader 无需注册
 
 ```kotlin
 
-@CommandHeader(command = "test", description = "描述", permission = "命令使用权限")
-class CommandPort {
+@ECommandHeader(command = "test", description = "描述", permission = "命令使用权限")
+object CommandPort {
 
     @CommandBody // command<CommandSender> 所有类型都可以执行
     val a = command<CommandSender>("a") {

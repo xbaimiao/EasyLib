@@ -18,6 +18,10 @@ annotation class EListener(val depend: Array<String> = [])
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
+annotation class EPlaceholderExpansion
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class ECommandHeader(
     val command: String,
     val permission: String = "",

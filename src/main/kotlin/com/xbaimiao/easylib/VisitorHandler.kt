@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib
 
+import com.xbaimiao.easylib.bridge.PlaceholderExpansion
 import com.xbaimiao.easylib.command.registerCommand
 import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
@@ -35,6 +36,11 @@ object VisitorHandler {
             val clazz = Class.forName(classReader.className.replace("/", "."), false, VisitorHandler::class.java.classLoader)
             val instance = runCatching { clazz.getDeclaredField("INSTANCE") }.getOrNull()?.get(clazz) ?: return@forEach
 
+            if (clazz.isAnnotationPresent(EPlaceholderExpansion::class.java)) {
+                (instance as? PlaceholderExpansion)?.register()
+                debug("${clazz.name} 通过 EPlaceholderExpansion 注册占位符成功")
+            }
+
             if (clazz.isAnnotationPresent(EConfig::class.java)) {
                 loadConfig(instance)
                 debug("${clazz.name} 通过 EConfig 注册配置文件成功")
@@ -65,7 +71,7 @@ object VisitorHandler {
     }
 
     private val annotations by lazy {
-        listOf(EConfig::class.java, ECommandHeader::class.java, EListener::class.java).map { it.name }
+        listOf(EConfig::class.java, ECommandHeader::class.java, EListener::class.java, EPlaceholderExpansion::class.java).map { it.name }
     }
 
     private fun ClassReader.hasAnnotation(): Boolean {

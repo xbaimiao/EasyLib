@@ -1,6 +1,6 @@
 package com.xbaimiao.easylib.bridge
 
-import com.xbaimiao.easylib.EasyPlugin
+import com.xbaimiao.easylib.util.plugin
 import com.xbaimiao.easylib.util.warn
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
@@ -13,8 +13,9 @@ import java.util.*
 abstract class PlaceholderExpansion {
 
     abstract val identifier: String
-    abstract val version: String
-    open val author: String get() = EasyPlugin.getPlugin<EasyPlugin>().description.authors.joinToString(",")
+
+    open val version: String get() = plugin.description.version
+    open val author: String get() = plugin.description.authors.joinToString(",")
 
     open fun onRequest(p: OfflinePlayer, params: String): String? {
         return onUUIDRequest(p.uniqueId, params)
