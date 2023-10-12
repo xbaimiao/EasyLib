@@ -74,10 +74,6 @@ object VisitorHandler {
         val classVisitor = object : ClassVisitor(Opcodes.ASM6, ClassWriter(this, ClassWriter.COMPUTE_MAXS)) {
             override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor {
                 val className = descriptor.substring(1, descriptor.length - 1).replace("/", ".")
-
-                if (!descriptor.contains("EConfig")) {
-                    return super.visitAnnotation(descriptor, visible)
-                }
                 debug(annotations)
                 debug(className)
                 if (annotations.any { className in annotations }) {
