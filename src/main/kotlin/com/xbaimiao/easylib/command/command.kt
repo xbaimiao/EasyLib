@@ -141,7 +141,7 @@ inline fun <reified C : CommandSender> mainCommand(
 inline fun <reified C : CommandSender> command(
     command: String, block: CommandSpec<C>.() -> Unit
 ): CommandSpec<C> {
-    val launcher = CommandSpec.tNewCommandSpec<C>(command)
+    val launcher = CommandSpec.newCommandSpec<C>(command)
     block.invoke(launcher)
     return launcher
 }
@@ -163,7 +163,7 @@ data class ArgNode<T>(
 }
 
 fun registerCommand(any: Any): Boolean {
-    val header = any::class.java.getAnnotation(CommandHeader::class.java)
+    val header = any::class.java.getAnnotation(ECommandHeader::class.java)
     if (header == null) {
         warn("The class ${any::class.java.name} is not a command class")
         return false

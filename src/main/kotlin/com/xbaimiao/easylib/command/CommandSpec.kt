@@ -10,7 +10,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     companion object {
 
-        inline fun <reified S : CommandSender> tNewCommandSpec(command: String): CommandSpec<S> {
+        inline fun <reified S : CommandSender> newCommandSpec(command: String): CommandSpec<S> {
             return CommandLauncher(command, S::class.java)
         }
 
@@ -40,7 +40,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     protected var root: CommandSpec<out CommandSender>? = null
     val argNodes = ArgNodeArrayList()
 
-    protected var exec: (CommandContext<S>.() -> Unit)? = null
+    internal var exec: (CommandContext<S>.() -> Unit)? = null
     protected var tab: (CommandContext<out CommandSender>.() -> List<String>)? = null
     protected val subCommands = CaseInsensitiveMap<CommandSpec<out CommandSender>>()
 

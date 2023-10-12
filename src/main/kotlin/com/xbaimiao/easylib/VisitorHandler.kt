@@ -35,11 +35,13 @@ object VisitorHandler {
             val clazz = Class.forName(classReader.className.replace("/", "."), false, VisitorHandler::class.java.classLoader)
             val instance = runCatching { clazz.getDeclaredField("INSTANCE") }.getOrNull()?.get(clazz) ?: return@forEach
 
-            if (clazz.isAnnotationPresent(Config::class.java)) {
+            if (clazz.isAnnotationPresent(EConfig::class.java)) {
                 loadConfig(instance)
+                debug("${clazz.name} 通过 EConfig 注册配置文件成功")
             }
-            if (clazz.isAnnotationPresent(CommandHeader::class.java)) {
+            if (clazz.isAnnotationPresent(ECommandHeader::class.java)) {
                 registerCommand(instance)
+                debug("${clazz.name} 通过 ECommandHeader 注册命令成功")
             }
             if (clazz.isAnnotationPresent(EListener::class.java)) {
                 val eListener = clazz.getAnnotation(EListener::class.java)
@@ -47,9 +49,13 @@ object VisitorHandler {
                     if (eListener.depend.isNotEmpty()) {
                         if (eListener.depend.all { Bukkit.getPluginManager().getPlugin(it) != null }) {
                             registerListener(instance as Listener)
+                            debug("${clazz.name} 通过 EListener 注册监听器成功")
+                        } else {
+                            debug("${clazz.name} 依赖 ${eListener.depend} 不满足 不注册监听器")
                         }
                     } else {
                         registerListener(instance as Listener)
+                        debug("${clazz.name} 通过 EListener 注册监听器成功")
                     }
                 } else {
                     warn("${clazz.name} not is Listener, but it annotation EListener!")
@@ -58,12 +64,23 @@ object VisitorHandler {
         }
     }
 
+    private val annotations by lazy {
+        listOf(EConfig::class.java, ECommandHeader::class.java, EListener::class.java).map { it.name }
+    }
+
     private fun ClassReader.hasAnnotation(): Boolean {
         var hasAnnotation = false
 
         val classVisitor = object : ClassVisitor(Opcodes.ASM6, ClassWriter(this, ClassWriter.COMPUTE_MAXS)) {
             override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor {
-                if (!descriptor.contains("Metadata")) {
+                val className = descriptor.substring(1, descriptor.length - 1).replace("/", ".")
+
+                if (!descriptor.contains("EConfig")) {
+                    return super.visitAnnotation(descriptor, visible)
+                }
+                debug(annotations)
+                debug(className)
+                if (annotations.any { className in annotations }) {
                     hasAnnotation = true
                 }
                 return super.visitAnnotation(descriptor, visible)
