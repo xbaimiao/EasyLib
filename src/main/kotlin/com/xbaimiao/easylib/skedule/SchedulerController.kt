@@ -41,14 +41,14 @@ class SchedulerController(
     }
 
     /**
-     * 异步运行一段代码，此方法等同于Bukkit runTaskAsynchronously 方法 但会挂起函数 等待结果后回到主线程执行
+     * 异步运行一段代码，此方法等同于Bukkit runTaskAsynchronously 方法 但会挂起函数 等待结果后回到原来的线程执行
      */
     suspend fun <T> async(asyncFunc: () -> T): T = suspendCoroutine { cont ->
         schedulerDelegate.doAsync(asyncFunc) { cont.resume(it) }
     }
 
     /**
-     * 同步运行一段代码，此方法等同于Bukkit runTask 方法 但会挂起函数 等待结果后回到主线程执行
+     * 同步运行一段代码，此方法等同于Bukkit runTask 方法 但会挂起函数 等待结果后回到原来的线程执行
      */
     suspend fun <T> sync(syncFunc: () -> T): T = suspendCoroutine { cont ->
         schedulerDelegate.doSync(syncFunc) { cont.resume(it) }

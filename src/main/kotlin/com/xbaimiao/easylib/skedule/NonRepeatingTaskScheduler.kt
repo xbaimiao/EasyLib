@@ -13,17 +13,30 @@ class NonRepeatingTaskScheduler(private val scheduler: EasyScheduler) : TaskSche
     }
 
     override fun <T> doAsync(asyncFunc: () -> T, task: (T) -> Unit) {
+        val currentContext = currentContext()
         runTask(ASYNC) {
             val result = asyncFunc()
-            runTask(SYNC) {
+            if (currentContext == ASYNC) {
                 task(result)
+            } else {
+                runTask(SYNC) {
+                    task(result)
+                }
             }
         }
     }
 
     override fun <T> doSync(syncFunc: () -> T, task: (T) -> Unit) {
+        val currentContext = currentContext()
         runTask(SYNC) {
-            task(syncFunc())
+            val result = syncFunc()
+            if (currentContext == SYNC) {
+                task(result)
+            } else {
+                runTask(currentContext) {
+                    task(result)
+                }
+            }
         }
     }
 

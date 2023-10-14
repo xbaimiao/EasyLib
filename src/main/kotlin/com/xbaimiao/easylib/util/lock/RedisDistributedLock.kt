@@ -1,4 +1,4 @@
-package com.xbaimiao.easylib.util
+package com.xbaimiao.easylib.util.lock
 
 import com.xbaimiao.easylib.skedule.SynchronizationContext
 import com.xbaimiao.easylib.skedule.currentContext
@@ -9,33 +9,27 @@ import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class DistributedLock(private val jedisPool: JedisPool, val lockName: String) {
+class RedisDistributedLock(private val jedisPool: JedisPool) : DistributedLock {
 
-    init {
+    override suspend fun <T> withLock(lockName: String, acquireTimeout: Long, timeout: Long, func: () -> T): T {
         if (lockName.contains(":")) {
             error("lockName 中不能包含 \":\"")
         }
-    }
-
-    /**
-     * 使用分布式锁执行一段代码
-     */
-    @JvmOverloads
-    suspend fun exec(acquireTimeout: Long = 10000, timeout: Long = 10000, func: () -> Unit) {
-        val identifier = lockWithTimeout(acquireTimeout, timeout) ?: error("加锁超时 请尝试增加 acquireTimeout")
-        func.invoke()
-        releaseLock(identifier)
+        val identifier = lockWithTimeout(lockName, acquireTimeout, timeout) ?: error("加锁超时 请尝试增加 acquireTimeout")
+        val result = func.invoke()
+        unlock(lockName, identifier)
+        return result
     }
 
     /**
      * 加锁
      *
-     * @param lockName       锁的key
+     * @param lockName 锁的key
      * @param acquireTimeout 获取超时时间
      * @param timeout        锁的超时时间
      * @return 锁标识
      */
-    suspend fun lockWithTimeout(acquireTimeout: Long, timeout: Long): String? = suspendCoroutine {
+    override suspend fun lockWithTimeout(lockName: String, acquireTimeout: Long, timeout: Long): String? = suspendCoroutine {
         // 当前线程
         val context = currentContext()
         // 启用异步线程
@@ -77,11 +71,11 @@ class DistributedLock(private val jedisPool: JedisPool, val lockName: String) {
     /**
      * 释放锁
      *
-     * @param lockName   锁的key
+     * @param lockName 锁的key
      * @param identifier 释放锁的标识
      * @return 是否释放成功
      */
-    suspend fun releaseLock(identifier: String): Boolean = suspendCoroutine {
+    override suspend fun unlock(lockName: String, identifier: String): Boolean = suspendCoroutine {
         val context = currentContext()
         schedule(SynchronizationContext.ASYNC) {
             jedisPool.getResource().use { conn ->
