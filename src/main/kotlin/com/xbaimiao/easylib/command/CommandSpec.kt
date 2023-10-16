@@ -205,7 +205,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun arg(usage: String, optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit): ArgNode<String> {
-        val argNode = ArgNode(usage, exec = { emptyList() }, parse = { it })
+        val argNode = ArgNode(usage, exec = { listOf(usage) }, parse = { it })
         return argNodes.append(argNode, optional).also { block.invoke(this, it) }
     }
 
@@ -216,7 +216,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun arg(usage: String, optional: Boolean = false): ArgNode<String> {
-        val argNode = ArgNode(usage, exec = { emptyList() }, parse = { it })
+        val argNode = ArgNode(usage, exec = { listOf(usage) }, parse = { it })
         return argNodes.append(argNode, optional)
     }
 
