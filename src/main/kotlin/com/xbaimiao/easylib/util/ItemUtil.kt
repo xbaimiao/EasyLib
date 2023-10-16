@@ -15,7 +15,14 @@ fun ItemStack?.isAir(): Boolean {
     return this == null || this.type == Material.AIR || this.type.name.endsWith("_AIR")
 }
 
-val ItemStack.displayName get() = kotlin.runCatching { itemMeta.displayName }.getOrDefault(type.name)
+val ItemStack.displayName
+    get() = kotlin.runCatching {
+        if (itemMeta.hasDisplayName()) {
+            itemMeta.displayName
+        } else {
+            type.name
+        }
+    }.getOrDefault(type.name)
 
 /**
  * 判断是否不是空气

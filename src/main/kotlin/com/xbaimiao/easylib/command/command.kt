@@ -1,94 +1,11 @@
 package com.xbaimiao.easylib.command
 
 import com.xbaimiao.easylib.EasyPlugin
-import com.xbaimiao.easylib.util.*
-import org.bukkit.Bukkit
-import org.bukkit.World
+import com.xbaimiao.easylib.util.CommandBody
+import com.xbaimiao.easylib.util.ECommandHeader
+import com.xbaimiao.easylib.util.debug
+import com.xbaimiao.easylib.util.warn
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
-
-val onlinePlayers: ArgNode<Collection<Player>> = ArgNode("player", exec = { token ->
-    arrayListOf(Bukkit.getOnlinePlayers().map { it.name }, arrayListOf("@a", "@p", "@s", "@r")).flatten()
-        .filter { it.uppercase().startsWith(token.uppercase()) }
-}) { name ->
-    return@ArgNode when (name.lowercase()) {
-        "@a" -> Bukkit.getOnlinePlayers().toList()
-        "@p" -> {
-            if (this is Player) {
-                arrayListOf(this)
-            } else {
-                arrayListOf(Bukkit.getOnlinePlayers().toList().random())
-            }
-        }
-
-        "@s" -> arrayListOf(this as Player)
-        "@r" -> arrayListOf(Bukkit.getOnlinePlayers().toList().random())
-        else -> arrayListOf(Bukkit.getPlayerExact(name) ?: error("Player $name not found"))
-    }
-}
-
-val onlinePlayerSingle = ArgNode("player", exec = { token ->
-    Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
-}) { name ->
-    Bukkit.getPlayerExact(name)
-}
-
-val offlinePlayerSingle = ArgNode("player", exec = { token ->
-    Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
-}) {
-    it
-}
-
-val worlds: ArgNode<World> = ArgNode("world", exec = { token ->
-    Bukkit.getWorlds().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
-}, parse = { name ->
-    Bukkit.getWorld(name) ?: error("World $name not found")
-})
-
-val booleans: ArgNode<Boolean> = ArgNode("boolean", exec = { token ->
-    arrayOf("true", "false").filter { it.uppercase().startsWith(token.uppercase()) }
-}, parse = {
-    it.toBoolean()
-})
-
-val times: ArgNode<Long> = ArgNode("time", exec = { token ->
-    arrayOf("1ms", "1s", "1m", "1h", "1d").filter { it.uppercase().startsWith(token.uppercase()) }
-}, parse = {
-    convertToMilliseconds(it)
-})
-
-val numbers: ArgNode<Double> = ArgNode("number", exec = { token ->
-    arrayOf("1", "2", "3", "4", "5", "number").filter { it.uppercase().startsWith(token.uppercase()) }
-}, parse = {
-    it.toDouble()
-})
-
-val x: ArgNode<Double> = ArgNode("x", {
-    if (this is Player) {
-        listOf(this.location.x.toString())
-    } else {
-        listOf("1", "2", "3", "4", "5")
-    }
-}, {
-    it.toDouble()
-})
-
-val y: ArgNode<Double> = ArgNode("y", {
-    if (this is Player) {
-        listOf(this.location.y.toString())
-    } else {
-        listOf("1", "2", "3", "4", "5")
-    }
-}, { it.toDouble() })
-
-val z: ArgNode<Double> = ArgNode("z", {
-    if (this is Player) {
-        listOf(this.location.z.toString())
-    } else {
-        listOf("1", "2", "3", "4", "5")
-    }
-}, { it.toDouble() })
-
 
 val debugCommand = command<CommandSender>("debug") {
     permission = "op"
@@ -170,6 +87,9 @@ fun registerCommand(any: Any): Boolean {
     }
 
     val subCommands = ArrayList<CommandSpec<*>>()
+    if (header.debug) {
+        subCommands.add(debugCommand)
+    }
 
     for (declaredField in any::class.java.declaredFields) {
         if (declaredField.getAnnotation(CommandBody::class.java) != null) {

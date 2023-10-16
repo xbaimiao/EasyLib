@@ -1,6 +1,8 @@
 package com.xbaimiao.easylib.command
 
 import com.xbaimiao.easylib.util.CaseInsensitiveMap
+import com.xbaimiao.easylib.util.convertToMilliseconds
+import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -85,53 +87,115 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     }
 
     @JvmOverloads
-    fun onlinePlayers(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Collection<Player>>) -> Unit = {}) {
-        arg(onlinePlayers, optional, block)
+    fun onlinePlayers(desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Collection<Player>>) -> Unit = {}) {
+        arg(ArgNode(desc, exec = { token ->
+            arrayListOf(Bukkit.getOnlinePlayers().map { it.name }, arrayListOf("@a", "@p", "@s", "@r")).flatten()
+                .filter { it.uppercase().startsWith(token.uppercase()) }
+        }) { name ->
+            return@ArgNode when (name.lowercase()) {
+                "@a" -> Bukkit.getOnlinePlayers().toList()
+                "@p" -> {
+                    if (this is Player) {
+                        arrayListOf(this)
+                    } else {
+                        arrayListOf(Bukkit.getOnlinePlayers().toList().random())
+                    }
+                }
+
+                "@s" -> arrayListOf(this as Player)
+                "@r" -> arrayListOf(Bukkit.getOnlinePlayers().toList().random())
+                else -> arrayListOf(Bukkit.getPlayerExact(name) ?: error("Player $name not found"))
+            }
+        }, optional, block)
     }
 
     @JvmOverloads
-    fun players(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Player?>) -> Unit = {}) {
-        arg(onlinePlayerSingle, optional, block)
+    fun players(desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Player?>) -> Unit = {}) {
+        arg(ArgNode(desc, exec = { token ->
+            Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+        }) { name ->
+            Bukkit.getPlayerExact(name)
+        }, optional, block)
     }
 
     @JvmOverloads
-    fun offlinePlayers(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit = {}) {
-        arg(offlinePlayerSingle, optional, block)
+    fun offlinePlayers(desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit = {}) {
+        arg(ArgNode(desc, exec = { token ->
+            Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+        }) {
+            it
+        }, optional, block)
     }
 
     @JvmOverloads
-    fun worlds(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<World>) -> Unit = {}) {
-        arg(worlds, optional, block)
+    fun worlds(desc: String = "world", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<World>) -> Unit = {}) {
+        arg(ArgNode(desc, exec = { token ->
+            Bukkit.getWorlds().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
+        }, parse = { name ->
+            Bukkit.getWorld(name) ?: error("World $name not found")
+        }), optional, block)
     }
 
     @JvmOverloads
-    fun booleans(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Boolean>) -> Unit = {}) {
-        arg(booleans, optional, block)
+    fun booleans(desc: String = "boolean", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Boolean>) -> Unit = {}) {
+        arg(ArgNode(desc, exec = { token ->
+            arrayOf("true", "false").filter { it.uppercase().startsWith(token.uppercase()) }
+        }, parse = {
+            it.toBoolean()
+        }), optional, block)
     }
 
     @JvmOverloads
-    fun times(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Long>) -> Unit = {}) {
-        arg(times, optional, block)
+    fun times(desc: String = "time", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Long>) -> Unit = {}) {
+        arg(ArgNode(desc, exec = { token ->
+            arrayOf("1ms", "1s", "1m", "1h", "1d").filter { it.uppercase().startsWith(token.uppercase()) }
+        }, parse = {
+            convertToMilliseconds(it)
+        }), optional, block)
     }
 
     @JvmOverloads
-    fun number(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
-        arg(numbers, optional, block)
+    fun number(desc: String = "number", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(ArgNode(desc, exec = { token ->
+            arrayOf("1", "2", "3", "4", "5", "number").filter { it.uppercase().startsWith(token.uppercase()) }
+        }, parse = {
+            it.toDouble()
+        }), optional, block)
     }
 
     @JvmOverloads
-    fun x(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
-        arg(x, optional, block)
+    fun x(desc: String = "x", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(ArgNode(desc, {
+            if (this is Player) {
+                listOf(this.location.x.toString())
+            } else {
+                listOf("1", "2", "3", "4", "5")
+            }
+        }, {
+            it.toDouble()
+        }), optional, block)
     }
 
     @JvmOverloads
-    fun y(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
-        arg(y, optional, block)
+    fun y(desc: String = "y", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(ArgNode(desc, {
+            if (this is Player) {
+                listOf(this.location.y.toString())
+            } else {
+                listOf("1", "2", "3", "4", "5")
+            }
+        }, { it.toDouble() }), optional, block)
     }
 
     @JvmOverloads
-    fun z(optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
-        arg(z, optional, block)
+    fun z(desc: String = "z", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}) {
+        arg(ArgNode(desc, {
+            if (this is Player) {
+                listOf(this.location.z.toString())
+            } else {
+                listOf("1", "2", "3", "4", "5")
+            }
+        }, { it.toDouble() }), optional, block)
     }
 
     @JvmOverloads

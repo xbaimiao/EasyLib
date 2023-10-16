@@ -26,7 +26,8 @@ annotation class ECommandHeader(
     val command: String,
     val permission: String = "",
     val permissionMessage: String = "",
-    val description: String = ""
+    val description: String = "",
+    val debug: Boolean = false
 )
 
 @Target(AnnotationTarget.FIELD)
