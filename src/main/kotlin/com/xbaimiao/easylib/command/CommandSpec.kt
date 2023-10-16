@@ -88,7 +88,9 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     @JvmOverloads
     fun onlinePlayers(desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Collection<Player>>) -> Unit = {}): ArgNode<Collection<Player>> {
         return arg(ArgNode(desc, exec = { token ->
-            arrayListOf(Bukkit.getOnlinePlayers().map { it.name }, arrayListOf("@a", "@p", "@s", "@r")).flatten().filter { it.uppercase().startsWith(token.uppercase()) }
+            arrayListOf(Bukkit.getOnlinePlayers().map { it.name }, arrayListOf("@a", "@p", "@s", "@r"))
+                .flatten()
+                .filter { it.uppercase().startsWith(token.uppercase()) }
         }) { name ->
             return@ArgNode when (name.lowercase()) {
                 "@a" -> Bukkit.getOnlinePlayers().toList()
@@ -137,7 +139,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     @JvmOverloads
     fun booleans(desc: String = "boolean", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Boolean>) -> Unit = {}): ArgNode<Boolean> {
         return arg(ArgNode(desc, exec = { token ->
-            arrayOf("true", "false").filter { it.uppercase().startsWith(token.uppercase()) }
+            arrayOf(desc, "true", "false").filter { it.uppercase().startsWith(token.uppercase()) }
         }, parse = {
             it.toBoolean()
         }), optional, block)
@@ -146,7 +148,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     @JvmOverloads
     fun times(desc: String = "time", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Long>) -> Unit = {}): ArgNode<Long> {
         return arg(ArgNode(desc, exec = { token ->
-            arrayOf("1ms", "1s", "1m", "1h", "1d").filter { it.uppercase().startsWith(token.uppercase()) }
+            arrayOf(desc, "1ms", "1s", "1m", "1h", "1d").filter { it.uppercase().startsWith(token.uppercase()) }
         }, parse = {
             convertToMilliseconds(it)
         }), optional, block)
@@ -155,7 +157,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     @JvmOverloads
     fun number(desc: String = "number", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}): ArgNode<Double> {
         return arg(ArgNode(desc, exec = { token ->
-            arrayOf("1", "2", "3", "4", "5", "number").filter { it.uppercase().startsWith(token.uppercase()) }
+            arrayOf(desc, "1", "2", "3", "4", "5", "number").filter { it.uppercase().startsWith(token.uppercase()) }
         }, parse = {
             it.toDouble()
         }), optional, block)
@@ -165,9 +167,9 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     fun x(desc: String = "x", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}): ArgNode<Double> {
         return arg(ArgNode(desc, {
             if (this is Player) {
-                listOf(this.location.x.toString())
+                listOf(desc, this.location.x.toString())
             } else {
-                listOf("1", "2", "3", "4", "5")
+                listOf(desc, "1", "2", "3", "4", "5")
             }
         }, {
             it.toDouble()
@@ -178,9 +180,9 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     fun y(desc: String = "y", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}): ArgNode<Double> {
         return arg(ArgNode(desc, {
             if (this is Player) {
-                listOf(this.location.y.toString())
+                listOf(desc, this.location.y.toString())
             } else {
-                listOf("1", "2", "3", "4", "5")
+                listOf(desc, "1", "2", "3", "4", "5")
             }
         }, { it.toDouble() }), optional, block)
     }
@@ -189,9 +191,9 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     fun z(desc: String = "z", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}): ArgNode<Double> {
         return arg(ArgNode(desc, {
             if (this is Player) {
-                listOf(this.location.z.toString())
+                listOf(desc, this.location.z.toString())
             } else {
-                listOf("1", "2", "3", "4", "5")
+                listOf(desc, "1", "2", "3", "4", "5")
             }
         }, { it.toDouble() }), optional, block)
     }
