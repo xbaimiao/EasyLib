@@ -44,9 +44,17 @@ class BukkitDispatcher(
 
     override val executor: Executor = Executor {
         if (async) {
-            scheduler.runTaskAsynchronously(it)
+            if (currentContext() == SynchronizationContext.ASYNC) {
+                it.run()
+            } else {
+                scheduler.runTaskAsynchronously(it)
+            }
         } else {
-            scheduler.runTask(it)
+            if (currentContext() == SynchronizationContext.SYNC) {
+                it.run()
+            } else {
+                scheduler.runTask(it)
+            }
         }
     }
 

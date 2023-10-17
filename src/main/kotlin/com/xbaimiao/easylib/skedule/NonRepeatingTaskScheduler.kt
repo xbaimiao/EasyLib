@@ -54,9 +54,20 @@ class NonRepeatingTaskScheduler(private val scheduler: EasyScheduler) : TaskSche
     }
 
     private fun runTask(context: SynchronizationContext = currentContext(), task: () -> Unit) {
-        currentTask = when (context) {
-            SYNC -> scheduler.runTask(task)
-            ASYNC -> scheduler.runTaskAsynchronously(task)
+        when (context) {
+            SYNC -> {
+                if (currentContext() == SYNC) {
+                    task.invoke()
+                } else {
+                    currentTask = scheduler.runTask(task)
+                }
+            }
+
+            ASYNC -> if (currentContext() == ASYNC) {
+                task.invoke()
+            } else {
+                currentTask = scheduler.runTaskAsynchronously(task)
+            }
         }
     }
 
