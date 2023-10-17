@@ -11,7 +11,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class RedisDistributedLock(private val jedisPool: JedisPool) : DistributedLock {
 
-    override suspend fun <T> withLock(lockName: String, acquireTimeout: Long, timeout: Long, func: () -> T): T {
+    override suspend fun <T> withLock(lockName: String, acquireTimeout: Long, timeout: Long, func: suspend () -> T): T {
         if (lockName.contains(":")) {
             error("lockName 中不能包含 \":\"")
         }

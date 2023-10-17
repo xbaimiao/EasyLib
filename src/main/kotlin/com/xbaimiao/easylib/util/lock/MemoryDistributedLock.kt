@@ -19,7 +19,7 @@ class MemoryDistributedLock : DistributedLock {
     private val lockMutexMap = HashMap<String, Mutex>()
     private val lockMutex = Mutex()
 
-    override suspend fun <T> withLock(lockName: String, acquireTimeout: Long, timeout: Long, func: () -> T): T {
+    override suspend fun <T> withLock(lockName: String, acquireTimeout: Long, timeout: Long, func: suspend () -> T): T {
         val context = currentContext()
         val lockMutex = getLockMutex(lockName)
         return lockMutex.withLock {
@@ -51,7 +51,7 @@ class MemoryDistributedLock : DistributedLock {
         return true
     }
 
-    private suspend fun <T> callContext(context: SynchronizationContext, func: () -> T): T = suspendCoroutine {
+    private suspend fun <T> callContext(context: SynchronizationContext, func: suspend () -> T): T = suspendCoroutine {
         schedule(context) {
             it.resume(func.invoke())
         }

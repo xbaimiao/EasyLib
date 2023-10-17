@@ -13,7 +13,7 @@ interface DistributedLock {
     /**
      * 使用分布式锁执行一段代码
      */
-    suspend fun <T> withLock(lockName: String, acquireTimeout: Long = 10000, timeout: Long = 10000, func: () -> T): T
+    suspend fun <T> withLock(lockName: String, acquireTimeout: Long = 10000, timeout: Long = 10000, func: suspend () -> T): T
 
     /**
      * 加锁
