@@ -126,6 +126,13 @@ publishing {
             }
             url("https://maven.xbaimiao.com/repository/releases/")
         }
+        maven {
+            credentials {
+                username = project.findProperty("clayUsername").toString()
+                password = project.findProperty("clayPassword").toString()
+            }
+            url("https://maven.mineclay.com/repository/zhua-release/")
+        }
     }
     publications {
         mavenJava(MavenPublication) {
