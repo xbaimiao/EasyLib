@@ -4,6 +4,7 @@ import com.xbaimiao.easylib.bridge.PlaceholderExpansion
 import com.xbaimiao.easylib.command.registerCommand
 import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.Listener
 import org.objectweb.asm.*
 import java.io.File
@@ -80,8 +81,6 @@ object VisitorHandler {
         val classVisitor = object : ClassVisitor(Opcodes.ASM6, ClassWriter(this, ClassWriter.COMPUTE_MAXS)) {
             override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor {
                 val className = descriptor.substring(1, descriptor.length - 1).replace("/", ".")
-                debug(annotations)
-                debug(className)
                 if (annotations.any { className in annotations }) {
                     hasAnnotation = true
                 }
@@ -92,6 +91,42 @@ object VisitorHandler {
 
         this.accept(classVisitor, 0)
         return hasAnnotation
+    }
+
+    private fun loadConfig(configObj: Any) {
+        val configClass = configObj::class.java
+        val configFileAnnotation = configClass.getAnnotation(EConfig::class.java)
+            ?: error("${configObj::class.java.simpleName} must have @Config annotation")
+
+        val file = File(EasyPlugin.getPlugin<EasyPlugin>().dataFolder, configFileAnnotation.file)
+
+        val configFields = configClass.declaredFields.filter {
+            it.isAnnotationPresent(ConfigNode::class.java)
+        }
+
+        val configuration = YamlConfiguration.loadConfiguration(file)
+
+        var isChange = false
+
+        for (field in configFields) {
+            field.isAccessible = true
+            val annotation = field.getAnnotation(ConfigNode::class.java)
+            val yamlValue = configuration.get(annotation.node)
+            if (yamlValue == null) {
+                debug("${configFileAnnotation.file} not found ${annotation.node}. auto create")
+                configuration.set(annotation.node, field.get(configObj))
+                if (!isChange) {
+                    isChange = true
+                }
+                continue
+            }
+            debug("${configFileAnnotation.file} found ${annotation.node}. value: $yamlValue")
+            field.set(configObj, yamlValue)
+        }
+        if (isChange) {
+            configuration.save(file)
+        }
+
     }
 
 }

@@ -1,7 +1,5 @@
-package com.xbaimiao.easylib.taboolib.common.env;
+package com.xbaimiao.easylib.nms;
 
-import com.xbaimiao.easylib.nms.RuntimeResource;
-import com.xbaimiao.easylib.nms.RuntimeResources;
 import com.xbaimiao.easylib.util.BukkitKt;
 import org.jetbrains.annotations.NotNull;
 

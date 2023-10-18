@@ -1,4 +1,4 @@
-package com.xbaimiao.easylib.util.eu
+package com.xbaimiao.easylib.bridge.player
 
 import com.cryptomorin.xseries.XSound
 import org.bukkit.Sound

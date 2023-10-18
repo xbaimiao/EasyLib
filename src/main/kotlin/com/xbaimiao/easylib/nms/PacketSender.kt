@@ -71,4 +71,5 @@ object PacketSender : Listener {
     private fun onQuit(e: PlayerQuitEvent) {
         submit(delay = 20) { playerConnectionMap.remove(e.player.name) }
     }
+
 }

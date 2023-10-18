@@ -1,4 +1,4 @@
-package com.xbaimiao.easylib.util.eu
+package com.xbaimiao.easylib.bridge.player
 
 import com.xbaimiao.easylib.bridge.replacePlaceholder
 import org.bukkit.Bukkit

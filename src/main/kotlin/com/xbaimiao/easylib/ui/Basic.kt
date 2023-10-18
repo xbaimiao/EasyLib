@@ -1,8 +1,6 @@
 package com.xbaimiao.easylib.ui
 
-import com.xbaimiao.easylib.bridge.replacePlaceholder
 import com.xbaimiao.easylib.util.submit
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -13,8 +11,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
-@Suppress("unused")
-open class Basic(player: Player, title: String = "chest") : Menu(title, player) {
+abstract class Basic(player: Player) : Menu(player) {
 
     /** 行数 **/
     var rows = -1
@@ -45,7 +42,6 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
 
     /** 抽象字符布局 **/
     var slots = CopyOnWriteArrayList<List<Char>>()
-    var slotList = CopyOnWriteArrayList<Slot>()
 
     /**
      * 行数
@@ -143,13 +139,6 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         }
     }
 
-    fun slot(slot: Int, apply: Slot.() -> Unit) {
-        Slot(slot, this).also {
-            slotList.add(it)
-            it.apply()
-        }
-    }
-
     /**
      * 根据抽象符号设置物品
      */
@@ -206,16 +195,7 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         return list
     }
 
-    private fun createTitle(): String {
-        return title.replacePlaceholder(player)
-    }
-
-    /**
-     * 构建页面
-     */
-    override fun build(): Inventory {
-        val inventory =
-            Bukkit.createInventory(holderCallback(this), if (rows > 0) rows * 9 else slots.size * 9, createTitle())
+    protected fun handleInventory(inventory: Inventory) {
         var row = 0
         while (row < slots.size) {
             val line = slots[row]
@@ -229,10 +209,6 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
         slotItems.forEach { (k, v) ->
             inventory.setItem(k, v)
         }
-        slotList.forEach {
-            inventory.setItem(it.slot, it.buildItem())
-        }
-        return inventory
     }
 
     override fun open() {
@@ -246,26 +222,6 @@ open class Basic(player: Player, title: String = "chest") : Menu(title, player) 
                 player.openInventory(inventory)
             }
         }
-    }
-
-    companion object {
-        fun asyncBuildAndOpen(player: Player, title: String, build: Basic.() -> Unit) {
-            submit(async = true) {
-                val basic = Basic(player, title)
-                build.invoke(basic)
-                basic.openAsync()
-            }
-        }
-
-        inline fun <reified T : Basic> asyncOpen(player: Player, title: String, crossinline build: T.() -> Unit) {
-            submit(async = true) {
-                val basic =
-                    T::class.java.getConstructor(Player::class.java, String::class.java).newInstance(player, title) as T
-                build.invoke(basic)
-                basic.openAsync()
-            }
-        }
-
     }
 
 }

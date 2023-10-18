@@ -1,6 +1,5 @@
 package com.xbaimiao.easylib.command
 
-import com.xbaimiao.easylib.util.CaseInsensitiveMap
 import com.xbaimiao.easylib.util.convertToMilliseconds
 import org.bukkit.Bukkit
 import org.bukkit.World
@@ -30,6 +29,18 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
             new.optional = optional
             super.add(new)
             return new
+        }
+
+    }
+
+    class CaseInsensitiveMap<V> : HashMap<String, V>() {
+
+        override fun containsKey(key: String): Boolean {
+            return super.keys.any { it.equals(key, true) }
+        }
+
+        override fun get(key: String): V? {
+            return super.keys.firstOrNull { it.equals(key, true) }?.let { super.get(it) }
         }
 
     }

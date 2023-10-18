@@ -1,7 +1,6 @@
 package com.xbaimiao.easylib.nms
 
 import com.cryptomorin.xseries.XMaterial
-import com.xbaimiao.easylib.skedule.schedule
 import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -84,11 +83,8 @@ fun Player.sendMap(
     height: Int = 128,
     builder: ItemBuilder.() -> Unit = {}
 ) {
-    schedule {
-        val map = async {
-            buildMap(url, hand, width, height, builder)
-        }
-        map.sendTo(this@sendMap)
+    submit(async = true) {
+        buildMap(url, hand, width, height, builder).sendTo(this@sendMap)
     }
 }
 
@@ -106,11 +102,8 @@ fun Player.sendMap(
     height: Int = 128,
     builder: ItemBuilder.() -> Unit = {}
 ) {
-    schedule {
-        val map = async {
-            buildMap(file, hand, width, height, builder)
-        }
-        map.sendTo(this@sendMap)
+    submit(async = true) {
+        buildMap(file, hand, width, height, builder).sendTo(this@sendMap)
     }
 }
 
@@ -128,11 +121,8 @@ fun Player.sendMap(
     height: Int = 128,
     builder: ItemBuilder.() -> Unit = {}
 ) {
-    schedule {
-        val map = async {
-            buildMap(image, hand, width, height, builder)
-        }
-        map.sendTo(this@sendMap)
+    submit(async = true) {
+        buildMap(image, hand, width, height, builder).sendTo(this@sendMap)
     }
 }
 

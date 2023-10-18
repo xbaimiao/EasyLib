@@ -15,13 +15,9 @@ object UIHandler : Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin)
     }
 
-    fun disable(plugin: EasyPlugin) {
+    fun disable() {
         HandlerList.unregisterAll(this)
-        Bukkit.getOnlinePlayers().forEach {
-            if (MenuHolder.fromInventory(it.openInventory.topInventory) != null) {
-                it.closeInventory()
-            }
-        }
+        Bukkit.getOnlinePlayers().forEach { it.closeInventory() }
     }
 
     @EventHandler
