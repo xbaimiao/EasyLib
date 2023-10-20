@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.2.1'
+    version = '3.2.2'
 
     repositories {
         mavenCentral()
@@ -39,6 +39,7 @@ allprojects {
         compileOnly("net.luckperms:api:5.4")
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
         compileOnly("redis.clients:jedis:5.0.1")
+        compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     }
 
     compileKotlin {
@@ -53,11 +54,11 @@ allprojects {
 
 dependencies {
     def reflexVersion = "1.0.19"
-    compileOnly "net.kyori:adventure-api:4.13.1"
+    compileOnly("net.kyori:adventure-api:4.13.1")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     compileOnly("public:paper:1.16.5")
     compileOnly("public:papi:1.0.0")
     compileOnly(fileTree("libs"))
-
     // 本体
     implementation("org.tabooproject.reflex:analyser:${reflexVersion}")
     implementation("org.tabooproject.reflex:fast-instance-getter:${reflexVersion}")
