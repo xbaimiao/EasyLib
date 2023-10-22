@@ -42,6 +42,18 @@ data class CommandContext<S : CommandSender>(
         return args[argNode.index]
     }
 
+    fun <T> ArgNode<T>.valueOrNull(): T? {
+        return valueOfOrNull(this)
+    }
+
+    fun <T> ArgNode<T>.value(): T {
+        return valueOf(this)
+    }
+
+    fun ArgNode<*>.argString(): String {
+        return valueToString(this)
+    }
+
     fun error(any: Any?) {
         sender.sendMessage("§c${any.toString()}".colored())
     }
