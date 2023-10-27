@@ -23,4 +23,9 @@ interface EPlayer {
      */
     fun execCommands(list: List<String>, sender: CommandSender)
 
+    /**
+     * 获取一个假OP
+     */
+    fun fakeOperator(): CommandSender
+
 }

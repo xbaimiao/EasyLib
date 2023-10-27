@@ -54,13 +54,13 @@ class Variable(val key: String, val value: String)
 
 fun buildMenu(
     basic: Basic, configuration: ConfigurationSection, func: Basic.() -> Unit
-) {
-    buildMenu(basic, configuration, listOf(), func)
+): Basic {
+    return buildMenu(basic, configuration, listOf(), func)
 }
 
 fun buildMenu(
     basic: Basic, configuration: ConfigurationSection, variables: List<Variable>, func: Basic.() -> Unit
-) {
+): Basic {
     val sort = configuration.getStringList("sort").map { it.toCharArray().toList() }
 
     val items = HashMap<Char, Pair<ItemStack, ConfigurationSection>>()
@@ -85,6 +85,7 @@ fun buildMenu(
     }
 
     func(basic)
+    return basic
 }
 
 @JvmOverloads

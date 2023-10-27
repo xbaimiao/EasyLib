@@ -22,6 +22,10 @@ class EPlayerImpl(private val player: Player) : EPlayer {
         list.parseECommand(player).exec(sender)
     }
 
+    override fun fakeOperator(): CommandSender {
+        return FakeOperator(player)
+    }
+
     companion object {
         fun Player.easylib(): EPlayer {
             return EPlayerImpl(this)
