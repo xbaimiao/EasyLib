@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.2.4'
+    version = '3.2.5'
 
     repositories {
         mavenCentral()
@@ -56,6 +56,7 @@ dependencies {
     def reflexVersion = "1.0.19"
     compileOnly("net.kyori:adventure-api:4.13.1")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    compileOnly("com.google.code.gson:gson:2.10.1")
     compileOnly("public:paper:1.16.5")
     compileOnly("public:papi:1.0.0")
     compileOnly(fileTree("libs"))
