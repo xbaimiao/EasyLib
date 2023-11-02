@@ -12,6 +12,8 @@ import java.util.*
 object HexColor {
 
     private var isLegacy = false
+    private val regex = Regex("<#[A-Z0-9]+>(.*?)<#[A-Z0-9]+>")
+    private val regexColor = Regex("<#[A-Z0-9]+>")
 
     init {
         try {
@@ -81,7 +83,42 @@ object HexColor {
             }
             i++
         }
-        return ChatColor.translateAlternateColorCodes('&', builder.toString())
+        var builderString = builder.toString()
+
+        if (builderString.contains(regexColor)) {
+            val result = regex.findAll(builderString)
+            val newMessage = StringBuilder()
+            result.map { it.value }
+                .forEach { string ->
+                    val colors = regexColor.findAll(string).toList()
+                    val colorA = colors[0].value.chunked(2)
+                    val colorB = colors[1].value.chunked(2)
+
+                    val redA = colorA[1].toInt(16)
+                    val greenA = colorA[2].toInt(16)
+                    val blueA = colorA[3].toInt(16)
+
+                    val redB = colorB[1].toInt(16)
+                    val greenB = colorB[2].toInt(16)
+                    val blueB = colorB[3].toInt(16)
+
+                    val rawMessage = string.replace(regexColor, "")
+                    val redStep = (redB - redA) / rawMessage.length
+                    val greenStep = (greenB - greenA) / rawMessage.length
+                    val blueStep = (blueB - blueA) / rawMessage.length
+
+                    repeat(rawMessage.length) { i ->
+                        val red = redA + redStep * i
+                        val green = greenA + greenStep * i
+                        val blue = blueA + blueStep * i
+
+                        newMessage.append(ChatColor.of(Color(red, green, blue)).toString() + rawMessage[i])
+                    }
+                }
+            builderString = newMessage.toString()
+        }
+
+        return ChatColor.translateAlternateColorCodes('&', builderString)
     }
 
     fun getColorCode(color: Int): String {
