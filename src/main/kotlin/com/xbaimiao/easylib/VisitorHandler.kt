@@ -31,7 +31,7 @@ object VisitorHandler {
             if (entry.name.contains("shadow")) return@forEach
             val classReader = ClassReader(jarFile.getInputStream(entry))
 
-            if (!classReader.hasAnnotation()) {
+            if (!runCatching { classReader.hasAnnotation() }.getOrElse { false }) {
                 return@forEach
             }
             val clazz = Class.forName(classReader.className.replace("/", "."), false, VisitorHandler::class.java.classLoader)
