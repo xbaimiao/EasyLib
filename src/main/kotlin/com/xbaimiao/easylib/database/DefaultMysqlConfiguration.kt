@@ -1,7 +1,6 @@
 package com.xbaimiao.easylib.database
 
 import com.xbaimiao.easylib.util.plugin
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
@@ -14,11 +13,10 @@ import java.io.File
 object DefaultMysqlConfiguration {
 
     @JvmStatic
-    @JvmOverloads
-    fun newOrInit(fileName: String = "database.yml"): ConfigurationSection {
-        val file = File(plugin.dataFolder, fileName)
+    val init by lazy {
+        val file = File(plugin.dataFolder, "database.yml")
         if (file.exists()) {
-            return YamlConfiguration.loadConfiguration(file)
+            return@lazy YamlConfiguration.loadConfiguration(file)
         }
         if (!file.parentFile.exists()) {
             file.parentFile.mkdirs()
@@ -26,6 +24,7 @@ object DefaultMysqlConfiguration {
         file.createNewFile()
 
         val configuration = YamlConfiguration.loadConfiguration(file)
+        configuration.set("mysql", false)
         configuration.set("host", "localhost")
         configuration.set("port", 3306)
         configuration.set("database", "minecraft")
@@ -35,7 +34,25 @@ object DefaultMysqlConfiguration {
 
         configuration.save(file)
 
-        return YamlConfiguration.loadConfiguration(file)
+        return@lazy YamlConfiguration.loadConfiguration(file)
+    }
+
+    @JvmStatic
+    val type by lazy {
+        if (init.getBoolean("mysql")) {
+            DatabaseType.MYSQL
+        } else {
+            DatabaseType.SQLITE
+        }
+    }
+
+    @JvmStatic
+    val ormlite by lazy {
+        if (type == DatabaseType.MYSQL) {
+            OrmliteMysql(init, true)
+        } else {
+            OrmliteSQLite("database.db")
+        }
     }
 
 }
