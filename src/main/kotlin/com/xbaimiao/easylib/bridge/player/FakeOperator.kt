@@ -7,7 +7,7 @@ import org.bukkit.permissions.PermissibleBase
 import org.bukkit.permissions.Permission
 import java.util.*
 
-class FakeOperator(val player: Player, ) : PermissibleBase(player), CommandSender {
+class FakeOperator(val player: Player) : PermissibleBase(player), CommandSender {
 
 
     override fun hasPermission(inName: String): Boolean {

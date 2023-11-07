@@ -45,4 +45,9 @@ class OrmliteMysql(
         hikariCP = hikariCP
     )
 
+    constructor(hikariCP: Boolean) : this(
+        configuration = DefaultMysqlConfiguration.newOrInit(),
+        hikariCP = hikariCP
+    )
+
 }

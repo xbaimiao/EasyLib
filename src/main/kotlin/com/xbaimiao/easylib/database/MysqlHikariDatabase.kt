@@ -34,4 +34,6 @@ class MysqlHikariDatabase(
         ssl = configuration.getBoolean("ssl"),
     )
 
+    constructor() : this(DefaultMysqlConfiguration.newOrInit())
+
 }
