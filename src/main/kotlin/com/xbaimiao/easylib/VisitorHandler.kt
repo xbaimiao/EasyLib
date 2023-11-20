@@ -93,7 +93,8 @@ object VisitorHandler {
         return hasAnnotation
     }
 
-    private fun loadConfig(configObj: Any) {
+    @JvmStatic
+    fun loadConfig(configObj: Any) {
         val configClass = configObj::class.java
         val configFileAnnotation = configClass.getAnnotation(EConfig::class.java)
             ?: error("${configObj::class.java.simpleName} must have @Config annotation")

@@ -50,9 +50,7 @@ object PacketSender : Listener {
         return if (playerConnectionMap.containsKey(player.name)) {
             playerConnectionMap[player.name]!!
         } else {
-            val connection = if (MinecraftVersion.isHigherOrEqual(MinecraftVersion.Version.V1_20_0)) {
-                player.getProperty<Any>("entity/c")!!
-            } else if (MinecraftVersion.isUniversal) {
+            val connection = if (MinecraftVersion.isUniversal) {
                 player.getProperty<Any>("entity/connection")!!
             } else {
                 player.getProperty<Any>("entity/playerConnection")!!

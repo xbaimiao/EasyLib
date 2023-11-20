@@ -90,30 +90,39 @@ object HexColor {
             val newMessage = StringBuilder()
             result.map { it.value }
                 .forEach { string ->
+                    // 获取消息块中的颜色代码 <#FFFFFF>消息内容<#000000>
                     val colors = regexColor.findAll(string).toList()
+                    // RGB起始颜色
                     val colorA = colors[0].value.chunked(2)
+                    // RGB结束颜色
                     val colorB = colors[1].value.chunked(2)
 
+                    // 起始颜色red green blue 转为10进制
                     val redA = colorA[1].toInt(16)
                     val greenA = colorA[2].toInt(16)
                     val blueA = colorA[3].toInt(16)
 
+                    // 结束颜色red green blue 转为10进制
                     val redB = colorB[1].toInt(16)
                     val greenB = colorB[2].toInt(16)
                     val blueB = colorB[3].toInt(16)
 
+                    // 去除颜色代码
                     val rawMessage = string.replace(regexColor, "")
+                    // 每个字符的颜色步长
                     val redStep = (redB - redA) / rawMessage.length
                     val greenStep = (greenB - greenA) / rawMessage.length
                     val blueStep = (blueB - blueA) / rawMessage.length
 
+                    // 拼接新的消息
                     repeat(rawMessage.length) { i ->
                         val red = redA + redStep * i
                         val green = greenA + greenStep * i
                         val blue = blueA + blueStep * i
-
+                        // 拼接新的消息
                         newMessage.append(ChatColor.of(Color(red, green, blue)).toString() + rawMessage[i])
                     }
+                    // newMessage 则为渐变消息
                 }
             builderString = newMessage.toString()
         }
