@@ -1,8 +1,6 @@
 package com.xbaimiao.easylib.bridge.player
 
 import com.cryptomorin.xseries.messages.ActionBar
-import com.xbaimiao.easylib.module.sound.parseToESound
-import com.xbaimiao.easylib.module.utils.parseECommand
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -22,6 +20,10 @@ class EPlayerImpl(private val player: Player) : EPlayer {
 
     override fun execCommands(list: List<String>, sender: CommandSender) {
         list.parseECommand(player).exec(sender)
+    }
+
+    override fun fakeOperator(): CommandSender {
+        return FakeOperator(player)
     }
 
     companion object {

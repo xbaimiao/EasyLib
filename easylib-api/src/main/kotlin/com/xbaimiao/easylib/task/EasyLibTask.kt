@@ -6,6 +6,8 @@ package com.xbaimiao.easylib.task
  **/
 interface EasyLibTask : Runnable {
 
+    val isSync: Boolean?
+
     fun runTask()
 
     fun runTaskLater(delay: Long)

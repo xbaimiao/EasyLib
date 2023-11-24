@@ -25,14 +25,14 @@ class PlaceholderExpansionImpl(
     }
 
     override fun onPlaceholderRequest(p: Player?, params: String?): String? {
-        if (p == null || params == null){
+        if (p == null || params == null) {
             return null
         }
         return placeholderExpansion.onPlaceholderRequest(p, params)
     }
 
     override fun onRequest(p: OfflinePlayer?, params: String?): String? {
-        if (p == null || params == null){
+        if (p == null || params == null) {
             return null
         }
         return placeholderExpansion.onRequest(p, params)

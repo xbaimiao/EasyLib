@@ -1,16 +1,17 @@
 package com.xbaimiao.easylib
 
-import com.xbaimiao.easylib.module.chat.Lang
-import com.xbaimiao.easylib.module.ui.InventoryModule
-import com.xbaimiao.easylib.module.utils.Module
-import com.xbaimiao.easylib.module.utils.ModuleManager
-import com.xbaimiao.easylib.module.utils.submit
+import com.xbaimiao.easylib.VisitorHandler.visitor
+import com.xbaimiao.easylib.chat.Lang
+import com.xbaimiao.easylib.nms.MappingFile
+import com.xbaimiao.easylib.nms.PacketSender
+import com.xbaimiao.easylib.nms.RefRemapper
+import com.xbaimiao.easylib.ui.UIHandler
+import com.xbaimiao.easylib.util.registerListener
+import com.xbaimiao.easylib.nms.RuntimeEnv
 import org.bukkit.plugin.java.JavaPlugin
+import org.tabooproject.reflex.Reflex
 
 abstract class EasyPlugin : JavaPlugin() {
-
-    protected lateinit var moduleManager: ModuleManager<EasyPlugin>
-        private set
 
     var debug = false
 
@@ -20,45 +21,34 @@ abstract class EasyPlugin : JavaPlugin() {
 
     private fun init() {
         instance = this
-        moduleManager = ModuleManager()
-        moduleManager.addModule(InventoryModule())
     }
 
     open fun load() {}
 
     open fun enable() {}
 
-    open fun active() {}
-
     open fun disable() {}
 
     override fun onLoad() {
         load()
         Lang.check(this)
-        moduleManager.loadAll()
     }
 
     override fun onEnable() {
+        RuntimeEnv.loadAssets(MappingFile::class.java)
+        Reflex.remapper.add(RefRemapper)
         enable()
-        moduleManager.enableAll()
-        submit {
-            moduleManager.modules.forEach { it.active(this@EasyPlugin) }
-            active()
-        }
+        UIHandler.enable(this)
+        registerListener(PacketSender)
+        VisitorHandler::class.java.protectionDomain.codeSource.location.visitor()
     }
 
     override fun onDisable() {
         disable()
-        moduleManager.disableAll()
+        UIHandler.disable()
     }
 
     companion object {
-
-        @Suppress("UNCHECKED_CAST")
-        fun ModuleManager<EasyPlugin>.addModule(module: Module<out EasyPlugin>) {
-            this.addModule(module as Module<EasyPlugin>)
-        }
-
 
         private lateinit var instance: EasyPlugin
 

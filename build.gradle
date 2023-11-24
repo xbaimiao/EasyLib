@@ -10,13 +10,14 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '2.3.7'
+    version = '3.3.6'
 
     repositories {
         mavenCentral()
         maven { url 'https://maven.xbaimiao.com/repository/releases/' }
         maven { url 'https://repo.aikar.co/content/groups/aikar/' }
         maven { url "https://repo.dmulloy2.net/repository/public/" }
+        maven { url "https://repo.tabooproject.org/repository/releases/" }
         maven {
             name 'CodeMC'
             url 'https://repo.codemc.org/repository/maven-public/'
@@ -37,6 +38,8 @@ allprojects {
         compileOnly("public:points:1.0.0")
         compileOnly("net.luckperms:api:5.4")
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
+        compileOnly("redis.clients:jedis:5.0.1")
+        compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     }
 
     compileKotlin {
@@ -50,10 +53,22 @@ allprojects {
 }
 
 dependencies {
-    compileOnly "net.kyori:adventure-api:4.13.1"
+    def reflexVersion = "1.0.19"
+    compileOnly("net.kyori:adventure-api:4.13.1")
+    compileOnly("com.zaxxer:HikariCP:4.0.3")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    compileOnly("com.google.code.gson:gson:2.10.1")
     compileOnly("public:paper:1.16.5")
     compileOnly("public:papi:1.0.0")
     compileOnly(fileTree("libs"))
+    // 本体
+    implementation("org.tabooproject.reflex:analyser:${reflexVersion}")
+    implementation("org.tabooproject.reflex:fast-instance-getter:${reflexVersion}")
+    implementation("org.tabooproject.reflex:reflex:${reflexVersion}") // 需要 analyser 模块
+    // 本体依赖
+    implementation("org.ow2.asm:asm:9.2")
+    implementation("org.ow2.asm:asm-util:9.2")
+    implementation("org.ow2.asm:asm-commons:9.2")
 
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
@@ -90,9 +105,12 @@ tasks {
         dependencies {
             exclude(dependency("org.jetbrains.kotlin:"))
             exclude(dependency("org.jetbrains:"))
+            exclude(dependency("org.jetbrains.kotlinx:"))
         }
         relocate("org.wltea.expression", "com.xbaimiao.easylib.expression")
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
+        relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
+        relocate("org.objectweb.asm", "com.xbaimiao.easylib.asm")
     }
     // UTF-8
     compileJava {
