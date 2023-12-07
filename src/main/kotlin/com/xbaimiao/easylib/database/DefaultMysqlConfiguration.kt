@@ -55,4 +55,13 @@ object DefaultMysqlConfiguration {
         }
     }
 
+    @JvmStatic
+    val hikari by lazy {
+        if (type == DatabaseType.MYSQL) {
+            MysqlHikariDatabase(init)
+        } else {
+            SQLiteHikariDatabase("database.db")
+        }
+    }
+
 }
