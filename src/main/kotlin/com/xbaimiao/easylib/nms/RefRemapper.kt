@@ -19,7 +19,7 @@ object RefRemapper : ReflexRemapper {
 
     var isUniversal = MinecraftVersion.isUniversal
     val major = MinecraftVersion.currentVersion.major
-    val mapping = MinecraftVersion.mapping
+    val mapping by lazy { MinecraftVersion.mapping }
     val fieldRemapCacheMap = ConcurrentHashMap<String, String>()
     val methodRemapCacheMap = ConcurrentHashMap<String, String>()
     val descriptorTypeCacheMap = ConcurrentHashMap<String, List<Class<*>>>()

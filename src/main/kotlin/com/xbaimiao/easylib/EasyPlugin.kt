@@ -5,9 +5,10 @@ import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.nms.MappingFile
 import com.xbaimiao.easylib.nms.PacketSender
 import com.xbaimiao.easylib.nms.RefRemapper
+import com.xbaimiao.easylib.nms.RuntimeEnv
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.registerListener
-import com.xbaimiao.easylib.nms.RuntimeEnv
+import com.xbaimiao.easylib.util.warn
 import org.bukkit.plugin.java.JavaPlugin
 import org.tabooproject.reflex.Reflex
 
@@ -35,8 +36,12 @@ abstract class EasyPlugin : JavaPlugin() {
     }
 
     override fun onEnable() {
-        RuntimeEnv.loadAssets(MappingFile::class.java)
-        Reflex.remapper.add(RefRemapper)
+        kotlin.runCatching {
+            RuntimeEnv.loadAssets(MappingFile::class.java)
+            Reflex.remapper.add(RefRemapper)
+        }.onFailure {
+            warn("加载映射文件失败: ${it.message}")
+        }
         enable()
         UIHandler.enable(this)
         registerListener(PacketSender)
