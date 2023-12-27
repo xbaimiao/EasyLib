@@ -34,7 +34,8 @@ object VisitorHandler {
             if (!runCatching { classReader.hasAnnotation() }.getOrElse { false }) {
                 return@forEach
             }
-            val clazz = Class.forName(classReader.className.replace("/", "."), false, VisitorHandler::class.java.classLoader)
+            val clazz =
+                Class.forName(classReader.className.replace("/", "."), false, VisitorHandler::class.java.classLoader)
             val instance = runCatching { clazz.getDeclaredField("INSTANCE") }.getOrNull()?.get(clazz) ?: return@forEach
 
             if (clazz.isAnnotationPresent(EPlaceholderExpansion::class.java)) {
@@ -72,7 +73,12 @@ object VisitorHandler {
     }
 
     private val annotations by lazy {
-        listOf(EConfig::class.java, ECommandHeader::class.java, EListener::class.java, EPlaceholderExpansion::class.java).map { it.name }
+        listOf(
+            EConfig::class.java,
+            ECommandHeader::class.java,
+            EListener::class.java,
+            EPlaceholderExpansion::class.java
+        ).map { it.name }
     }
 
     private fun ClassReader.hasAnnotation(): Boolean {
@@ -100,6 +106,10 @@ object VisitorHandler {
             ?: error("${configObj::class.java.simpleName} must have @Config annotation")
 
         val file = File(EasyPlugin.getPlugin<EasyPlugin>().dataFolder, configFileAnnotation.file)
+
+        if (!file.exists()) {
+            plugin.saveResource(configFileAnnotation.file, false)
+        }
 
         val configFields = configClass.declaredFields.filter {
             it.isAnnotationPresent(ConfigNode::class.java)

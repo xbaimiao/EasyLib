@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.3.8'
+    version = '3.3.9'
 
     repositories {
         mavenCentral()
@@ -83,6 +83,14 @@ dependencies {
     implementation(project(":easylib-gson"))
     implementation 'public:ik:1.0.0'
     implementation 'com.github.cryptomorin:XSeries:9.4.0'
+}
+
+task copyDependencies(type: Copy) {
+    from configurations.compileClasspath
+    subprojects.forEach {
+        from it.configurations.compileClasspath
+    }
+    into 'dependencies'
 }
 
 tasks.register('sourcesJar', Jar) {
