@@ -124,7 +124,8 @@ class RedisDistributedLock(private val jedisPool: JedisPool) : DistributedLock {
         if (lockName.contains(":")) {
             error("lockName 中不能包含 \":\"")
         }
-        val identifier = lockWithTimeout(lockName, acquireTimeout, timeout) ?: error("加锁超时 请尝试增加 acquireTimeout")
+        val identifier =
+            lockWithTimeout(lockName, acquireTimeout, timeout) ?: error("加锁超时 请尝试增加 acquireTimeout")
         val result = func.invoke()
         unlock(lockName, identifier)
         return result

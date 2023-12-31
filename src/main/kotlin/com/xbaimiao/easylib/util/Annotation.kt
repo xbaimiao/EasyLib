@@ -1,9 +1,5 @@
 package com.xbaimiao.easylib.util
 
-import com.xbaimiao.easylib.EasyPlugin
-import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
-
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class EConfig(val file: String)

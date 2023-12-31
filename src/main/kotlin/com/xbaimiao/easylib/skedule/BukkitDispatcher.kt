@@ -36,7 +36,10 @@ internal class BukkitDispatcher(private val async: Boolean) : ExecutorCoroutineD
         closed = true
     }
 
-    @Deprecated("Deprecated without replacement as an internal method never intended for public use", level = DeprecationLevel.ERROR)
+    @Deprecated(
+        "Deprecated without replacement as an internal method never intended for public use",
+        level = DeprecationLevel.ERROR
+    )
     override suspend fun delay(time: Long) {
         if (time <= 0) {
             return

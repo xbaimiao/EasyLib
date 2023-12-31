@@ -3,6 +3,8 @@ package com.xbaimiao.easylib
 import com.xbaimiao.easylib.VisitorHandler.visitor
 import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.ui.UIHandler
+import com.xbaimiao.easylib.util.MutexMap
+import com.xbaimiao.easylib.util.registerListener
 import org.bukkit.plugin.java.JavaPlugin
 
 abstract class EasyPlugin : JavaPlugin() {
@@ -31,6 +33,7 @@ abstract class EasyPlugin : JavaPlugin() {
     override fun onEnable() {
         enable()
         UIHandler.enable(this)
+        registerListener(MutexMap)
         VisitorHandler::class.java.protectionDomain.codeSource.location.visitor()
     }
 
