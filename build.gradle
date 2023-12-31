@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.4.0'
+    version = '3.4.1'
 
     repositories {
         mavenCentral()
@@ -75,7 +75,6 @@ dependencies {
     implementation("org.ow2.asm:asm:9.2")
     implementation("org.ow2.asm:asm-util:9.2")
     implementation("org.ow2.asm:asm-commons:9.2")
-
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
     implementation(project(":easylib-bukkit"))

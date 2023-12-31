@@ -1,86 +1,12 @@
-package com.xbaimiao.easylib.nms
+package com.xbaimiao.easylib.util
 
-import com.xbaimiao.easylib.util.plugin
-import com.xbaimiao.easylib.util.submit
-import com.xbaimiao.easylib.util.unsafeLazy
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
-import java.io.FileInputStream
-import java.util.concurrent.CompletableFuture
-
-/**
- * 获取 OBC 类
- */
-fun obcClass(name: String): Class<*> {
-    return Class.forName("org.bukkit.craftbukkit.${MinecraftVersion.minecraftVersion}.$name")
-}
-
-/**
- * 获取 NMS 类
- */
-fun nmsClass(name: String): Class<*> {
-    return if (MinecraftVersion.isUniversal) {
-        Class.forName(
-            MinecraftVersion.mapping.classMap[name]?.replace('/', '.') ?: error("Cannot find nms class: $name")
-        )
-    } else {
-        Class.forName("net.minecraft.server.${MinecraftVersion.minecraftVersion}.$name")
-    }
-}
-
-/**
- * 向玩家发送数据包（异步）
- */
-fun Player.sendPacket(packet: Any): CompletableFuture<Void> {
-    val future = CompletableFuture<Void>()
-    submit(async = true) {
-        try {
-            sendPacketBlocking(packet)
-            future.complete(null)
-        } catch (e: Throwable) {
-            future.completeExceptionally(e)
-            e.printStackTrace()
-        }
-    }
-    return future
-}
-
-/**
- * 向玩家发送数据包
- */
-fun Player.sendPacketBlocking(packet: Any) {
-    PacketSender.sendPacket(this, packet)
-}
 
 @Suppress("unused")
 object MinecraftVersion {
 
     val minecraftVersion by unsafeLazy {
         Bukkit.getServer().javaClass.name.split('.')[3]
-    }
-
-    /**
-     * 当前运行的版本（数字版本），例如：1.8.8
-     */
-    private val runningVersion by unsafeLazy {
-        val version = Bukkit.getServer().version.split("MC:")[1]
-        version.substring(0, version.length - 1).trim()
-    }
-
-    val mapping by unsafeLazy {
-        val mappingFile = if (isUniversal) {
-            MappingFile.files[runningVersion]
-        } else {
-            MappingFile.files["1.17"]!!
-        }
-        if (mappingFile == null) {
-            Bukkit.getPluginManager().disablePlugin(plugin)
-            error("UnsupportedVersionException")
-        }
-        Mapping(
-            FileInputStream("assets/${mappingFile.combined.substring(0, 2)}/${mappingFile.combined}"),
-            FileInputStream("assets/${mappingFile.fields.substring(0, 2)}/${mappingFile.fields}"),
-        )
     }
 
     /**
@@ -137,7 +63,7 @@ object MinecraftVersion {
         V1_17(17000, 9), V1_17_1(17010, 9),
         V1_18(18000, 10), V1_18_1(18010, 10), V1_18_2(18020, 10), //10
         V1_19(19000, 11), V1_19_1(19100, 11), V1_19_2(19200, 11), V1_19_3(19300, 11), V1_19_4(19400, 11), //11
-        V1_20_0(20000, 12), V1_20_1(20001, 12), V1_20_2(20002, 12), V1_20_3(20003, 12), V1_20_4(20004, 12), //12
+        V1_20_0(20000, 12), V1_20_1(20001, 12), V1_20_2(20002, 12), V1_20_3(20003, 12), //12
         UNKNOWN(0, -999);
 
         companion object {

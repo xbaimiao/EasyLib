@@ -2,7 +2,7 @@ package com.xbaimiao.easylib.command
 
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.chat.TellrawJson
-import com.xbaimiao.easylib.nms.MinecraftVersion
+import com.xbaimiao.easylib.util.MinecraftVersion
 import com.xbaimiao.easylib.util.Strings
 import com.xbaimiao.easylib.util.isSuperClassOf
 import org.bukkit.command.Command
