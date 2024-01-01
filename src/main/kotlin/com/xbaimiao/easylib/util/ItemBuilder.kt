@@ -10,7 +10,6 @@ import org.bukkit.Material
 import org.bukkit.block.banner.Pattern
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.*
 import org.bukkit.potion.PotionData
@@ -229,7 +228,9 @@ open class ItemBuilder {
         val itemMeta = originMeta ?: itemStack.itemMeta ?: return itemStack
         itemMeta.setDisplayName(name)
         itemMeta.lore = lore
-        itemMeta.addItemFlags(*flags.toTypedArray())
+        kotlin.runCatching {
+            itemMeta.addItemFlags(*flags.map { org.bukkit.inventory.ItemFlag.valueOf(it.name) }.toTypedArray())
+        }
         if (itemMeta is EnchantmentStorageMeta) {
             enchants.forEach { (e, lvl) -> itemMeta.addStoredEnchant(e, lvl, true) }
         } else {
@@ -307,7 +308,7 @@ open class ItemBuilder {
         originMeta = itemMeta
         name = itemMeta.displayName
         lore += itemMeta.lore ?: emptyList()
-        flags += itemMeta.itemFlags
+        flags += kotlin.runCatching { itemMeta.itemFlags.map { ItemFlag.valueOf(it.name) } }.getOrElse { emptyList() }
         enchants += if (itemMeta is EnchantmentStorageMeta) {
             itemMeta.storedEnchants
         } else {

@@ -2,6 +2,7 @@ package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.bridge.PlaceholderExpansion
 import com.xbaimiao.easylib.command.registerCommand
+import com.xbaimiao.easylib.loader.DependencyLoader
 import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
@@ -51,6 +52,14 @@ object VisitorHandler {
                 registerCommand(instance)
                 debug("${clazz.name} 通过 ECommandHeader 注册命令成功")
             }
+            if (clazz.isAnnotationPresent(Dependency::class.java)) {
+                handleDependency(clazz.getAnnotation(Dependency::class.java))
+            }
+            if (clazz.isAnnotationPresent(DependencyList::class.java)) {
+                clazz.getAnnotation(DependencyList::class.java).depends.forEach {
+                    handleDependency(it)
+                }
+            }
             if (clazz.isAnnotationPresent(EListener::class.java)) {
                 val eListener = clazz.getAnnotation(EListener::class.java)
                 if (clazz.interfaces.contains(Listener::class.java)) {
@@ -77,7 +86,9 @@ object VisitorHandler {
             EConfig::class.java,
             ECommandHeader::class.java,
             EListener::class.java,
-            EPlaceholderExpansion::class.java
+            EPlaceholderExpansion::class.java,
+            Dependency::class.java,
+            DependencyList::class.java
         ).map { it.name }
     }
 
@@ -97,6 +108,14 @@ object VisitorHandler {
 
         this.accept(classVisitor, 0)
         return hasAnnotation
+    }
+
+    private fun handleDependency(dependency: Dependency) {
+        debug("处理依赖 ${dependency.url}")
+        if (kotlin.runCatching { Class.forName(dependency.clazz) }.getOrNull() == null) {
+            DependencyLoader.DEPENDENCIES.add(DependencyLoader.Dependency(dependency.url))
+            debug("添加依赖 ${dependency.url}")
+        }
     }
 
     @JvmStatic

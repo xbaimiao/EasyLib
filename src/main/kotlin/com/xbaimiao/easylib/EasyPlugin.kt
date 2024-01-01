@@ -2,6 +2,7 @@ package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.VisitorHandler.visitor
 import com.xbaimiao.easylib.chat.Lang
+import com.xbaimiao.easylib.loader.DependencyLoader
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.MutexMap
 import com.xbaimiao.easylib.util.registerListener
@@ -26,20 +27,21 @@ abstract class EasyPlugin : JavaPlugin() {
     open fun disable() {}
 
     override fun onLoad() {
-        load()
         Lang.check(this)
+        load()
     }
 
     override fun onEnable() {
-        enable()
         UIHandler.enable(this)
         registerListener(MutexMap)
         VisitorHandler::class.java.protectionDomain.codeSource.location.visitor()
+        DependencyLoader.loader(this)
+        enable()
     }
 
     override fun onDisable() {
-        disable()
         UIHandler.disable()
+        disable()
     }
 
     companion object {

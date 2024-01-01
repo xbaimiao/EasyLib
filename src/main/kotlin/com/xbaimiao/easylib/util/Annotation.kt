@@ -30,6 +30,12 @@ annotation class ECommandHeader(
 @Retention(AnnotationRetention.RUNTIME)
 annotation class CommandBody
 
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class DependencyList(val depends: Array<Dependency>)
 
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Dependency(val url: String, val clazz: String)
 
 
