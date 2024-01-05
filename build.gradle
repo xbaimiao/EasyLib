@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.4.3'
+    version = '3.4.4'
 
     repositories {
         mavenCentral()
@@ -67,21 +67,28 @@ dependencies {
     compileOnly("public:paper:1.16.5")
     compileOnly("public:papi:1.0.0")
     compileOnly(fileTree("libs"))
-    // 本体
+
+    // reflex
     implementation("org.tabooproject.reflex:analyser:${reflexVersion}")
     implementation("org.tabooproject.reflex:fast-instance-getter:${reflexVersion}")
     implementation("org.tabooproject.reflex:reflex:${reflexVersion}") // 需要 analyser 模块
-    // 本体依赖
+
+    // configuration
+    implementation "cc.carm.lib:easyconfiguration-core:3.9.1"
+    //基于YAML文件的实现版本，可用于全部Java环境。
+    implementation "cc.carm.lib:easyconfiguration-yaml:3.9.1"
+
+    // asm
     implementation("org.ow2.asm:asm:9.2")
     implementation("org.ow2.asm:asm-util:9.2")
     implementation("org.ow2.asm:asm-commons:9.2")
+    implementation(project(":easylib-gson"))
+    implementation 'public:ik:1.0.0'
+    implementation 'com.github.cryptomorin:XSeries:9.8.1'
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
     implementation(project(":easylib-bukkit"))
     implementation(project(":easylib-bukkit-common"))
-    implementation(project(":easylib-gson"))
-    implementation 'public:ik:1.0.0'
-    implementation 'com.github.cryptomorin:XSeries:9.4.0'
 }
 
 task copyDependencies(type: Copy) {
@@ -124,6 +131,7 @@ tasks {
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
         relocate("org.objectweb.asm", "com.xbaimiao.easylib.asm")
+        relocate("cc.carm.lib", "com.xbaimiao.easylib.configuration")
     }
     // UTF-8
     compileJava {
