@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.4.4'
+    version = '3.4.6'
 
     repositories {
         mavenCentral()
@@ -112,9 +112,7 @@ tasks {
     build {
         artifacts {
             archives(shadowJar)
-//            archives(jar)
             archives(sourcesJar)
-//            archives(kotlinSourcesJar)
         }
     }
     assemble {
@@ -132,6 +130,7 @@ tasks {
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
         relocate("org.objectweb.asm", "com.xbaimiao.easylib.asm")
         relocate("cc.carm.lib", "com.xbaimiao.easylib.configuration")
+        relocate("org.bspfsystems", "com.xbaimiao.easylib.configuration")
     }
     // UTF-8
     compileJava {
@@ -141,27 +140,35 @@ tasks {
 
 publishing {
     repositories {
-        mavenLocal()
+//        maven {
+//            credentials {
+//                username = project.findProperty("BaiUser").toString()
+//                password = project.findProperty("BaiPassword").toString()
+//            }
+//            url("https://maven.xbaimiao.com/repository/releases/")
+//        }
+//        maven {
+//            credentials {
+//                username = project.findProperty("clayUsername").toString()
+//                password = project.findProperty("clayPassword").toString()
+//            }
+//            url("https://maven.mineclay.com/repository/zhua-release/")
+//        }
         maven {
             credentials {
-                username = project.findProperty("BaiUser").toString()
-                password = project.findProperty("BaiPassword").toString()
+                username = project.findProperty("githubUsername").toString()
+                password = project.findProperty("githubPassword").toString()
             }
-            url("https://maven.xbaimiao.com/repository/releases/")
-        }
-        maven {
-            credentials {
-                username = project.findProperty("clayUsername").toString()
-                password = project.findProperty("clayPassword").toString()
-            }
-            url("https://maven.mineclay.com/repository/zhua-release/")
+            name = "GithubPackages"
+            url = uri("https://maven.pkg.github.com/xbaimiao/EasyLib")
         }
     }
     publications {
-        mavenJava(MavenPublication) {
-//            artifact jar
+        gpr(MavenPublication) {
+//            from(components.java)
             artifact sourcesJar
             artifact shadowJar
+            artifactId = 'easy-lib'
         }
     }
 }
