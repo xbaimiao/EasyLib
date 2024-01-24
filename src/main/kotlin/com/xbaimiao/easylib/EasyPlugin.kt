@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 abstract class EasyPlugin : JavaPlugin() {
 
+    private val pluginEnableLazys = mutableListOf<PluginEnableLazy<*>>()
     var debug = false
 
     init {
@@ -37,11 +38,21 @@ abstract class EasyPlugin : JavaPlugin() {
         VisitorHandler::class.java.protectionDomain.codeSource.location.visitor()
         DependencyLoader.loader(this)
         enable()
+        pluginEnableLazys.forEach {
+            it.init()
+        }
     }
 
     override fun onDisable() {
         UIHandler.disable()
         disable()
+    }
+
+    /**
+     * 插件启用时赋值
+     */
+    fun <T> enable(initializer: () -> T) = PluginEnableLazy(initializer).also {
+        pluginEnableLazys.add(it)
     }
 
     companion object {

@@ -38,86 +38,6 @@ interface DistributedLock {
 
 }
 
-class MemoryDistributedLock : DistributedLock {
-
-    // 定义一个全局的锁对象，用于控制锁的互斥
-    private val lock = Any()
-
-    // 定义一个Map，用于存储锁的标识和锁的超时时间
-    private val locks = mutableMapOf<String, Pair<String, Long>>()
-
-    override fun <T> withLock(lockName: String, acquireTimeout: Long, timeout: Long, func: () -> T): T {
-        // 获取锁的超时时间，超过这个时间则放弃获取锁
-        val end = System.currentTimeMillis() + acquireTimeout
-        while (System.currentTimeMillis() < end) {
-            synchronized(lock) {
-                // 尝试获取锁
-                val pair = locks[lockName]
-                if (pair == null) {
-                    // 如果锁不存在，则创建锁
-                    val identifier = UUID.randomUUID().toString()
-                    locks[lockName] = Pair(identifier, System.currentTimeMillis() + timeout)
-                    try {
-                        // 执行加锁代码块
-                        return func.invoke()
-                    } finally {
-                        // 释放锁
-                        synchronized(lock) {
-                            locks.remove(lockName)
-                        }
-                    }
-                } else if (pair.second < System.currentTimeMillis()) {
-                    // 如果锁已经超时，则删除锁
-                    synchronized(lock) {
-                        locks.remove(lockName)
-                    }
-                }
-            }
-            Thread.sleep(10)
-        }
-        // 加锁超时，抛出异常
-        throw RuntimeException("加锁超时，请尝试增加 acquireTimeout")
-    }
-
-    override fun lockWithTimeout(lockName: String, acquireTimeout: Long, timeout: Long): String? {
-        // 获取锁的超时时间，超过这个时间则放弃获取锁
-        val end = System.currentTimeMillis() + acquireTimeout
-        while (System.currentTimeMillis() < end) {
-            synchronized(lock) {
-                // 尝试获取锁
-                val pair = locks[lockName]
-                if (pair == null) {
-                    // 如果锁不存在，则创建锁
-                    val identifier = UUID.randomUUID().toString()
-                    locks[lockName] = Pair(identifier, System.currentTimeMillis() + timeout)
-                    return identifier
-                } else if (pair.second < System.currentTimeMillis()) {
-                    // 如果锁已经超时，则删除锁
-                    locks.remove(lockName)
-                }
-            }
-            Thread.sleep(10)
-        }
-        // 加锁超时，返回null
-        return null
-    }
-
-    override fun unlock(lockName: String, identifier: String): Boolean {
-        synchronized(lock) {
-            // 判断锁是否存在
-            val pair = locks[lockName]
-            if (pair != null && pair.first == identifier) {
-                // 如果锁存在且标识匹配，则删除锁
-                locks.remove(lockName)
-                return true
-            }
-        }
-        // 锁不存在或标识不匹配，返回false
-        return false
-    }
-
-}
-
 class RedisDistributedLock(private val jedisPool: JedisPool) : DistributedLock {
 
     override fun <T> withLock(lockName: String, acquireTimeout: Long, timeout: Long, func: () -> T): T {
@@ -132,7 +52,7 @@ class RedisDistributedLock(private val jedisPool: JedisPool) : DistributedLock {
     }
 
     override fun lockWithTimeout(lockName: String, acquireTimeout: Long, timeout: Long): String? {
-        return jedisPool.getResource().use { conn ->
+        return jedisPool.resource.use { conn ->
             // 随机生成一个value
             val identifier = UUID.randomUUID().toString()
             // 锁名，即key值
@@ -160,7 +80,7 @@ class RedisDistributedLock(private val jedisPool: JedisPool) : DistributedLock {
     }
 
     override fun unlock(lockName: String, identifier: String): Boolean {
-        jedisPool.getResource().use { conn ->
+        jedisPool.resource.use { conn ->
             val lockKey = "lock:$lockName"
             var retFlag = false
             while (true) {
@@ -188,8 +108,4 @@ class RedisDistributedLock(private val jedisPool: JedisPool) : DistributedLock {
 
 fun buildDistributedLock(jedisPool: JedisPool): DistributedLock {
     return RedisDistributedLock(jedisPool)
-}
-
-fun buildDistributedLock(): DistributedLock {
-    return MemoryDistributedLock()
 }

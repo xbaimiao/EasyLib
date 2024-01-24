@@ -93,10 +93,16 @@ object Lang {
         }
         if (obj is List<*>) {
             obj.forEach { msg ->
-                this.sendMessage((msg as String?).colored().formats(*args))
+                val raw = (msg as String?).colored().formats(*args)
+                if (raw.isNotBlank()) {
+                    this.sendMessage(raw)
+                }
             }
         } else {
-            this.sendMessage((obj as String?).colored().formats(*args))
+            val raw = (obj as String?).colored().formats(*args)
+            if (raw.isNotBlank()) {
+                this.sendMessage(raw)
+            }
         }
     }
 

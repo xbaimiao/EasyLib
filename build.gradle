@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.4.6'
+    version = '3.4.9'
 
     repositories {
         mavenCentral()
@@ -73,11 +73,6 @@ dependencies {
     implementation("org.tabooproject.reflex:fast-instance-getter:${reflexVersion}")
     implementation("org.tabooproject.reflex:reflex:${reflexVersion}") // 需要 analyser 模块
 
-    // configuration
-    implementation "cc.carm.lib:easyconfiguration-core:3.9.1"
-    //基于YAML文件的实现版本，可用于全部Java环境。
-    implementation "cc.carm.lib:easyconfiguration-yaml:3.9.1"
-
     // asm
     implementation("org.ow2.asm:asm:9.2")
     implementation("org.ow2.asm:asm-util:9.2")
@@ -129,8 +124,6 @@ tasks {
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
         relocate("org.objectweb.asm", "com.xbaimiao.easylib.asm")
-        relocate("cc.carm.lib", "com.xbaimiao.easylib.configuration")
-        relocate("org.bspfsystems", "com.xbaimiao.easylib.configuration")
     }
     // UTF-8
     compileJava {
