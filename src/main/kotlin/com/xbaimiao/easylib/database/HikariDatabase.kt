@@ -36,4 +36,23 @@ abstract class HikariDatabase(url: String, user: String?, passwd: String?) : SQL
         return dataSource.connection.use { block(it) }
     }
 
+    override fun <T> transaction(func: (Connection) -> T): T {
+        return useConnection {
+            var isSuccessful = false
+            it.autoCommit = false
+            try {
+                val result = func(it)
+                isSuccessful = true
+                result
+            } finally {
+                if (isSuccessful) {
+                    it.commit()
+                } else {
+                    it.rollback()
+                }
+                it.autoCommit = true
+            }
+        }
+    }
+
 }

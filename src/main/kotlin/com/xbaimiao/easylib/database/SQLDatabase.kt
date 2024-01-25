@@ -15,4 +15,9 @@ interface SQLDatabase {
      */
     fun <T> useConnection(block: (Connection) -> T): T
 
+    /**
+     * 使用事务操作mysql
+     */
+    fun <T> transaction(func: (Connection) -> T): T
+
 }

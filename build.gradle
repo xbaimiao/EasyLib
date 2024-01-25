@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.4.9'
+    version = '3.5.0'
 
     repositories {
         mavenCentral()
@@ -36,8 +36,6 @@ allprojects {
 
     dependencies {
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")
-        compileOnly("com.j256.ormlite:ormlite-core:6.1")
-        compileOnly("com.j256.ormlite:ormlite-jdbc:6.1")
         compileOnly("com.zaxxer:HikariCP:4.0.3")
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
         compileOnly("public:vault:1.0.0")
