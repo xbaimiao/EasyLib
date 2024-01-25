@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.5.0'
+    version = '3.5.2'
 
     repositories {
         mavenCentral()
@@ -131,20 +131,13 @@ tasks {
 
 publishing {
     repositories {
-//        maven {
-//            credentials {
-//                username = project.findProperty("BaiUser").toString()
-//                password = project.findProperty("BaiPassword").toString()
-//            }
-//            url("https://maven.xbaimiao.com/repository/releases/")
-//        }
-//        maven {
-//            credentials {
-//                username = project.findProperty("clayUsername").toString()
-//                password = project.findProperty("clayPassword").toString()
-//            }
-//            url("https://maven.mineclay.com/repository/zhua-release/")
-//        }
+        maven {
+            credentials {
+                username = project.findProperty("clayUsername").toString()
+                password = project.findProperty("clayPassword").toString()
+            }
+            url("https://maven.mineclay.com/repository/zhua-release/")
+        }
         maven {
             credentials {
                 username = project.findProperty("githubUsername").toString()
@@ -156,7 +149,6 @@ publishing {
     }
     publications {
         gpr(MavenPublication) {
-//            from(components.java)
             artifact sourcesJar
             artifact shadowJar
             artifactId = 'easy-lib'
