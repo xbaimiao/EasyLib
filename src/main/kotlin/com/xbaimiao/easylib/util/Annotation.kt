@@ -1,5 +1,7 @@
 package com.xbaimiao.easylib.util
 
+import java.lang.reflect.Method
+
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class EConfig(val file: String)
@@ -37,5 +39,19 @@ annotation class DependencyList(val depends: Array<Dependency>)
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Dependency(val url: String, val clazz: String)
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class AwakeClass
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Awake(val lifeCycle: LifeCycle)
+
+class LifeCycleMethod(val lifeCycle: LifeCycle, val method: Method, val instance: Any)
+
+enum class LifeCycle {
+    ENABLE, ACTIVE, DISABLE
+}
 
 

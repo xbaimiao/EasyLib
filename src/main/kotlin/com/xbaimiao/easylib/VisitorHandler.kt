@@ -16,6 +16,8 @@ import java.util.jar.JarFile
 
 object VisitorHandler {
 
+    val lifeCycleMethodList = ArrayList<LifeCycleMethod>()
+
     /**
      * 获取 URL 下的所有类
      */
@@ -60,6 +62,15 @@ object VisitorHandler {
                     handleDependency(it)
                 }
             }
+            if (clazz.isAnnotationPresent(AwakeClass::class.java)) {
+                clazz.declaredMethods.filter { it.isAnnotationPresent(Awake::class.java) }.forEach { method ->
+                    val awake = method.getAnnotation(Awake::class.java)
+                    LifeCycleMethod(awake.lifeCycle, method, instance).also {
+                        lifeCycleMethodList.add(it)
+                        debug("${clazz.name} 通过 Awake 注册生命周期方法 ${method.name} 成功")
+                    }
+                }
+            }
             if (clazz.isAnnotationPresent(EListener::class.java)) {
                 val eListener = clazz.getAnnotation(EListener::class.java)
                 if (clazz.interfaces.contains(Listener::class.java)) {
@@ -88,7 +99,8 @@ object VisitorHandler {
             EListener::class.java,
             EPlaceholderExpansion::class.java,
             Dependency::class.java,
-            DependencyList::class.java
+            DependencyList::class.java,
+            AwakeClass::class.java
         ).map { it.name }
     }
 

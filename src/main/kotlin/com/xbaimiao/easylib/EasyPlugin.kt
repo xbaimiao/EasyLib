@@ -4,8 +4,10 @@ import com.xbaimiao.easylib.VisitorHandler.visitor
 import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.loader.DependencyLoader
 import com.xbaimiao.easylib.ui.UIHandler
+import com.xbaimiao.easylib.util.LifeCycle
 import com.xbaimiao.easylib.util.MutexMap
 import com.xbaimiao.easylib.util.registerListener
+import com.xbaimiao.easylib.util.submit
 import org.bukkit.plugin.java.JavaPlugin
 
 abstract class EasyPlugin : JavaPlugin() {
@@ -25,6 +27,8 @@ abstract class EasyPlugin : JavaPlugin() {
 
     open fun enable() {}
 
+    open fun active() {}
+
     open fun disable() {}
 
     override fun onLoad() {
@@ -41,9 +45,29 @@ abstract class EasyPlugin : JavaPlugin() {
         pluginEnableLazys.forEach {
             it.init()
         }
+
+        VisitorHandler.lifeCycleMethodList.forEach {
+            if (it.lifeCycle == LifeCycle.ENABLE) {
+                it.method.invoke(it.instance)
+            }
+        }
+
+        submit {
+            VisitorHandler.lifeCycleMethodList.forEach {
+                if (it.lifeCycle == LifeCycle.ACTIVE) {
+                    it.method.invoke(it.instance)
+                }
+            }
+            active()
+        }
     }
 
     override fun onDisable() {
+        VisitorHandler.lifeCycleMethodList.forEach {
+            if (it.lifeCycle == LifeCycle.DISABLE) {
+                it.method.invoke(it.instance)
+            }
+        }
         UIHandler.disable()
         disable()
     }
