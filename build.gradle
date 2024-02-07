@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.5.3'
+    version = '3.5.4'
 
     repositories {
         mavenCentral()
@@ -44,6 +44,8 @@ allprojects {
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
         compileOnly("redis.clients:jedis:5.0.1")
         compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+        compileOnly("com.j256.ormlite:ormlite-core:6.1")
+        compileOnly("com.j256.ormlite:ormlite-jdbc:6.1")
     }
 
     compileKotlin {
