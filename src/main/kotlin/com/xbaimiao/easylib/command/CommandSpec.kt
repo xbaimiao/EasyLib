@@ -274,6 +274,14 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
         return argNodes.append(argNode, optional)
     }
 
+    fun <T> requiredArg(argNode: ArgNode<T>): ArgNode<T> {
+        return argNodes.append(argNode, false)
+    }
+
+    fun <T> optionalArg(argNode: ArgNode<T>): ArgNode<T> {
+        return argNodes.append(argNode, true)
+    }
+
     @JvmOverloads
     fun arg(usage: String, optional: Boolean = false): ArgNode<String> {
         val argNode = ArgNode(usage, exec = { listOf(usage) }, parse = { it })

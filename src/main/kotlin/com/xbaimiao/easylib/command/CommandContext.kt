@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.command
 
+import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.chat.colored
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -56,6 +57,19 @@ data class CommandContext<S : CommandSender>(
 
     fun error(any: Any?) {
         sender.sendMessage("§c${any.toString()}".colored())
+    }
+
+    fun echo(any: Any?) {
+        if (any is String) {
+            val lang = Lang.asLangText<String>(any)
+            if (lang.isNotEmpty()) {
+                sender.sendMessage(lang)
+            }else{
+                sender.sendMessage(any)
+            }
+        }else{
+            sender.sendMessage(any?.toString() ?: "null")
+        }
     }
 
     fun findIntOrNull(index: Int): Int? = kotlin.runCatching { args[index].toInt() }.getOrNull()
