@@ -84,10 +84,10 @@ object Lang {
     }
 
     fun CommandSender.sendLang(path: String, vararg args: Any) {
+        init(EasyPlugin.getPlugin())
         if (configuration == null) {
             return
         }
-        init(EasyPlugin.getPlugin())
         var obj = configuration!![path]
         if (obj == null && jarLang != null) {
             obj = jarLang!![path]
@@ -111,10 +111,10 @@ object Lang {
 
     @Suppress("UNCHECKED_CAST")
     fun <T> asLangText(path: String, vararg args: Any): T {
+        init(EasyPlugin.getPlugin())
         if (configuration == null) {
             return "" as T
         }
-        init(EasyPlugin.getPlugin())
         var obj = configuration!![path]
         if (obj == null && jarLang != null) {
             obj = jarLang!![path]
