@@ -1,7 +1,6 @@
 package com.xbaimiao.easylib.chat
 
 import com.xbaimiao.easylib.EasyPlugin
-import com.xbaimiao.easylib.util.info
 import com.xbaimiao.easylib.util.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.ConfigurationSection
@@ -51,11 +50,8 @@ object Lang {
         if (init) {
             return
         }
-        val inputStream = plugin.getResource("lang.yml")
-        if (inputStream == null) {
-            info("lang.yml not found")
-            return
-        }
+        init = true
+        val inputStream = plugin.getResource("lang.yml") ?: return
         jarLang =
             YamlConfiguration.loadConfiguration(BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8)))
         file = File(plugin.dataFolder, "lang.yml")
@@ -63,13 +59,11 @@ object Lang {
             try {
                 plugin.saveResource("lang.yml", false)
             } catch (e: IllegalArgumentException) {
-                info("lang.yml not found")
                 return
             }
         }
 
         configuration = YamlConfiguration.loadConfiguration(file!!)
-        init = true
     }
 
     private fun save() {
