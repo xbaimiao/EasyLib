@@ -52,11 +52,15 @@ public class DependencyLoader {
         private final File file;
         private final String url;
 
-        public Dependency(String url) {
+        public Dependency(String url, String baseUrl) {
             this.url = url;
-            String filePath = url.replace("https://maven.aliyun.com/repository/public/", "")
+            String filePath = url.replace(baseUrl, "")
                     .replace("/", File.separator);
             this.file = new File("libraries",filePath);
+        }
+
+        public Dependency(String url) {
+            this(url, "https://maven.aliyun.com/repository/public/");
         }
 
         public File getFile() {

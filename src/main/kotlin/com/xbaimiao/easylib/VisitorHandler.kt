@@ -125,9 +125,32 @@ object VisitorHandler {
     private fun handleDependency(dependency: Dependency) {
         debug("处理依赖 ${dependency.url}")
         if (kotlin.runCatching { Class.forName(dependency.clazz) }.getOrNull() == null) {
-            DependencyLoader.DEPENDENCIES.add(DependencyLoader.Dependency(dependency.url))
+            val url = if (dependency.format) {
+                val processed = dependency.url.dependencyToUrl(dependency.repoUrl)
+                debug("解析依赖地址 $processed")
+                processed
+            } else dependency.url
+            DependencyLoader.DEPENDENCIES.add(DependencyLoader.Dependency(url, dependency.repoUrl))
             debug("添加依赖 ${dependency.url}")
         }
+    }
+
+    private fun String.dependencyToUrl(repoUrl: String): String {
+        var repoBaseUrl = repoUrl
+        if (!repoUrl.endsWith("/")) repoBaseUrl = "$repoUrl/"
+
+        val parts = this.split(':')
+        if (parts.size !in 3..4) {
+            throw IllegalArgumentException("Format not correct")
+        }
+        val group = parts[0]
+        val name = parts[1]
+        val version = parts[2]
+        val classifier = if (parts.size == 4) parts[3] else ""
+        val groupPath = group.replace('.', '/')
+        val artifact = if (classifier.isNotEmpty()) "$name-$version-$classifier.jar" else "$name-$version.jar"
+
+        return "${repoBaseUrl}$groupPath/$name/$version/$artifact"
     }
 
     @JvmStatic
