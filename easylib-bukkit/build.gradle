@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(":easylib-api"))
-    compileOnly("public:paper:1.16.5")
+    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
 }
 
 test {

@@ -24,7 +24,7 @@ class FakeOperator(val player: Player) : PermissibleBase(player), CommandSender 
 
 
     override fun sendMessage(vararg messages: String) {
-        player.sendMessage(messages)
+        player.sendMessage(messages.toString())
     }
 
 
@@ -34,7 +34,7 @@ class FakeOperator(val player: Player) : PermissibleBase(player), CommandSender 
 
 
     override fun sendMessage(sender: UUID?, vararg messages: String) {
-        player.sendMessage(sender, messages)
+        player.sendMessage(sender, messages.toString())
     }
 
     override fun getServer(): Server {

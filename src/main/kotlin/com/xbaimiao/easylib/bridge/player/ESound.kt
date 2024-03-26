@@ -29,11 +29,11 @@ class ESound(
 
     fun playSound(location: Location) {
         if (sound != null) {
-            location.world.playSound(location, sound, volume, pitch)
+            location.world!!.playSound(location, sound, volume, pitch)
         }
         xSound?.play(location, volume, pitch)
         rwaSound?.let {
-            location.world.playSound(location, it, volume, pitch)
+            location.world!!.playSound(location, it, volume, pitch)
         }
     }
 

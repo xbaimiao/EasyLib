@@ -1,47 +1,35 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.20'
     id("com.github.johnrengelman.shadow") version("7.1.2")
 }
+
+def kotlinVersion = "1.9.20"
 
 allprojects {
     apply plugin: 'java'
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.6.1'
+    version = '3.6.3'
 
     repositories {
         mavenCentral()
-        maven {
-            url 'https://maven.xbaimiao.com/repository/releases/'
-            credentials {
-                username = project.findProperty("BaiUser").toString()
-                password = project.findProperty("BaiPassword").toString()
-            }
-        }
         maven { url 'https://repo.aikar.co/content/groups/aikar/' }
         maven { url "https://repo.dmulloy2.net/repository/public/" }
         maven { url "https://repo.tabooproject.org/repository/releases/" }
-        maven {
-            name 'CodeMC'
-            url 'https://repo.codemc.org/repository/maven-public/'
-        }
-        maven {
-            name 'PaperMC'
-            url 'https://repo.papermc.io/repository/maven-snapshots/'
-        }
+        maven { url "https://repo.papermc.io/repository/maven-public/" }
+        maven { url "https://repo.papermc.io/repository/maven-snapshots/" }
+        maven { url "https://repo.codemc.org/repository/maven-public/" }
     }
 
     dependencies {
-        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
         compileOnly("com.zaxxer:HikariCP:4.0.3")
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
-        compileOnly("public:vault:1.0.0")
-        compileOnly("public:points:1.0.0")
         compileOnly("net.luckperms:api:5.4")
-        compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
         compileOnly("redis.clients:jedis:5.0.1")
         compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
         compileOnly("com.j256.ormlite:ormlite-core:6.1")
@@ -64,8 +52,8 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:4.0.3")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     compileOnly("com.google.code.gson:gson:2.10.1")
-    compileOnly("public:paper:1.16.5")
-    compileOnly("public:papi:1.0.0")
+    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("com.mojang:authlib:1.5.25")
     compileOnly(fileTree("libs"))
 
     // reflex
@@ -77,13 +65,10 @@ dependencies {
     implementation("org.ow2.asm:asm:9.2")
     implementation("org.ow2.asm:asm-util:9.2")
     implementation("org.ow2.asm:asm-commons:9.2")
-    implementation(project(":easylib-gson"))
-    implementation 'public:ik:1.0.0'
-    implementation 'com.github.cryptomorin:XSeries:9.8.1'
+    implementation("com.github.cryptomorin:XSeries:9.9.0")
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
     implementation(project(":easylib-bukkit"))
-    implementation(project(":easylib-bukkit-common"))
 }
 
 task copyDependencies(type: Copy) {
