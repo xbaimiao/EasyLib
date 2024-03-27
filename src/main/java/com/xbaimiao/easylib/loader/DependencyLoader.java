@@ -27,6 +27,7 @@ public class DependencyLoader {
             }
             File finalFile = dependency.getFile();
             Map<String, String> rules = dependency.getRelocateRules();
+            boolean shouldDeleteOnExit = false;
             if (!rules.isEmpty()) {
                 try {
                     List<Relocation> relocationRules = new ArrayList<>();
@@ -40,6 +41,7 @@ public class DependencyLoader {
                     plugin.getLogger().info("Relocated " + dependency.getFile().getName());
 
                     finalFile = tempFile;
+                    shouldDeleteOnExit = true;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -47,6 +49,7 @@ public class DependencyLoader {
             if (!Loader.addPath(finalFile)) {
                 plugin.getLogger().warning("Load " + dependency.getFile().getName() + " Fail");
             }
+            if (shouldDeleteOnExit) finalFile.deleteOnExit();
         }
     }
 
