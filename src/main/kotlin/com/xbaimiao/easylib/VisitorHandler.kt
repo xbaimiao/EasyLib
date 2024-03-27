@@ -130,7 +130,19 @@ object VisitorHandler {
                 debug("解析依赖地址 $processed")
                 processed
             } else dependency.url
-            DependencyLoader.DEPENDENCIES.add(DependencyLoader.Dependency(url, dependency.repoUrl))
+            val relocationRules = mutableMapOf<String, String>()
+            debug(dependency.relocationRules.toString())
+            if (dependency.relocationRules.size % 2 != 0) {
+                warn("Incorrect relocation rules ${dependency.relocationRules}")
+            } else {
+                dependency.relocationRules.toList().chunked(2).forEach {
+                    val target = it[0]
+                    val result = it[1]
+                    debug("Relocating $target to $result")
+                    relocationRules[target] = result
+                }
+            }
+            DependencyLoader.DEPENDENCIES.add(DependencyLoader.Dependency(url, dependency.repoUrl, relocationRules))
             debug("添加依赖 ${dependency.url}")
         }
     }

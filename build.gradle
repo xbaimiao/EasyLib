@@ -12,7 +12,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.6.3'
+    version = '3.6.4'
 
     repositories {
         mavenCentral()
@@ -65,6 +65,10 @@ dependencies {
     implementation("org.ow2.asm:asm:9.2")
     implementation("org.ow2.asm:asm-util:9.2")
     implementation("org.ow2.asm:asm-commons:9.2")
+    implementation("me.lucko:jar-relocator:1.7") {
+        exclude group: "org.ow2.asm", module: "asm-commons"
+        exclude group: "org.ow2.asm", module: "asm"
+    }
     implementation("com.github.cryptomorin:XSeries:9.9.0")
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
@@ -109,6 +113,7 @@ tasks {
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
         relocate("org.objectweb.asm", "com.xbaimiao.easylib.asm")
+        relocate("me.lucko.jarrelocator", "com.xbaimiao.easylib.relocator")
     }
     // UTF-8
     compileJava {

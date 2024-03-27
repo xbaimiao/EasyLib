@@ -1,11 +1,15 @@
 package com.xbaimiao.easylib.loader;
 
 import com.xbaimiao.easylib.EasyPlugin;
+import me.lucko.jarrelocator.JarRelocator;
+import me.lucko.jarrelocator.Relocation;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DependencyLoader {
 
@@ -21,7 +25,26 @@ public class DependencyLoader {
                     }
                 }
             }
-            if (!Loader.addPath(dependency.getFile())) {
+            File finalFile = dependency.getFile();
+            Map<String, String> rules = dependency.getRelocateRules();
+            if (!rules.isEmpty()) {
+                try {
+                    List<Relocation> relocationRules = new ArrayList<>();
+                    for (Map.Entry<String, String> entry : rules.entrySet()) {
+                        relocationRules.add(new Relocation(entry.getKey(), entry.getValue()));
+                    }
+                    File tempFile = File.createTempFile("EasyLib_Relocate_", ".jar");
+                    JarRelocator jarRelocator = new JarRelocator(dependency.getFile(), tempFile, relocationRules);
+                    jarRelocator.run();
+
+                    plugin.getLogger().info("Relocated " + dependency.getFile().getName());
+
+                    finalFile = tempFile;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!Loader.addPath(finalFile)) {
                 plugin.getLogger().warning("Load " + dependency.getFile().getName() + " Fail");
             }
         }
@@ -51,16 +74,18 @@ public class DependencyLoader {
 
         private final File file;
         private final String url;
+        private final Map<String, String> relocateRules;
 
-        public Dependency(String url, String baseUrl) {
+        public Dependency(String url, String baseUrl, Map<String, String> relocateRules) {
             this.url = url;
+            this.relocateRules = relocateRules;
             String filePath = url.replace(baseUrl, "")
                     .replace("/", File.separator);
-            this.file = new File("libraries",filePath);
+            this.file = new File("libraries", filePath);
         }
 
         public Dependency(String url) {
-            this(url, "https://maven.aliyun.com/repository/public/");
+            this(url, "https://maven.aliyun.com/repository/public/", new HashMap<>());
         }
 
         public File getFile() {
@@ -69,6 +94,10 @@ public class DependencyLoader {
 
         public String getUrl() {
             return url;
+        }
+
+        public Map<String, String> getRelocateRules() {
+            return relocateRules;
         }
     }
 
