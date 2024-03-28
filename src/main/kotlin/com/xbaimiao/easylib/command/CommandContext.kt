@@ -64,10 +64,10 @@ data class CommandContext<S : CommandSender>(
             val lang = Lang.asLangText<String>(any)
             if (lang.isNotEmpty()) {
                 sender.sendMessage(lang)
-            }else{
+            } else {
                 sender.sendMessage(any)
             }
-        }else{
+        } else {
             sender.sendMessage(any?.toString() ?: "null")
         }
     }
