@@ -4,25 +4,9 @@ import com.xbaimiao.easylib.bridge.PlaceholderExpansion
 import com.xbaimiao.easylib.command.registerCommand
 import com.xbaimiao.easylib.loader.DependencyLoader
 import com.xbaimiao.easylib.util.*
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.Listener
-import org.eclipse.aether.RepositorySystem
-import org.eclipse.aether.RepositorySystemSession
-import org.eclipse.aether.artifact.Artifact
-import org.eclipse.aether.artifact.DefaultArtifact
-import org.eclipse.aether.collection.CollectRequest
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory
-import org.eclipse.aether.impl.DefaultServiceLocator
-import org.eclipse.aether.repository.LocalRepository
-import org.eclipse.aether.repository.RemoteRepository
-import org.eclipse.aether.resolution.DependencyRequest
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
-import org.eclipse.aether.spi.connector.transport.TransporterFactory
-import org.eclipse.aether.transport.http.HttpTransporterFactory
-import org.eclipse.aether.util.artifact.JavaScopes
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
 import org.objectweb.asm.*
 import java.io.File
 import java.net.JarURLConnection
@@ -33,21 +17,6 @@ import java.util.jar.JarFile
 object VisitorHandler {
 
     val lifeCycleMethodList = ArrayList<LifeCycleMethod>()
-    private val repository: RepositorySystem
-    private val session: RepositorySystemSession
-
-    init {
-        val locator: DefaultServiceLocator = MavenRepositorySystemUtils.newServiceLocator()
-        locator.addService(RepositoryConnectorFactory::class.java, BasicRepositoryConnectorFactory::class.java)
-        locator.addService(TransporterFactory::class.java, HttpTransporterFactory::class.java)
-
-        repository = locator.getService(RepositorySystem::class.java)
-        session = MavenRepositorySystemUtils.newSession()
-
-        session.localRepositoryManager = repository.newLocalRepositoryManager(session, LocalRepository("libraries"))
-
-        session.setReadOnly()
-    }
 
     /**
      * 获取 URL 下的所有类
@@ -160,22 +129,17 @@ object VisitorHandler {
                 val processed = dependency.url.dependencyToUrl(dependency.repoUrl)
                 debug("解析依赖地址 $processed")
                 processed
-            } else dependency.url to ("ignore:ignore" to Int.MAX_VALUE.toString())
+            } else DependUrl(dependency.url, "ignore:ignore", Int.MAX_VALUE.toString())
 
-            if (dependency.fetchSubDependencies && dependency.format) {
-                val dependencies = fetchDependencies(dependency)
-                DependencyLoader.DEPENDENCIES.addAll(dependencies)
-            } else {
-                DependencyLoader.DEPENDENCIES.add(
-                    DependencyLoader.Dependency(
-                        url.first,
-                        dependency.repoUrl,
-                        toRelocationRules(dependency),
-                        url.second.second.toNumericVersion(),
-                        url.second.first
-                    )
+            DependencyLoader.DEPENDENCIES.add(
+                DependencyLoader.Dependency(
+                    url.downloadUrl,
+                    dependency.repoUrl,
+                    toRelocationRules(dependency),
+                    url.version.toNumericVersion(),
+                    url.groupName
                 )
-            }
+            )
             debug("添加依赖 ${dependency.url}")
         }
     }
@@ -188,69 +152,14 @@ object VisitorHandler {
                 //warn("Incorrect relocation rules ${dependency.relocationRules}")
             } else {
                 dependency.relocationRules.toList().chunked(2).forEach {
-                    val target = it[0]
-                    val result = it[1]
+                    val target = it[0].replace("!", "")
+                    val result = it[1].replace("!", "")
                     //debug("Relocating $target to $result")
                     relocationRules[target] = result
                 }
             }
         }
         return relocationRules
-    }
-
-    private fun fetchDependencies(dependency: Dependency): List<DependencyLoader.Dependency> {
-        return fetchDependencies(dependency.url, dependency.repoUrl, toRelocationRules(dependency))
-    }
-
-    private fun fetchDependencies(
-        format: String,
-        repoUrl: String,
-        relocationRules: Map<String, String>
-    ): List<DependencyLoader.Dependency> {
-        val artifact: Artifact = DefaultArtifact(format)
-
-        val repositories = repository.newResolutionRepositories(
-            session, mutableListOf(
-                RemoteRepository.Builder(
-                    "repo",
-                    "default",
-                    repoUrl
-                ).build()
-            )
-        )
-
-        val collectRequest = CollectRequest(null, repositories)
-        collectRequest.root = org.eclipse.aether.graph.Dependency(artifact, JavaScopes.COMPILE)
-        val dependencyRequest = DependencyRequest(collectRequest, null)
-
-        val result = repository.resolveDependencies(session, dependencyRequest)
-        val nodeListGenerator = PreorderNodeListGenerator()
-        result.root.accept(nodeListGenerator)
-
-        val list = mutableListOf<DependencyLoader.Dependency>()
-
-        for (depend in nodeListGenerator.getDependencies(true).filter {
-            it.scope == "compile"
-        }) {
-            val dependencyArtifact = depend.artifact
-            val subDependFormat = dependencyArtifact.toDependencyFormat()
-            val downloadUrl = subDependFormat.dependencyToUrl(repoUrl)
-            //println("Artifact: ${dependencyArtifact.toDependencyFormat()} Scope: ${depend.scope} Download: ${downloadUrl.first} Numeric: ${dependencyArtifact.version.toNumericVersion()}")
-            list.add(
-                DependencyLoader.Dependency(
-                    downloadUrl.first,
-                    repoUrl,
-                    relocationRules,
-                    dependencyArtifact.baseVersion.toNumericVersion(),
-                    downloadUrl.second.first
-                )
-            )
-
-            if (subDependFormat != format) {
-                list.addAll(fetchDependencies(subDependFormat, repoUrl, relocationRules))
-            }
-        }
-        return cleanDependencies(list)
     }
 
     @JvmStatic
@@ -279,17 +188,7 @@ object VisitorHandler {
         return cleanedList
     }
 
-    /*@JvmStatic
-    fun main(args: Array<String>) {
-        val list = mutableListOf<DependencyLoader.Dependency>()
-        list.addAll(fetchDependencies(Dependency(url = "net.kyori:adventure-platform-bukkit:4.3.2", format = true, clazz = "")))
-        list.addAll(fetchDependencies(Dependency(url = "net.kyori:adventure-api:4.16.0", format = true, clazz = "")))
-        cleanDependencies(list).forEach {
-            println("Identify: ${it.identify}, URL: ${it.url}, Numeric: ${it.numericVersion}")
-        }
-    }*/
-
-    private fun String.dependencyToUrl(repoUrl: String): Pair<String, Pair<String, String>> {
+    private fun String.dependencyToUrl(repoUrl: String): DependUrl {
         var repoBaseUrl = repoUrl
         if (!repoUrl.endsWith("/")) repoBaseUrl = "$repoUrl/"
 
@@ -304,24 +203,13 @@ object VisitorHandler {
         val groupPath = group.replace('.', '/')
         val artifact = if (classifier.isNotEmpty()) "$name-$version-$classifier.jar" else "$name-$version.jar"
 
-        return "${repoBaseUrl}$groupPath/$name/$version/$artifact" to ("$group:$name" to version)
+        return DependUrl("${repoBaseUrl}$groupPath/$name/$version/$artifact", "$group:$name", version)
     }
 
     private fun String.toNumericVersion(): Int {
         return "\\d+".toRegex().findAll(this).joinToString("") {
             it.value
         }.toInt()
-    }
-
-    private fun Artifact.toDependencyFormat(): String {
-        val buffer = StringBuilder(128)
-        buffer.append(this.groupId)
-        buffer.append(':').append(this.artifactId)
-        buffer.append(':').append(this.version)
-        if (this.classifier.isNotEmpty()) {
-            buffer.append(':').append(this.classifier)
-        }
-        return buffer.toString()
     }
 
     @JvmStatic
@@ -364,5 +252,11 @@ object VisitorHandler {
         }
 
     }
+
+    data class DependUrl(
+        val downloadUrl: String,
+        val groupName: String,
+        val version: String
+    )
 
 }

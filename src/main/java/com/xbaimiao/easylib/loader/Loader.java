@@ -8,8 +8,11 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("ALL")
 public class Loader extends URLClassLoader {
@@ -60,6 +63,25 @@ public class Loader extends URLClassLoader {
             var8.printStackTrace();
             return false;
         }
+    }
+
+    public static Map.Entry<String, Map.Entry<String, String>> dependencyToUrl(String dependency, String repoUrl) throws MalformedURLException {
+        String repoBaseUrl = repoUrl;
+        if (!repoUrl.endsWith("/")) repoBaseUrl = repoUrl + "/";
+
+        String[] parts = dependency.split(":");
+        if (parts.length < 3 || parts.length > 4) {
+            throw new IllegalArgumentException("Format not correct");
+        }
+        String group = parts[0];
+        String name = parts[1];
+        String version = parts[2];
+        String classifier = parts.length == 4 ? parts[3] : "";
+        String groupPath = group.replace('.', '/');
+        String artifact = !classifier.isEmpty() ? String.format("%s-%s-%s.jar", name, version, classifier) : String.format("%s-%s.jar", name, version);
+
+        Map.Entry<String, String> innerPair = new HashMap.SimpleEntry<>(group + ":" + name, version);
+        return new HashMap.SimpleEntry<>(repoBaseUrl + groupPath + "/" + name + "/" + version + "/" + artifact, innerPair);
     }
 
 }

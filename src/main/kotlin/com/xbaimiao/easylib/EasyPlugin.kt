@@ -3,6 +3,7 @@ package com.xbaimiao.easylib
 import com.xbaimiao.easylib.VisitorHandler.visitor
 import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.loader.DependencyLoader
+import com.xbaimiao.easylib.loader.KotlinLoader
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.LifeCycle
 import com.xbaimiao.easylib.util.submit
@@ -18,7 +19,55 @@ abstract class EasyPlugin : JavaPlugin() {
     }
 
     private fun init() {
+        if (cloudKotlin()) {
+            val ktVersion = kotlinVersion()
+            logger.info("Kotlin Version: $ktVersion")
+            val ktRelocateRule = kotlinRelocateRule()
+            val ktRelocateRuleAnalysis = HashMap<String?, String?>()
+
+            for (entry in ktRelocateRule) {
+                ktRelocateRuleAnalysis[KotlinLoader.replace(entry.key)] = KotlinLoader.replace(entry.value)
+            }
+
+            logger.info("Kotlin Relocate Rule: $ktRelocateRuleAnalysis")
+            KotlinLoader.loader(ktVersion, this, ktRelocateRuleAnalysis, repoUrl())
+        }
+
         instance = this
+    }
+
+    /**
+     * kotlin 是否以云依赖模式运行
+     */
+    open fun cloudKotlin(): Boolean {
+        return false
+    }
+
+    /**
+     * kotlin重定向规则
+     * 例如：
+     * val map = HashMap<Array<Char>, String>()
+     * map[arrayOf('k', 'o', 't', 'l', 'i', 'n')] = "com.xbaimiao.template.shadow.kotlin"
+     * map[arrayOf('k', 'o', 't', 'l', 'i', 'n', 'x')] = "com.xbaimiao.template.shadow.kotlinx"
+     * return map
+     */
+    open fun kotlinRelocateRule(): Map<String, String> {
+        val map = HashMap<String, String>()
+        return map
+    }
+
+    /**
+     * 自定义kotlin版本号
+     */
+    open fun kotlinVersion(): String {
+        return "1.9.20"
+    }
+
+    /**
+     * 自定义仓库地址
+     */
+    open fun repoUrl(): String {
+        return "https://maven.aliyun.com/repository/public/"
     }
 
     open fun load() {}

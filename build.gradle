@@ -69,9 +69,9 @@ dependencies {
         exclude group: "org.ow2.asm", module: "asm-commons"
         exclude group: "org.ow2.asm", module: "asm"
     }
-    implementation("org.apache.maven:maven-resolver-provider:3.9.6")
-    implementation("org.apache.maven.resolver:maven-resolver-connector-basic:1.9.18")
-    implementation("org.apache.maven.resolver:maven-resolver-transport-http:1.9.18")
+//    implementation("org.apache.maven:maven-resolver-provider:3.9.6")
+//    implementation("org.apache.maven.resolver:maven-resolver-connector-basic:1.9.18")
+//    implementation("org.apache.maven.resolver:maven-resolver-transport-http:1.9.18")
     implementation("com.github.cryptomorin:XSeries:9.9.0")
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
@@ -108,19 +108,39 @@ tasks {
     shadowJar {
         classifier = ''
         dependencies {
+            exclude(dependency("org.slf4j:"))
+            exclude(dependency("org.apache.commons:"))
+            exclude(dependency("org.apache.logging.log4j:"))
             exclude(dependency("org.jetbrains.kotlin:"))
             exclude(dependency("org.jetbrains:"))
             exclude(dependency("org.jetbrains.kotlinx:"))
         }
-        relocate("org.wltea.expression", "com.xbaimiao.easylib.expression")
+        exclude("META-INF/**")
+        exclude("licenses/**")
+        exclude("about.html")
+        exclude("overview.html")
+        exclude("mozilla")
+        exclude("plugin.xml")
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
-        relocate("org.objectweb.asm", "com.xbaimiao.easylib.asm")
-        relocate("me.lucko.jarrelocator", "com.xbaimiao.easylib.relocator")
-        relocate("org.eclipse.aether", "com.xbaimiao.easylib.maven.aether")
-        relocate("org.apache.maven", "com.xbaimiao.easylib.maven.resolver")
-        relocate("org.apache.http", "com.xbaimiao.easylib.maven.http")
-        relocate("org.codehaus.plexus", "com.xbaimiao.easylib.maven.plexus")
+
+        // library start
+        relocate("org.wltea.expression", "com.xbaimiao.easylib.library.expression")
+        relocate("org.objectweb.asm", "com.xbaimiao.easylib.library.asm")
+        relocate("me.lucko.jarrelocator", "com.xbaimiao.easylib.library.relocator")
+//        relocate("org.eclipse.aether", "com.xbaimiao.easylib.library.aether")
+//        relocate("org.apache.maven", "com.xbaimiao.easylib.library.resolver")
+//        relocate("org.apache.http", "com.xbaimiao.easylib.library.http")
+//        relocate("org.codehaus.plexus", "com.xbaimiao.easylib.library.plexus")
+//        relocate("org.eclipse.sisu", "com.xbaimiao.easylib.library.sisu")
+//        relocate("org.apache.commons.codec", "com.xbaimiao.easylib.library.commons.codec")
+        // library end
+//        minimize {
+//            include(dependency("org.apache.maven:"))
+//            include(dependency("org.apache.maven.resolver:"))
+//            include(dependency("org.apache.httpcomponents:"))
+//            include(dependency("org.eclipse.sisu:"))
+//        }
     }
     // UTF-8
     compileJava {
