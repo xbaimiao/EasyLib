@@ -42,7 +42,9 @@ annotation class Dependency(
     val url: String,
     val clazz: String,
     val format: Boolean = false,
-    val repoUrl: String = "https://maven.aliyun.com/repository/public/"
+    val repoUrl: String = "https://maven.aliyun.com/repository/public/",
+    val relocationRules: Array<String> = [],
+    val fetchSubDependencies: Boolean = false,
 )
 
 @Target(AnnotationTarget.CLASS)
