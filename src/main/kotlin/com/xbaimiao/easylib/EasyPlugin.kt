@@ -19,6 +19,7 @@ abstract class EasyPlugin : JavaPlugin() {
     }
 
     private fun init() {
+        DependencyLoader.init(this)
         if (cloudKotlin()) {
             val ktVersion = kotlinVersion()
             logger.info("Kotlin Version: $ktVersion")
@@ -28,8 +29,6 @@ abstract class EasyPlugin : JavaPlugin() {
             for (entry in ktRelocateRule) {
                 ktRelocateRuleAnalysis[KotlinLoader.replace(entry.key)] = KotlinLoader.replace(entry.value)
             }
-
-            logger.info("Kotlin Relocate Rule: $ktRelocateRuleAnalysis")
             KotlinLoader.loader(ktVersion, this, ktRelocateRuleAnalysis, repoUrl())
         }
 

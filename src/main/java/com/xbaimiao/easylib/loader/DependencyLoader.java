@@ -5,6 +5,7 @@ import com.xbaimiao.easylib.VisitorHandler;
 import me.lucko.jarrelocator.JarRelocator;
 import me.lucko.jarrelocator.Relocation;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +13,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -19,6 +21,7 @@ import java.util.logging.Level;
 public class DependencyLoader {
 
     public static final List<Dependency> DEPENDENCIES = new ArrayList<>();
+    private static final Map<String, String> goalRelocate = new HashMap<>();
 
     public static void loader(EasyPlugin plugin) {
         List<Dependency> dependencies = VisitorHandler.cleanDependencies(DEPENDENCIES);
@@ -39,6 +42,7 @@ public class DependencyLoader {
         }
         File finalFile = dependency.getFile();
         Map<String, String> rules = dependency.getRelocateRules();
+        rules.putAll(goalRelocate);
         boolean shouldDeleteOnExit = false;
         if (!rules.isEmpty()) {
             try {
@@ -93,6 +97,24 @@ public class DependencyLoader {
             bufferedOutputStream.write(buf, 0, len);
         }
         return bufferedOutputStream;
+    }
+
+    public static void init(EasyPlugin plugin) {
+        InputStream inputStream = plugin.getResource("plugin.yml");
+        assert inputStream != null;
+        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(new BufferedReader(new InputStreamReader(inputStream)));
+        List<String> relocateList = configuration.getStringList("relocate");
+        if (!relocateList.isEmpty()) {
+            for (String s : relocateList) {
+                String[] args = s.split("!");
+                String source = args[0];
+                String fresh = args[1];
+                goalRelocate.put(source, fresh);
+                if (plugin.getDebug()) {
+                    plugin.getLogger().info("Relocating " + source + " to " + fresh);
+                }
+            }
+        }
     }
 
     public static class Dependency {
