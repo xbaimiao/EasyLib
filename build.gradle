@@ -6,6 +6,7 @@ plugins {
 }
 
 def kotlinVersion = "1.9.20"
+def reflexVersion = "1.0.19"
 
 allprojects {
     apply plugin: 'java'
@@ -47,7 +48,6 @@ allprojects {
 }
 
 dependencies {
-    def reflexVersion = "1.0.19"
     compileOnly("net.kyori:adventure-api:4.13.1")
     compileOnly("com.zaxxer:HikariCP:4.0.3")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
