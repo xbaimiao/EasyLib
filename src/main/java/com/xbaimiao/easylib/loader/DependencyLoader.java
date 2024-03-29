@@ -10,8 +10,10 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,21 +45,32 @@ public class DependencyLoader {
         File finalFile = dependency.getFile();
         Map<String, String> rules = dependency.getRelocateRules();
         rules.putAll(goalRelocate);
-        boolean shouldDeleteOnExit = false;
         if (!rules.isEmpty()) {
             try {
                 List<Relocation> relocationRules = new ArrayList<>();
                 for (Map.Entry<String, String> entry : rules.entrySet()) {
                     relocationRules.add(new Relocation(entry.getKey(), entry.getValue()));
                 }
-                File tempFile = File.createTempFile("EasyLib_Relocate_", ".jar");
-                JarRelocator jarRelocator = new JarRelocator(dependency.getFile(), tempFile, relocationRules);
-                jarRelocator.run();
+                String md5 = generateMD5FromMap(rules);
+                debug(plugin, "Relocation Rules: " + rules + "MD5: " + md5);
+
+                int fileNameIndex = dependency.getFile().getName().lastIndexOf('.');
+                String fileName = dependency.getFile().getName().substring(0, fileNameIndex);
+                String fileExtension = dependency.getFile().getName().substring(fileNameIndex);
+                File tempFile = new File(dependency.getFile().getParentFile(), fileName + "-" + md5 + fileExtension);
+
+                debug(plugin, "File Path: " + tempFile.getAbsolutePath());
+
+                if (!tempFile.exists()) {
+                    debug(plugin, "Relocating " + dependency.getFile().getName());
+                    JarRelocator jarRelocator = new JarRelocator(dependency.getFile(), tempFile, relocationRules);
+                    jarRelocator.run();
+                    debug(plugin, "Relocated " + dependency.getFile().getName());
+                }
 
 //                plugin.getLogger().info("Relocated " + dependency.getFile().getName());
 
                 finalFile = tempFile;
-                shouldDeleteOnExit = true;
             } catch (IOException e) {
                 Bukkit.getLogger().log(Level.SEVERE, "Failed to relocate " + dependency.getFile().getName(), e);
             }
@@ -65,7 +78,6 @@ public class DependencyLoader {
         if (!Loader.addPath(finalFile)) {
             plugin.getLogger().warning("Load " + dependency.getFile().getName() + " Fail");
         }
-        if (shouldDeleteOnExit) finalFile.deleteOnExit();
     }
 
     private static boolean download(String in, File file, Plugin plugin) {
@@ -79,6 +91,7 @@ public class DependencyLoader {
             bufferedOutputStream.flush();
             return true;
         } catch (Exception e) {
+            file.delete();
             e.printStackTrace();
             return false;
         }
@@ -99,6 +112,41 @@ public class DependencyLoader {
         return bufferedOutputStream;
     }
 
+    private static String generateMD5FromMap(Map<String, String> map) {
+
+        // 将map转换成String
+        StringBuilder mapAsString = new StringBuilder();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            mapAsString.append(entry.getKey() + "=" + entry.getValue() + ",");
+        }
+
+        String result = "";
+
+        try {
+            // 获取一个MD5消息摘要实例
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // 计算并更新摘要
+            md.update(mapAsString.toString().getBytes());
+
+            // 生成摘要
+            byte[] digest = md.digest();
+
+            // 使用BigInteger将bytes转换为Hex
+            BigInteger no = new BigInteger(1, digest);
+
+            // 转换为16进制字符串
+            result = no.toString(16);
+            while (result.length() < 32) {
+                result = "0" + result;
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return result;
+    }
+
     public static void init(EasyPlugin plugin) {
         InputStream inputStream = plugin.getResource("plugin.yml");
         assert inputStream != null;
@@ -110,10 +158,14 @@ public class DependencyLoader {
                 String source = args[0];
                 String fresh = args[1];
                 goalRelocate.put(source, fresh);
-                if (plugin.getDebug()) {
-                    plugin.getLogger().info("Relocating " + source + " to " + fresh);
-                }
+                debug(plugin, "Relocating " + source + " to " + fresh);
             }
+        }
+    }
+
+    public static void debug(EasyPlugin plugin, String content) {
+        if (plugin.getDebug()) {
+            plugin.getLogger().info(content);
         }
     }
 
@@ -135,8 +187,7 @@ public class DependencyLoader {
         public Dependency(String url, String baseUrl, Map<String, String> relocateRules, int numericVersion, String identify) {
             this.url = url;
             this.relocateRules = relocateRules;
-            String filePath = url.replace(baseUrl, "")
-                    .replace("/", File.separator);
+            String filePath = url.replace(baseUrl, "").replace("/", File.separator);
             this.file = new File("libraries", filePath);
             this.numericVersion = numericVersion;
             this.identify = identify;
