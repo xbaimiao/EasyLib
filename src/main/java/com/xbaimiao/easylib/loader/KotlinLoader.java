@@ -2,7 +2,6 @@ package com.xbaimiao.easylib.loader;
 
 import com.xbaimiao.easylib.EasyPlugin;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +17,9 @@ public class KotlinLoader {
         kotlinLibrary.add("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3");
 
         for (String library : kotlinLibrary) {
-            try {
-                Map.Entry<String, Map.Entry<String, String>> url = Loader.dependencyToUrl(library, repoUrl);
-                DependencyLoader.Dependency dependency = new DependencyLoader.Dependency(url.getKey(), repoUrl, relocateMap, 1, url.getValue().getKey());
-                DependencyLoader.load(plugin, dependency);
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
+            Map.Entry<String, Map.Entry<String, String>> url = Loader.dependencyToUrl(library, repoUrl);
+            DependencyLoader.Dependency dependency = Loader.toDependenency(url, repoUrl, relocateMap);
+            DependencyLoader.load(plugin, dependency);
         }
     }
 
