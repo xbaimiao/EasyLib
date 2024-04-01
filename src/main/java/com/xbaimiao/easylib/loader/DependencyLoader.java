@@ -78,9 +78,7 @@ public class DependencyLoader {
                 Bukkit.getLogger().log(Level.SEVERE, "Failed to relocate " + dependency.getFile().getName(), e);
             }
         }
-        if (!Loader.addPath(finalFile)) {
-            plugin.getLogger().warning("Load " + dependency.getFile().getName() + " Fail");
-        }
+        plugin.getClassPathAppender().addJarToClasspath(finalFile.toPath());
     }
 
     private static boolean download(String in, File file, Plugin plugin) {

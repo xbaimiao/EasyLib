@@ -1,15 +1,7 @@
 package com.xbaimiao.easylib.loader;
 
-import org.bukkit.Bukkit;
-import sun.misc.Unsafe;
+import com.xbaimiao.easylib.EasyPlugin;
 
-import java.io.File;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,54 +10,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("ALL")
-public class Loader extends URLClassLoader {
+public class Loader {
 
-    static Lookup lookup;
-    static Unsafe unsafe;
+    public static void loaderKotlin(String version, EasyPlugin plugin, Map<String, String> relocateMap, String repoUrl) {
+        List<String> kotlinLibrary = new ArrayList<>();
+        kotlinLibrary.add("org.jetbrains.kotlin:kotlin-stdlib:" + version);
+        kotlinLibrary.add("org.jetbrains.kotlin:kotlin-stdlib-jdk8:" + version);
+        kotlinLibrary.add("org.jetbrains.kotlin:kotlin-stdlib-jdk7:" + version);
+        kotlinLibrary.add("org.jetbrains.kotlin:kotlin-reflect:" + version);
+        kotlinLibrary.add("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3");
 
-    static {
-        try {
-            Field field = Unsafe.class.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            unsafe = (Unsafe) field.get(null);
-            Field lookupField = Lookup.class.getDeclaredField("IMPL_LOOKUP");
-            Object lookupBase = unsafe.staticFieldBase(lookupField);
-            long lookupOffset = unsafe.staticFieldOffset(lookupField);
-            lookup = (Lookup) unsafe.getObject(lookupBase, lookupOffset);
-        } catch (Throwable ignored) {
+        for (String library : kotlinLibrary) {
+            Map.Entry<String, Map.Entry<String, String>> url = Loader.dependencyToUrl(library, repoUrl);
+            DependencyLoader.Dependency dependency = Loader.toDependenency(url, repoUrl, relocateMap);
+            DependencyLoader.load(plugin, dependency);
         }
-
     }
 
-    public Loader(URL[] urls) {
-        super(urls);
-    }
-
-    public static boolean addPath(File file) {
-        try {
-            ClassLoader loader = Bukkit.class.getClassLoader();
-            if (loader.getClass().getSimpleName().equals("LaunchClassLoader")) {
-                MethodHandle methodHandle = lookup.findVirtual(loader.getClass(), "addURL", MethodType.methodType(Void.TYPE, URL.class));
-                methodHandle.invoke(loader, file.toURI().toURL());
-            } else {
-                Field ucpField;
-                try {
-                    ucpField = loader.getClass().getDeclaredField("ucp");
-                } catch (NoSuchFieldException | NoSuchFieldError var7) {
-                    ucpField = loader.getClass().getSuperclass().getDeclaredField("ucp");
-                }
-
-                long ucpOffset = unsafe.objectFieldOffset(ucpField);
-                Object ucp = unsafe.getObject(loader, ucpOffset);
-                MethodHandle methodHandle = lookup.findVirtual(ucp.getClass(), "addURL", MethodType.methodType(Void.TYPE, URL.class));
-                methodHandle.invoke(ucp, file.toURI().toURL());
-            }
-
-            return true;
-        } catch (Throwable var8) {
-            var8.printStackTrace();
-            return false;
-        }
+    public static String replace(String s) {
+        return s.replace("!", "");
     }
 
     public static Map.Entry<String, Map.Entry<String, String>> dependencyToUrl(String dependency, String repoUrl) {

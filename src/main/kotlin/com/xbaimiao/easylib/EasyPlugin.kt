@@ -3,7 +3,9 @@ package com.xbaimiao.easylib
 import com.xbaimiao.easylib.VisitorHandler.visitor
 import com.xbaimiao.easylib.chat.Lang
 import com.xbaimiao.easylib.loader.DependencyLoader
-import com.xbaimiao.easylib.loader.KotlinLoader
+import com.xbaimiao.easylib.loader.Loader
+import com.xbaimiao.easylib.loader.classpath.ClassPathAppender
+import com.xbaimiao.easylib.loader.classpath.ReflectionClassPathAppender
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.LifeCycle
 import com.xbaimiao.easylib.util.submit
@@ -13,6 +15,7 @@ abstract class EasyPlugin : JavaPlugin() {
 
     private val pluginEnableLazys = mutableListOf<PluginEnableLazy<*>>()
     var debug = false
+    var classPathAppender: ClassPathAppender = ReflectionClassPathAppender(this.classLoader)
 
     init {
         init()
@@ -22,14 +25,13 @@ abstract class EasyPlugin : JavaPlugin() {
         DependencyLoader.init(this)
         if (cloudKotlin()) {
             val ktVersion = kotlinVersion()
-            logger.info("Kotlin Version: $ktVersion")
             val ktRelocateRule = kotlinRelocateRule()
             val ktRelocateRuleAnalysis = HashMap<String?, String?>()
 
             for (entry in ktRelocateRule) {
-                ktRelocateRuleAnalysis[KotlinLoader.replace(entry.key)] = KotlinLoader.replace(entry.value)
+                ktRelocateRuleAnalysis[Loader.replace(entry.key)] = Loader.replace(entry.value)
             }
-            KotlinLoader.loader(ktVersion, this, ktRelocateRuleAnalysis, repoUrl())
+            Loader.loaderKotlin(ktVersion, this, ktRelocateRuleAnalysis, repoUrl())
         }
 
         instance = this
