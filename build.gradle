@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.6.7'
+    version = '3.6.8'
 
     repositories {
         mavenCentral()
@@ -115,12 +115,6 @@ tasks {
             exclude(dependency("org.jetbrains:"))
             exclude(dependency("org.jetbrains.kotlinx:"))
         }
-        exclude("META-INF/**")
-        exclude("licenses/**")
-        exclude("about.html")
-        exclude("overview.html")
-        exclude("mozilla")
-        exclude("plugin.xml")
         relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
 

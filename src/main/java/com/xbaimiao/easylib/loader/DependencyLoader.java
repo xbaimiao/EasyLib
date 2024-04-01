@@ -46,6 +46,7 @@ public class DependencyLoader {
         Map<String, String> rules = dependency.getRelocateRules();
         rules.putAll(goalRelocate);
         if (!rules.isEmpty()) {
+            File tempFile = null;
             try {
                 List<Relocation> relocationRules = new ArrayList<>();
                 for (Map.Entry<String, String> entry : rules.entrySet()) {
@@ -57,7 +58,7 @@ public class DependencyLoader {
                 int fileNameIndex = dependency.getFile().getName().lastIndexOf('.');
                 String fileName = dependency.getFile().getName().substring(0, fileNameIndex);
                 String fileExtension = dependency.getFile().getName().substring(fileNameIndex);
-                File tempFile = new File(dependency.getFile().getParentFile(), fileName + "-" + md5 + fileExtension);
+                tempFile = new File(dependency.getFile().getParentFile(), fileName + "-" + md5 + fileExtension);
 
                 debug(plugin, "File Path: " + tempFile.getAbsolutePath());
 
@@ -72,6 +73,9 @@ public class DependencyLoader {
 
                 finalFile = tempFile;
             } catch (IOException e) {
+                if (tempFile != null) {
+                    tempFile.delete();
+                }
                 Bukkit.getLogger().log(Level.SEVERE, "Failed to relocate " + dependency.getFile().getName(), e);
             }
         }
