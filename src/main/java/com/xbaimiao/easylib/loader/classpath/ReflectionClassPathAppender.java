@@ -26,8 +26,6 @@
 package com.xbaimiao.easylib.loader.classpath;
 
 
-import org.bukkit.Bukkit;
-
 import java.net.MalformedURLException;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -38,7 +36,6 @@ public class ReflectionClassPathAppender implements ClassPathAppender {
     public ReflectionClassPathAppender(ClassLoader classLoader) throws IllegalStateException {
         if (classLoader instanceof URLClassLoader) {
             this.classLoaderAccess = URLClassLoaderAccess.create((URLClassLoader) classLoader);
-            Bukkit.getLogger().info("classLoaderAccess: " + classLoaderAccess.getClass().getSimpleName());
         } else {
             throw new IllegalStateException("ClassLoader is not instance of URLClassLoader");
         }

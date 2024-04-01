@@ -44,40 +44,68 @@ public class DependencyLoader {
         File finalFile = dependency.getFile();
         Map<String, String> rules = dependency.getRelocateRules();
         rules.putAll(goalRelocate);
+        // 如果规则不为空
         if (!rules.isEmpty()) {
             File tempFile = null;
             try {
+                // 创建重定位规则列表
                 List<Relocation> relocationRules = new ArrayList<>();
+                // 遍历规则集合，将规则添加到重定位规则列表中
                 for (Map.Entry<String, String> entry : rules.entrySet()) {
                     relocationRules.add(new Relocation(entry.getKey(), entry.getValue()));
                 }
+                // 生成规则的MD5值
                 String md5 = generateMD5FromMap(rules);
+                // 调试日志输出重定位规则和MD5值
                 debug(plugin, "Relocation Rules: " + rules + "MD5: " + md5);
 
+                // 获取文件名和文件扩展名
                 int fileNameIndex = dependency.getFile().getName().lastIndexOf('.');
                 String fileName = dependency.getFile().getName().substring(0, fileNameIndex);
                 String fileExtension = dependency.getFile().getName().substring(fileNameIndex);
-                tempFile = new File(dependency.getFile().getParentFile(), fileName + "-" + md5 + fileExtension);
 
+                File folder = new File(plugin.getDataFolder(), "libs");
+                if (!folder.exists()) {
+                    folder.mkdirs();
+                }
+                File[] files = folder.listFiles();
+
+                if (files != null) {
+                    for (File file : files) {
+                        if (!file.getName().contains(md5)) {
+                            file.delete();
+                        }
+                    }
+                }
+                // 创建临时文件
+                tempFile = new File(folder, fileName + "-" + md5 + fileExtension);
+
+                // 调试日志输出文件路径
                 debug(plugin, "File Path: " + tempFile.getAbsolutePath());
 
+                // 如果临时文件不存在
                 if (!tempFile.exists()) {
+                    // 调试日志输出正在重定位的文件名
                     debug(plugin, "Relocating " + dependency.getFile().getName());
+                    // 创建Jar重定位器并执行重定位
                     JarRelocator jarRelocator = new JarRelocator(dependency.getFile(), tempFile, relocationRules);
                     jarRelocator.run();
+                    // 调试日志输出已重定位的文件名
                     debug(plugin, "Relocated " + dependency.getFile().getName());
                 }
 
-//                plugin.getLogger().info("Relocated " + dependency.getFile().getName());
-
+                // 设置最终文件为临时文件
                 finalFile = tempFile;
             } catch (IOException e) {
+                // 如果发生异常且临时文件不为空，删除临时文件
                 if (tempFile != null) {
                     tempFile.delete();
                 }
+                // 记录日志输出失败重定位的文件名和异常信息
                 Bukkit.getLogger().log(Level.SEVERE, "Failed to relocate " + dependency.getFile().getName(), e);
             }
         }
+
         plugin.getClassPathAppender().addJarToClasspath(finalFile.toPath());
     }
 
