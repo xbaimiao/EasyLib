@@ -1,7 +1,6 @@
 package com.xbaimiao.easylib.loader;
 
 import com.xbaimiao.easylib.EasyPlugin;
-import com.xbaimiao.easylib.VisitorHandler;
 import me.lucko.jarrelocator.JarRelocator;
 import me.lucko.jarrelocator.Relocation;
 import org.bukkit.Bukkit;
@@ -26,7 +25,7 @@ public class DependencyLoader {
     private static final Map<String, String> goalRelocate = new HashMap<>();
 
     public static void loader(EasyPlugin plugin) {
-        List<Dependency> dependencies = VisitorHandler.cleanDependencies(DEPENDENCIES);
+        List<Dependency> dependencies = Loader.cleanDependencies(DEPENDENCIES);
         for (Dependency dependency : dependencies) {
             load(plugin, dependency);
         }

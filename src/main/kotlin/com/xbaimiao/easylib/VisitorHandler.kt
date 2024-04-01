@@ -2,7 +2,9 @@ package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.bridge.PlaceholderExpansion
 import com.xbaimiao.easylib.command.registerCommand
+import com.xbaimiao.easylib.loader.DependenciesFetcher
 import com.xbaimiao.easylib.loader.DependencyLoader
+import com.xbaimiao.easylib.loader.Loader
 import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
@@ -131,30 +133,36 @@ object VisitorHandler {
                 processed
             } else DependUrl(dependency.url, "ignore:ignore", Int.MAX_VALUE.toString())
 
-            DependencyLoader.DEPENDENCIES.add(
-                DependencyLoader.Dependency(
-                    url.downloadUrl,
-                    dependency.repoUrl,
-                    toRelocationRules(dependency),
-                    url.version.toNumericVersion(),
-                    url.groupName
+            if (dependency.format && dependency.fetchDependencies) {
+                DependenciesFetcher.fetchDependencies(dependency.url, dependency.repoUrl, toRelocationRules(dependency)).forEach {
+                    DependencyLoader.DEPENDENCIES.add(it)
+                }
+            } else {
+                DependencyLoader.DEPENDENCIES.add(
+                    DependencyLoader.Dependency(
+                        url.downloadUrl,
+                        dependency.repoUrl,
+                        toRelocationRules(dependency),
+                        url.version.toNumericVersion(),
+                        url.groupName
+                    )
                 )
-            )
+            }
             debug("添加依赖 ${dependency.url}")
         }
     }
 
     private fun toRelocationRules(dependency: Dependency): Map<String, String> {
         val relocationRules = mutableMapOf<String, String>()
-        //debug(dependency.relocationRules.toString())
+        debug(dependency.relocationRules.toString())
         if (dependency.relocationRules.isNotEmpty()) {
             if (dependency.relocationRules.size % 2 != 0) {
-                //warn("Incorrect relocation rules ${dependency.relocationRules}")
+                warn("Incorrect relocation rules ${dependency.relocationRules}")
             } else {
                 dependency.relocationRules.toList().chunked(2).forEach {
                     val target = it[0].replace("!", "")
                     val result = it[1].replace("!", "")
-                    //debug("Relocating $target to $result")
+                    debug("Relocating $target to $result")
                     relocationRules[target] = result
                 }
             }
@@ -164,52 +172,16 @@ object VisitorHandler {
 
     @JvmStatic
     fun cleanDependencies(list: List<DependencyLoader.Dependency>): List<DependencyLoader.Dependency> {
-        val map = mutableMapOf<String, DependencyLoader.Dependency>()
-
-        for (dependency in list) {
-            if (dependency.identify == "ignore:ignore") {
-                map[dependency.url] = dependency
-            } else {
-                if (map.containsKey(dependency.identify)) {
-                    val oldDependency = map[dependency.identify] ?: continue
-                    if (dependency.numericVersion > oldDependency.numericVersion) {
-                        map[dependency.identify] = dependency
-                    }
-                } else {
-                    map[dependency.identify] = dependency
-                }
-            }
-        }
-
-        val cleanedList = mutableListOf<DependencyLoader.Dependency>()
-        map.forEach { (_, v) ->
-            cleanedList.add(v)
-        }
-        return cleanedList
+        return Loader.cleanDependencies(list)
     }
 
     private fun String.dependencyToUrl(repoUrl: String): DependUrl {
-        var repoBaseUrl = repoUrl
-        if (!repoUrl.endsWith("/")) repoBaseUrl = "$repoUrl/"
-
-        val parts = this.split(':')
-        if (parts.size !in 3..4) {
-            throw IllegalArgumentException("Format not correct")
-        }
-        val group = parts[0]
-        val name = parts[1]
-        val version = parts[2]
-        val classifier = if (parts.size == 4) parts[3] else ""
-        val groupPath = group.replace('.', '/')
-        val artifact = if (classifier.isNotEmpty()) "$name-$version-$classifier.jar" else "$name-$version.jar"
-
-        return DependUrl("${repoBaseUrl}$groupPath/$name/$version/$artifact", "$group:$name", version)
+        val result = Loader.dependencyToUrl(this, repoUrl)
+        return DependUrl(result.key, result.value.key, result.value.value)
     }
 
     private fun String.toNumericVersion(): Int {
-        return "\\d+".toRegex().findAll(this).joinToString("") {
-            it.value
-        }.toInt()
+        return Loader.toNumericVersion(this)
     }
 
     @JvmStatic
