@@ -255,17 +255,8 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
         return argNodes.append(argNode, false)
     }
 
-    fun <T> requiredArg(collection: Collection<T>): ArgNode<T?> {
-        val argNode = ArgNode(collection::class.java.simpleName, exec = { token ->
-            collection.map { it.toString() }.filter { it.startsWith(token) }
-        }, { token ->
-            collection.firstOrNull { it.toString() == token }
-        })
-        return argNodes.append(argNode, false)
-    }
-
     fun <T> requiredArg(collection: Collection<T>, codec: CommandCodec<T>): ArgNode<T?> {
-        val argNode = ArgNode(collection::class.java.simpleName, exec = { token ->
+        val argNode = ArgNode(codec.name(), exec = { token ->
             collection.map { codec.encode(it) }.filter { it.startsWith(token) }
         }, { token ->
             collection.firstOrNull { codec.encode(it) == token }
@@ -277,17 +268,8 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
         return argNodes.append(argNode, true)
     }
 
-    fun <T> optionalArg(collection: Collection<T>): ArgNode<T?> {
-        val argNode = ArgNode(collection::class.java.simpleName, exec = { token ->
-            collection.map { it.toString() }.filter { it.startsWith(token) }
-        }, { token ->
-            collection.firstOrNull { it.toString() == token }
-        })
-        return argNodes.append(argNode, true)
-    }
-
     fun <T> optionalArg(collection: Collection<T>, codec: CommandCodec<T>): ArgNode<T?> {
-        val argNode = ArgNode(collection::class.java.simpleName, exec = { token ->
+        val argNode = ArgNode(codec.name(), exec = { token ->
             collection.map { codec.encode(it) }.filter { it.startsWith(token) }
         }, { token ->
             collection.firstOrNull { codec.encode(it) == token }
