@@ -1,5 +1,6 @@
 package com.xbaimiao.easylib.loader;
 
+//import com.xbaimiao.easylib.EasyPlugin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,8 +21,20 @@ import java.util.Map;
 
 public class DependenciesFetcher {
     private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    //private static EasyPlugin easyPlugin = null;
+
+    public static void main(String[] args) {
+        long time = System.currentTimeMillis();
+        fetchDependencies("net.kyori:adventure-platform-bukkit:4.3.2", "https://maven.aliyun.com/repository/public/", new HashMap<>());
+        System.out.println((System.currentTimeMillis() - time));
+    }
 
     public static List<DependencyLoader.Dependency> fetchDependencies(String dependency, String repoUrl, Map<String, String> relocationRules) {
+        return fetchDependencies(dependency, repoUrl, relocationRules, 0);
+    }
+
+    public static List<DependencyLoader.Dependency> fetchDependencies(String dependency, String repoUrl, Map<String, String> relocationRules, int deep) {
+        //if (easyPlugin == null) easyPlugin = EasyPlugin.getPlugin(EasyPlugin.class);
         List<DependencyLoader.Dependency> list = new ArrayList<>();
         if (dependency.contains("@")) {
             if (dependency.endsWith("@jar")) {
@@ -33,6 +46,7 @@ public class DependenciesFetcher {
         String pomDependency = dependency + "@pom";
         String url = Loader.dependencyToUrl(pomDependency, repoUrl).getKey();
         Document document = fetchUrlContent(url);
+        if (document == null) return list;
         Element element = document.getDocumentElement();
         NodeList nodeList = element.getChildNodes();
         handleDependencyManagement(nodeList, repoUrl, versionVariables);
@@ -44,23 +58,24 @@ public class DependenciesFetcher {
                     artifact.setVersion(versionVariables.get(identify));
                 } else continue;
             }
-            List<DependencyLoader.Dependency> subDependencies = fetchDependencies(artifact.toString(), repoUrl, relocationRules);
-            list.addAll(subDependencies);
-            if (artifact.scope.equalsIgnoreCase("compile") && artifact.extension.equalsIgnoreCase("jar")) {
-                if (isDependencyAvailable(artifact, repoUrl)) {
+            if (artifact.scope.equalsIgnoreCase("compile")) {
+                if (artifact.extension.equalsIgnoreCase("jar")) {
                     list.add(Loader.toDependenency(Loader.dependencyToUrl(artifact.toString(), repoUrl), repoUrl, relocationRules));
+                }
+                if (deep < 3) {
+                    List<DependencyLoader.Dependency> subDependencies = fetchDependencies(artifact.toString(), repoUrl, relocationRules, deep + 1);
+                    list.addAll(subDependencies);
                 }
             }
         }
-        if (isDependencyAvailable(dependency, repoUrl)) {
-            list.add(Loader.toDependenency(Loader.dependencyToUrl(dependency, repoUrl), repoUrl, relocationRules));
-        }
-        return list;
+        list.add(Loader.toDependenency(Loader.dependencyToUrl(dependency, repoUrl), repoUrl, relocationRules));
+        return Loader.cleanDependencies(list);
     }
 
     private static void processBom(String bomDependency, String repoUrl, Map<String, String> versions) {
         String url = Loader.dependencyToUrl(bomDependency, repoUrl).getKey();
         Document document = fetchUrlContent(url);
+        if (document == null) return;
         Element element = document.getDocumentElement();
         NodeList nodeList = element.getChildNodes();
         handleDependencyManagement(nodeList, repoUrl, versions);
@@ -165,33 +180,18 @@ public class DependenciesFetcher {
         return artifacts;
     }
 
-    private static boolean isDependencyAvailable(Artifact artifact, String repoUrl) {
-        return isDependencyAvailable(artifact.toString(), repoUrl);
-    }
-
-    private static boolean isDependencyAvailable(String dependency, String repoUrl) {
-        Map.Entry<String, Map.Entry<String, String>> processed = Loader.dependencyToUrl(dependency, repoUrl);
-        String url = processed.getKey();
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("HEAD");
-            connection.setReadTimeout(2000);
-            connection.setConnectTimeout(1000);
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     private static Document fetchUrlContent(String url) {
         try {
-            InputStream inputStream = new URL(url).openStream();
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(5000);
+            InputStream inputStream = connection.getInputStream();
 
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(inputStream);
         } catch (IOException | ParserConfigurationException | SAXException e) {
-            throw new RuntimeException(e);
+            //if (easyPlugin.getDebug()) e.printStackTrace(System.err);
+            return null;
         }
     }
 
