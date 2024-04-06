@@ -2,7 +2,7 @@ package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.bridge.PlaceholderExpansion
 import com.xbaimiao.easylib.command.registerCommand
-import com.xbaimiao.easylib.loader.DependenciesFetcher
+import com.xbaimiao.easylib.loader.fetcher.DependenciesFetcher
 import com.xbaimiao.easylib.loader.DependencyLoader
 import com.xbaimiao.easylib.loader.Loader
 import com.xbaimiao.easylib.util.*
@@ -134,9 +134,11 @@ object VisitorHandler {
             } else DependUrl(dependency.url, "ignore:ignore", Int.MAX_VALUE.toString())
 
             if (dependency.format && dependency.fetchDependencies) {
-                DependenciesFetcher.fetchDependencies(dependency.url, dependency.repoUrl, toRelocationRules(dependency)).forEach {
-                    DependencyLoader.DEPENDENCIES.add(it)
-                }
+                DependenciesFetcher.fetchDependencies(dependency.url, dependency.repoUrl, toRelocationRules(dependency))
+                    .forEach {
+                        DependencyLoader.DEPENDENCIES.add(it)
+                        debug("添加依赖 ${it.url}")
+                    }
             } else {
                 DependencyLoader.DEPENDENCIES.add(
                     DependencyLoader.Dependency(
@@ -147,14 +149,14 @@ object VisitorHandler {
                         url.groupName
                     )
                 )
+                debug("添加依赖 ${dependency.url}")
             }
-            debug("添加依赖 ${dependency.url}")
         }
     }
 
     private fun toRelocationRules(dependency: Dependency): Map<String, String> {
         val relocationRules = mutableMapOf<String, String>()
-        debug(dependency.relocationRules.toString())
+        debug(dependency.relocationRules.joinToString(",") { it })
         if (dependency.relocationRules.isNotEmpty()) {
             if (dependency.relocationRules.size % 2 != 0) {
                 warn("Incorrect relocation rules ${dependency.relocationRules}")

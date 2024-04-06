@@ -1,6 +1,7 @@
-package com.xbaimiao.easylib.loader;
+package com.xbaimiao.easylib.loader.fetcher;
 
-//import com.xbaimiao.easylib.EasyPlugin;
+import com.xbaimiao.easylib.loader.DependencyLoader;
+import com.xbaimiao.easylib.loader.Loader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,16 +26,29 @@ public class DependenciesFetcher {
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
-        fetchDependencies("net.kyori:adventure-platform-bukkit:4.3.2", "https://maven.aliyun.com/repository/public/", new HashMap<>());
-        System.out.println((System.currentTimeMillis() - time));
+        List<DependencyLoader.Dependency> dependencies =
+                fetchDependencies("net.kyori:adventure-platform-bukkit:4.3.2",
+                        Loader.ALIYUN_REPO_URL,
+                        new HashMap<String,String>(){{
+                            put("nms;l","dsadsa");
+                        }});
+        dependencies.forEach(System.out::println);
+        System.out.println((System.currentTimeMillis() - time) + "ms");
     }
 
     public static List<DependencyLoader.Dependency> fetchDependencies(String dependency, String repoUrl, Map<String, String> relocationRules) {
-        return fetchDependencies(dependency, repoUrl, relocationRules, 0);
+        List<DependencyLoader.Dependency> cacheDependency = FetcherCacheManager.getCache(dependency, repoUrl, relocationRules);
+        if (cacheDependency != null) {
+            return cacheDependency;
+        }
+
+        List<DependencyLoader.Dependency> dependencies = fetchDependencies(dependency, repoUrl, relocationRules, 0);
+        FetcherCache fetcherCache = new FetcherCache(dependency, repoUrl, dependencies);
+        FetcherCacheManager.addCache(fetcherCache);
+        return dependencies;
     }
 
-    public static List<DependencyLoader.Dependency> fetchDependencies(String dependency, String repoUrl, Map<String, String> relocationRules, int deep) {
-        //if (easyPlugin == null) easyPlugin = EasyPlugin.getPlugin(EasyPlugin.class);
+    private static List<DependencyLoader.Dependency> fetchDependencies(String dependency, String repoUrl, Map<String, String> relocationRules, int deep) {
         List<DependencyLoader.Dependency> list = new ArrayList<>();
         if (dependency.contains("@")) {
             if (dependency.endsWith("@jar")) {

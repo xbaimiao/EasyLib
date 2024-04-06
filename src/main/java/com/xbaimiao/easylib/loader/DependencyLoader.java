@@ -1,5 +1,8 @@
 package com.xbaimiao.easylib.loader;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.xbaimiao.easylib.EasyPlugin;
 import me.lucko.jarrelocator.JarRelocator;
 import me.lucko.jarrelocator.Relocation;
@@ -29,6 +32,10 @@ public class DependencyLoader {
         for (Dependency dependency : dependencies) {
             load(plugin, dependency);
         }
+    }
+
+    public static void load(EasyPlugin plugin, String dependency) {
+        load(plugin, Loader.toDependenency(dependency));
     }
 
     public static void load(EasyPlugin plugin, Dependency dependency) {
@@ -72,6 +79,10 @@ public class DependencyLoader {
 
                 if (files != null) {
                     for (File file : files) {
+                        if (file.isDirectory()) {
+                            continue;
+                        }
+                        debug(plugin, file.getName() + " MD5: " + md5);
                         if (!file.getName().contains(md5)) {
                             file.delete();
                         }
@@ -202,7 +213,7 @@ public class DependencyLoader {
 
         private final File file;
         private final String url;
-        private final Map<String, String> relocateRules;
+        private Map<String, String> relocateRules;
         private final int numericVersion;
         private final String identify;
 
@@ -222,6 +233,20 @@ public class DependencyLoader {
             this.identify = identify;
         }
 
+        /**
+         * @param url            下载链接
+         * @param file           文件地址
+         * @param numericVersion 版本号
+         * @param identify       唯一标识
+         */
+        public Dependency(String url, File file, int numericVersion, String identify) {
+            this.url = url;
+            this.relocateRules = new HashMap<>();
+            this.file = file;
+            this.numericVersion = numericVersion;
+            this.identify = identify;
+        }
+
         public File getFile() {
             return file;
         }
@@ -234,6 +259,10 @@ public class DependencyLoader {
             return relocateRules;
         }
 
+        public void setRelocateRules(Map<String, String> relocateRules) {
+            this.relocateRules = relocateRules;
+        }
+
         public int getNumericVersion() {
             return numericVersion;
         }
@@ -241,6 +270,47 @@ public class DependencyLoader {
         public String getIdentify() {
             return identify;
         }
+
+        public JsonObject toJson() {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("url", url);
+            jsonObject.addProperty("numericVersion", numericVersion);
+            jsonObject.addProperty("identify", identify);
+            jsonObject.addProperty("file", file.getPath());
+            return jsonObject;
+        }
+
+        public Dependency copy(Map<String, String> relocateRules) {
+            Dependency dependency = new Dependency(url, file, numericVersion, identify);
+            dependency.setRelocateRules(relocateRules);
+            return dependency;
+        }
+
+        @Override
+        public String toString() {
+            return "Dependency{" +
+                    "file=" + file +
+                    ", url='" + url + '\'' +
+                    ", relocateRules=" + relocateRules +
+                    ", numericVersion=" + numericVersion +
+                    ", identify='" + identify + '\'' +
+                    '}';
+        }
+
+        public static List<Dependency> fromJsonArray(JsonArray dependencies) {
+            List<Dependency> result = new ArrayList<>();
+            for (JsonElement element : dependencies) {
+                JsonObject jsonObject = element.getAsJsonObject();
+                String url = jsonObject.get("url").getAsString();
+                int numericVersion = jsonObject.get("numericVersion").getAsInt();
+                String identify = jsonObject.get("identify").getAsString();
+                String filePath = jsonObject.get("file").getAsString();
+                File file = new File(filePath);
+                result.add(new Dependency(url, file, numericVersion, identify));
+            }
+            return result;
+        }
+
     }
 
 }

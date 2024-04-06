@@ -68,7 +68,7 @@ abstract class EasyPlugin : JavaPlugin() {
      * 自定义仓库地址
      */
     open fun repoUrl(): String {
-        return "https://maven.aliyun.com/repository/public/"
+        return Loader.ALIYUN_REPO_URL
     }
 
     open fun load() {}

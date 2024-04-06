@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class Loader {
 
+    public static final String ALIYUN_REPO_URL = "https://maven.aliyun.com/repository/public/";
+
     public static void loaderKotlin(String version, EasyPlugin plugin, Map<String, String> relocateMap, String repoUrl) {
         List<String> kotlinLibrary = new ArrayList<>();
         kotlinLibrary.add("org.jetbrains.kotlin:kotlin-stdlib:" + version);
@@ -19,6 +21,7 @@ public class Loader {
         kotlinLibrary.add("org.jetbrains.kotlin:kotlin-stdlib-jdk7:" + version);
         kotlinLibrary.add("org.jetbrains.kotlin:kotlin-reflect:" + version);
         kotlinLibrary.add("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3");
+        kotlinLibrary.add("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3");
 
         for (String library : kotlinLibrary) {
             Map.Entry<String, Map.Entry<String, String>> url = Loader.dependencyToUrl(library, repoUrl);
@@ -54,6 +57,16 @@ public class Loader {
 
     public static DependencyLoader.Dependency toDependenency(Map.Entry<String, Map.Entry<String, String>> entry, String repoUrl, Map<String, String> relocateMap) {
         return new DependencyLoader.Dependency(entry.getKey(), repoUrl, relocateMap, toNumericVersion(entry.getValue().getValue()), entry.getValue().getKey());
+    }
+
+    public static DependencyLoader.Dependency toDependenency(String dependency, String repoUrl) {
+        Map.Entry<String, Map.Entry<String, String>> url = dependencyToUrl(dependency, repoUrl);
+        return toDependenency(url, repoUrl, new HashMap<>());
+    }
+
+    public static DependencyLoader.Dependency toDependenency(String dependency) {
+        Map.Entry<String, Map.Entry<String, String>> url = dependencyToUrl(dependency, ALIYUN_REPO_URL);
+        return toDependenency(url, ALIYUN_REPO_URL, new HashMap<>());
     }
 
     public static int toNumericVersion(String version) {
