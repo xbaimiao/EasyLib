@@ -43,9 +43,9 @@ public class DependencyLoader {
             if (!dependency.getFile().getParentFile().exists()) {
                 dependency.getFile().getParentFile().mkdirs();
             }
-            plugin.getLogger().info("Download " + dependency.getFile().getName());
+            debug(plugin, "Download " + dependency.getFile().getName());
             if (download(dependency.getUrl(), dependency.getFile(), plugin)) {
-                plugin.getLogger().info("Download " + dependency.getFile().getName() + " Success");
+                debug(plugin, "Download " + dependency.getFile().getName() + " Success");
             }
         }
         File finalFile = dependency.getFile();
@@ -71,7 +71,7 @@ public class DependencyLoader {
                 String fileName = dependency.getFile().getName().substring(0, fileNameIndex);
                 String fileExtension = dependency.getFile().getName().substring(fileNameIndex);
 
-                File folder = new File(plugin.getDataFolder(), "libs");
+                File folder = new File(dependency.getFile().getParentFile(), plugin.getName());
                 if (!folder.exists()) {
                     folder.mkdirs();
                 }
