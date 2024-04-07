@@ -23,45 +23,11 @@ abstract class EasyPlugin : JavaPlugin() {
 
     private fun init() {
         DependencyLoader.init(this)
-        if (cloudKotlin()) {
-            val ktVersion = kotlinVersion()
-            val ktRelocateRule = kotlinRelocateRule()
-            val ktRelocateRuleAnalysis = HashMap<String?, String?>()
 
-            for (entry in ktRelocateRule) {
-                ktRelocateRuleAnalysis[Loader.replace(entry.key)] = Loader.replace(entry.value)
-            }
-            Loader.loaderKotlin(ktVersion, this, ktRelocateRuleAnalysis, repoUrl())
-        }
+        Loader.loaderKotlin(this, HashMap(), repoUrl())
+        Loader.loaderLibrary(this)
 
         instance = this
-    }
-
-    /**
-     * kotlin 是否以云依赖模式运行
-     */
-    open fun cloudKotlin(): Boolean {
-        return false
-    }
-
-    /**
-     * kotlin重定向规则
-     * 例如：
-     * val map = HashMap<Array<Char>, String>()
-     * map[arrayOf('k', 'o', 't', 'l', 'i', 'n')] = "com.xbaimiao.template.shadow.kotlin"
-     * map[arrayOf('k', 'o', 't', 'l', 'i', 'n', 'x')] = "com.xbaimiao.template.shadow.kotlinx"
-     * return map
-     */
-    open fun kotlinRelocateRule(): Map<String, String> {
-        val map = HashMap<String, String>()
-        return map
-    }
-
-    /**
-     * 自定义kotlin版本号
-     */
-    open fun kotlinVersion(): String {
-        return "1.9.20"
     }
 
     /**

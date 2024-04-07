@@ -6,14 +6,14 @@ plugins {
 }
 
 def kotlinVersion = "1.9.20"
-def reflexVersion = "1.0.19"
+def reflexVersion = "1.0.23"
 
 allprojects {
     apply plugin: 'java'
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.7.4'
+    version = '3.7.5'
 
     repositories {
         mavenCentral()
@@ -65,7 +65,8 @@ dependencies {
         exclude group: "org.ow2.asm", module: "asm-commons"
         exclude group: "org.ow2.asm", module: "asm"
     }
-    implementation("com.github.cryptomorin:XSeries:9.9.0")
+    compileOnly("com.github.cryptomorin:XSeries:9.9.0")
+
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
     implementation(project(":easylib-bukkit"))
@@ -108,13 +109,11 @@ tasks {
             exclude(dependency("org.jetbrains:"))
             exclude(dependency("org.jetbrains.kotlinx:"))
         }
-        relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
+//        relocate("com.cryptomorin.xseries", "com.xbaimiao.easylib.xseries")
         relocate("org.tabooproject.reflex", "com.xbaimiao.easylib.reflex")
-
-        // library start
-        relocate("org.wltea.expression", "com.xbaimiao.easylib.library.expression")
-        relocate("org.objectweb.asm", "com.xbaimiao.easylib.library.asm")
-        relocate("me.lucko.jarrelocator", "com.xbaimiao.easylib.library.relocator")
+        relocate("org.objectweb.asm", "com.xbaimiao.easylib.loader.asm")
+        relocate("me.lucko.jarrelocator", "com.xbaimiao.easylib.loader.relocator")
+        relocate("org.wltea.expression", "com.xbaimiao.easylib.expression.expression")
     }
     // UTF-8
     compileJava {

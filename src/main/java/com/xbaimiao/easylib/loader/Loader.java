@@ -14,7 +14,8 @@ public class Loader {
 
     public static final String ALIYUN_REPO_URL = "https://maven.aliyun.com/repository/public/";
 
-    public static void loaderKotlin(String version, EasyPlugin plugin, Map<String, String> relocateMap, String repoUrl) {
+    public static void loaderKotlin(EasyPlugin plugin, Map<String, String> relocateMap, String repoUrl) {
+        String version = DependencyLoader.kotlinVersion;
         List<String> kotlinLibrary = new ArrayList<>();
         kotlinLibrary.add("org.jetbrains.kotlin:kotlin-stdlib:" + version);
         kotlinLibrary.add("org.jetbrains.kotlin:kotlin-stdlib-jdk8:" + version);
@@ -26,6 +27,12 @@ public class Loader {
         for (String library : kotlinLibrary) {
             Map.Entry<String, Map.Entry<String, String>> url = Loader.dependencyToUrl(library, repoUrl);
             DependencyLoader.Dependency dependency = Loader.toDependenency(url, repoUrl, relocateMap);
+            DependencyLoader.load(plugin, dependency);
+        }
+    }
+
+    public static void loaderLibrary(EasyPlugin plugin) {
+        for (DependencyLoader.Dependency dependency : DependencyLoader.DEPENDENCIES_FOR_PLUGIN) {
             DependencyLoader.load(plugin, dependency);
         }
     }

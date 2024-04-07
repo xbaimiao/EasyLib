@@ -25,7 +25,10 @@ import java.util.logging.Level;
 public class DependencyLoader {
 
     public static final List<Dependency> DEPENDENCIES = new ArrayList<>();
-    private static final Map<String, String> goalRelocate = new HashMap<>();
+
+    private static final Map<String, String> GOAL_RELOCATE = new HashMap<>();
+    protected static final List<Dependency> DEPENDENCIES_FOR_PLUGIN = new ArrayList<>();
+    protected static String kotlinVersion = "1.9.20";
 
     public static void loader(EasyPlugin plugin) {
         List<Dependency> dependencies = Loader.cleanDependencies(DEPENDENCIES);
@@ -36,6 +39,10 @@ public class DependencyLoader {
 
     public static void load(EasyPlugin plugin, String dependency) {
         load(plugin, Loader.toDependenency(dependency));
+    }
+
+    public static void load(EasyPlugin plugin, String dependency, String repo) {
+        load(plugin, Loader.toDependenency(dependency, repo));
     }
 
     public static void load(EasyPlugin plugin, Dependency dependency) {
@@ -49,71 +56,74 @@ public class DependencyLoader {
             }
         }
         File finalFile = dependency.getFile();
-        Map<String, String> rules = dependency.getRelocateRules();
-        rules.putAll(goalRelocate);
-        // 如果规则不为空
-        if (!rules.isEmpty()) {
-            File tempFile = null;
-            try {
-                // 创建重定位规则列表
-                List<Relocation> relocationRules = new ArrayList<>();
-                // 遍历规则集合，将规则添加到重定位规则列表中
-                for (Map.Entry<String, String> entry : rules.entrySet()) {
-                    relocationRules.add(new Relocation(entry.getKey(), entry.getValue()));
-                }
-                // 生成规则的MD5值
-                String md5 = generateMD5FromMap(rules);
-                // 调试日志输出重定位规则和MD5值
-                debug(plugin, "Relocation Rules: " + rules + "MD5: " + md5);
+        if (dependency.isRelocate()) {
+            Map<String, String> rules = dependency.getRelocateRules();
+            rules.putAll(GOAL_RELOCATE);
+            // 如果规则不为空
+            if (!rules.isEmpty()) {
+                File tempFile = null;
+                try {
+                    // 创建重定位规则列表
+                    List<Relocation> relocationRules = new ArrayList<>();
+                    // 遍历规则集合，将规则添加到重定位规则列表中
+                    for (Map.Entry<String, String> entry : rules.entrySet()) {
+                        relocationRules.add(new Relocation(entry.getKey(), entry.getValue()));
+                    }
+                    // 生成规则的MD5值
+                    String md5 = generateMD5FromMap(rules);
+                    // 调试日志输出重定位规则和MD5值
+                    debug(plugin, "Relocation Rules: " + rules + "MD5: " + md5);
 
-                // 获取文件名和文件扩展名
-                int fileNameIndex = dependency.getFile().getName().lastIndexOf('.');
-                String fileName = dependency.getFile().getName().substring(0, fileNameIndex);
-                String fileExtension = dependency.getFile().getName().substring(fileNameIndex);
+                    // 获取文件名和文件扩展名
+                    int fileNameIndex = dependency.getFile().getName().lastIndexOf('.');
+                    String fileName = dependency.getFile().getName().substring(0, fileNameIndex);
+                    String fileExtension = dependency.getFile().getName().substring(fileNameIndex);
 
-                File folder = new File(dependency.getFile().getParentFile(), plugin.getName());
-                if (!folder.exists()) {
-                    folder.mkdirs();
-                }
-                File[] files = folder.listFiles();
+                    File folder = new File(dependency.getFile().getParentFile(), plugin.getName());
+                    if (!folder.exists()) {
+                        folder.mkdirs();
+                    }
+                    File[] files = folder.listFiles();
 
-                if (files != null) {
-                    for (File file : files) {
-                        if (file.isDirectory()) {
-                            continue;
-                        }
-                        debug(plugin, file.getName() + " MD5: " + md5);
-                        if (!file.getName().contains(md5)) {
-                            file.delete();
+                    if (files != null) {
+                        for (File file : files) {
+                            if (file.isDirectory()) {
+                                continue;
+                            }
+                            debug(plugin, file.getName() + " MD5: " + md5);
+                            if (!file.getName().contains(md5)) {
+                                file.delete();
+                            }
                         }
                     }
-                }
-                // 创建临时文件
-                tempFile = new File(folder, fileName + "-" + md5 + fileExtension);
+                    // 创建临时文件
+                    tempFile = new File(folder, fileName + "-" + md5 + fileExtension);
 
-                // 调试日志输出文件路径
-                debug(plugin, "File Path: " + tempFile.getAbsolutePath());
+                    // 调试日志输出文件路径
+                    debug(plugin, "File Path: " + tempFile.getAbsolutePath());
 
-                // 如果临时文件不存在
-                if (!tempFile.exists()) {
-                    // 调试日志输出正在重定位的文件名
-                    debug(plugin, "Relocating " + dependency.getFile().getName());
-                    // 创建Jar重定位器并执行重定位
-                    JarRelocator jarRelocator = new JarRelocator(dependency.getFile(), tempFile, relocationRules);
-                    jarRelocator.run();
-                    // 调试日志输出已重定位的文件名
-                    debug(plugin, "Relocated " + dependency.getFile().getName());
-                }
+                    // 如果临时文件不存在
+                    if (!tempFile.exists()) {
+                        // 调试日志输出正在重定位的文件名
+                        debug(plugin, "Relocating " + dependency.getFile().getName());
+                        // 创建Jar重定位器并执行重定位
+                        JarRelocator jarRelocator = new JarRelocator(dependency.getFile(), tempFile, relocationRules);
+                        jarRelocator.run();
+                        // 调试日志输出已重定位的文件名
+                        debug(plugin, "Relocated " + dependency.getFile().getName());
+                    }
 
-                // 设置最终文件为临时文件
-                finalFile = tempFile;
-            } catch (IOException e) {
-                // 如果发生异常且临时文件不为空，删除临时文件
-                if (tempFile != null) {
-                    tempFile.delete();
+                    // 设置最终文件为临时文件
+                    finalFile = tempFile;
+                } catch (Throwable e) {
+                    // 如果发生异常且临时文件不为空，删除临时文件
+                    if (tempFile != null) {
+                        tempFile.delete();
+                    }
+                    // 记录日志输出失败重定位的文件名和异常信息
+                    Bukkit.getLogger().log(Level.SEVERE, "Failed to relocate " + dependency.getFile().getName(), e);
+                    throw new RuntimeException(e);
                 }
-                // 记录日志输出失败重定位的文件名和异常信息
-                Bukkit.getLogger().log(Level.SEVERE, "Failed to relocate " + dependency.getFile().getName(), e);
             }
         }
 
@@ -197,10 +207,27 @@ public class DependencyLoader {
                 String[] args = s.split("!");
                 String source = args[0];
                 String fresh = args[1];
-                goalRelocate.put(source, fresh);
+                GOAL_RELOCATE.put(source, fresh);
                 debug(plugin, "Relocating " + source + " to " + fresh);
             }
         }
+
+        String overrideKotlinVersion = configuration.getString("kotlin-version");
+        if (overrideKotlinVersion != null) {
+            kotlinVersion = overrideKotlinVersion;
+        }
+        debug(plugin, "Kotlin Version: " + kotlinVersion);
+
+        for (String s : configuration.getStringList("depend-list")) {
+            String depend = s;
+            String repo = Loader.ALIYUN_REPO_URL;
+            if (s.contains("<<repo>>")) {
+                repo = s.split("<<repo>>")[1];
+                depend = s.split("<<repo>>")[0];
+            }
+            DEPENDENCIES_FOR_PLUGIN.add(Loader.toDependenency(depend, repo));
+        }
+
     }
 
     public static void debug(EasyPlugin plugin, String content) {
@@ -216,6 +243,7 @@ public class DependencyLoader {
         private Map<String, String> relocateRules;
         private final int numericVersion;
         private final String identify;
+        private boolean relocate = true;
 
         /**
          * @param url            下载链接
@@ -271,6 +299,14 @@ public class DependencyLoader {
             return identify;
         }
 
+        public boolean isRelocate() {
+            return relocate;
+        }
+
+        public void setRelocate(boolean relocate) {
+            this.relocate = relocate;
+        }
+
         public JsonObject toJson() {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("url", url);
@@ -288,13 +324,7 @@ public class DependencyLoader {
 
         @Override
         public String toString() {
-            return "Dependency{" +
-                    "file=" + file +
-                    ", url='" + url + '\'' +
-                    ", relocateRules=" + relocateRules +
-                    ", numericVersion=" + numericVersion +
-                    ", identify='" + identify + '\'' +
-                    '}';
+            return "Dependency{" + "file=" + file + ", url='" + url + '\'' + ", relocateRules=" + relocateRules + ", numericVersion=" + numericVersion + ", identify='" + identify + '\'' + '}';
         }
 
         public static List<Dependency> fromJsonArray(JsonArray dependencies) {
