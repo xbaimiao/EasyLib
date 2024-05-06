@@ -2,7 +2,6 @@ package com.xbaimiao.easylib.workload
 
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.util.BoundingBox
 
 /**
  * 分批次填充两点之间的方块
@@ -14,7 +13,7 @@ class FillBox(private val workloadRunnable: WorkloadRunnable) {
             error("cornerA and cornerB must be in the same world")
         }
 
-        val box: BoundingBox = BoundingBox.of(cornerA.block, cornerB.block)
+        val box = BoundingBox.of(cornerA.block.location, cornerB.block.location)
         val max = box.max
         val min = box.min
 

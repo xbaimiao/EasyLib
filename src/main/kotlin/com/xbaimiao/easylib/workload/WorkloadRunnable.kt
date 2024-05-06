@@ -31,8 +31,9 @@ class WorkloadRunnable : Runnable {
             }
             val stopTime = System.currentTimeMillis() + (MAX_PERIOD_TICK * 50)
             var nextLoad = workloadDeque.poll()
+            var computeAmount = 0
             while (System.currentTimeMillis() <= stopTime && nextLoad != null) {
-                nextLoad.compute()
+                nextLoad.compute(computeAmount++)
                 nextLoad = workloadDeque.poll()
             }
         }
@@ -52,6 +53,7 @@ class WorkloadRunnable : Runnable {
         if (!isStart) {
             error("WorkloadRunnable has not started")
         }
+        isStart = false
         task.cancel()
     }
 

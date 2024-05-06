@@ -5,7 +5,11 @@ import org.bukkit.Material
 import java.util.*
 
 interface Workload {
-    fun compute()
+    /**
+     * 执行代码
+     * @param computeAmount 本次执行的次数
+     */
+    fun compute(computeAmount: Int)
 }
 
 /**
@@ -19,7 +23,7 @@ class PlaceBlock(
     private val material: Material,
 ) : Workload {
 
-    override fun compute() {
+    override fun compute(computeAmount: Int) {
         val world = Bukkit.getWorld(worldID) ?: error("World not found")
         world.getBlockAt(blockX, blockY, blockZ).type = material
     }
