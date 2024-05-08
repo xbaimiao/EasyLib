@@ -2,9 +2,9 @@ package com.xbaimiao.easylib
 
 import com.xbaimiao.easylib.bridge.PlaceholderExpansion
 import com.xbaimiao.easylib.command.registerCommand
-import com.xbaimiao.easylib.loader.fetcher.DependenciesFetcher
 import com.xbaimiao.easylib.loader.DependencyLoader
 import com.xbaimiao.easylib.loader.Loader
+import com.xbaimiao.easylib.loader.fetcher.DependenciesFetcher
 import com.xbaimiao.easylib.util.*
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
@@ -18,7 +18,8 @@ import java.util.jar.JarFile
 
 object VisitorHandler {
 
-    val lifeCycleMethodList = ArrayList<LifeCycleMethod>()
+    private val _lifeCycleMethodList = ArrayList<LifeCycleMethod>()
+    val lifeCycleMethodList get() = _lifeCycleMethodList.sortedBy { it.priority }
 
     /**
      * 获取 URL 下的所有类
@@ -67,8 +68,8 @@ object VisitorHandler {
             if (clazz.isAnnotationPresent(AwakeClass::class.java)) {
                 clazz.declaredMethods.filter { it.isAnnotationPresent(Awake::class.java) }.forEach { method ->
                     val awake = method.getAnnotation(Awake::class.java)
-                    LifeCycleMethod(awake.lifeCycle, method, instance).also {
-                        lifeCycleMethodList.add(it)
+                    LifeCycleMethod(awake.lifeCycle, awake.priority, method, instance).also {
+                        _lifeCycleMethodList.add(it)
                         debug("${clazz.name} 通过 Awake 注册生命周期方法 ${method.name} 成功")
                     }
                 }
@@ -230,7 +231,7 @@ object VisitorHandler {
     data class DependUrl(
         val downloadUrl: String,
         val groupName: String,
-        val version: String
+        val version: String,
     )
 
 }
