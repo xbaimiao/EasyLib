@@ -55,4 +55,13 @@ object DefaultMysqlConfiguration {
         }
     }
 
+    @JvmStatic
+    val ormlite by lazy {
+        if (type == DatabaseType.MYSQL) {
+            OrmliteMysql(init, true)
+        } else {
+            OrmliteSQLite("database.db")
+        }
+    }
+
 }
