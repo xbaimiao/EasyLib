@@ -197,6 +197,17 @@ public class DependencyLoader {
         return result;
     }
 
+    public static void injectDebug(EasyPlugin plugin) {
+        InputStream inputStream = plugin.getResource("config.yml");
+        if (inputStream == null) {
+            return;
+        }
+        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(new BufferedReader(new InputStreamReader(inputStream)));
+        if (configuration.getBoolean("debug")) {
+            plugin.setDebug(true);
+        }
+    }
+
     public static void init(EasyPlugin plugin) {
         InputStream inputStream = plugin.getResource("plugin.yml");
         assert inputStream != null;

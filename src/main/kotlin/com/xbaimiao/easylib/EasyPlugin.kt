@@ -22,6 +22,7 @@ abstract class EasyPlugin : JavaPlugin() {
     }
 
     private fun init() {
+        DependencyLoader.injectDebug(this)
         DependencyLoader.init(this)
 
         Loader.loaderKotlin(this, HashMap(), repoUrl())
