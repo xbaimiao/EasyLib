@@ -69,6 +69,16 @@ fun buildItem(material: XMaterial, builder: ItemBuilder.() -> Unit = {}): ItemSt
 
 open class ItemBuilder {
 
+    enum class ItemBuilderFlag {
+        HIDE_ENCHANTS,
+        HIDE_ATTRIBUTES,
+        HIDE_UNBREAKABLE,
+        HIDE_DESTROYS,
+        HIDE_PLACED_ON,
+        HIDE_POTION_EFFECTS,
+        HIDE_DYE
+    }
+
     class SkullTexture(val textures: String, val uuid: UUID? = UUID.randomUUID())
 
     /**
@@ -99,7 +109,7 @@ open class ItemBuilder {
     /**
      * 标签
      */
-    val flags = ArrayList<ItemFlag>()
+    val flags = ArrayList<ItemBuilderFlag>()
 
     /**
      * 附魔
@@ -167,7 +177,7 @@ open class ItemBuilder {
      * 使其发光
      */
     fun shiny() {
-        flags += ItemFlag.HIDE_ENCHANTS
+        flags += ItemBuilderFlag.HIDE_ENCHANTS
         enchants[Enchantment.LURE] = 1
     }
 
@@ -175,7 +185,7 @@ open class ItemBuilder {
      * 隐藏所有附加信息（赋予所有 ItemFlag）
      */
     fun hideAll() {
-        flags.addAll(ItemFlag.values())
+        flags.addAll(ItemBuilderFlag.values())
     }
 
     open fun getSkinValue(skull: ItemMeta): SkullTexture? {
@@ -308,7 +318,7 @@ open class ItemBuilder {
         originMeta = itemMeta
         name = itemMeta.displayName
         lore += itemMeta.lore ?: emptyList()
-        flags += kotlin.runCatching { itemMeta.itemFlags.map { ItemFlag.valueOf(it.name) } }.getOrElse { emptyList() }
+        flags += kotlin.runCatching { itemMeta.itemFlags.map { ItemBuilderFlag.valueOf(it.name) } }.getOrElse { emptyList() }
         enchants += if (itemMeta is EnchantmentStorageMeta) {
             itemMeta.storedEnchants
         } else {
