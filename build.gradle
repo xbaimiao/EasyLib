@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.8.2'
+    version = '3.8.3'
 
     repositories {
         mavenCentral()
@@ -65,7 +65,7 @@ dependencies {
         exclude group: "org.ow2.asm", module: "asm-commons"
         exclude group: "org.ow2.asm", module: "asm"
     }
-    compileOnly("com.github.cryptomorin:XSeries:9.9.0")
+    compileOnly("com.github.cryptomorin:XSeries:10.0.0")
 
     implementation(project(":easylib-api"))
     implementation(project(":easylib-folia"))
@@ -138,6 +138,13 @@ publishing {
             }
             name = "GithubPackages"
             url = uri("https://maven.pkg.github.com/xbaimiao/EasyLib")
+        }
+        maven {
+            credentials {
+                username = project.findProperty("BaiUser").toString()
+                password = project.findProperty("BaiPassword").toString()
+            }
+            url = uri("https://maven.xbaimiao.com/repository/releases/")
         }
     }
     publications {
