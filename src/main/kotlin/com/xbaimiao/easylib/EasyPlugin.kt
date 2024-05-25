@@ -25,7 +25,9 @@ abstract class EasyPlugin : JavaPlugin() {
         DependencyLoader.injectDebug(this)
         DependencyLoader.init(this)
 
-        Loader.loaderKotlin(this, HashMap(), repoUrl())
+        if (loadKotlin()) {
+            Loader.loaderKotlin(this, HashMap(), repoUrl())
+        }
         Loader.loaderLibrary(this)
 
         instance = this
@@ -36,6 +38,10 @@ abstract class EasyPlugin : JavaPlugin() {
      */
     open fun repoUrl(): String {
         return Loader.ALIYUN_REPO_URL
+    }
+
+    open fun loadKotlin(): Boolean {
+        return true
     }
 
     open fun load() {}
