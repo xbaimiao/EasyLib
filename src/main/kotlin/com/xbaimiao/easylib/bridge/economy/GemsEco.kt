@@ -5,7 +5,7 @@ import me.xanium.gemseconomy.currency.Currency
 import org.bukkit.OfflinePlayer
 
 class GemsEco(
-    private val gemsEconomyName: String
+    private val gemsEconomyName: String,
 ) : Economy {
 
     private val api: GemsEconomyAPI by lazy { GemsEconomyAPI() }
@@ -28,4 +28,7 @@ class GemsEco(
         api.deposit(player.uniqueId, amount, currency)
     }
 
+    override fun set(player: OfflinePlayer, amount: Double) {
+        take(player, get(player))
+    }
 }

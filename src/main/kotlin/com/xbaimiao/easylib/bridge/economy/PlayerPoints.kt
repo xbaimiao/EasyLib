@@ -47,4 +47,8 @@ class PlayerPoints : Economy {
         playerPointsAPI!!.give(player.uniqueId, amount.toInt())
     }
 
+    override fun set(player: OfflinePlayer, amount: Double) {
+        playerPointsAPI!!.set(player.uniqueId, amount.toInt())
+    }
+
 }

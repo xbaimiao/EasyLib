@@ -51,4 +51,8 @@ class Vault : Economy {
         economy.depositPlayer(player, amount)
     }
 
+    override fun set(player: OfflinePlayer, amount: Double) {
+        take(player, get(player))
+    }
+
 }

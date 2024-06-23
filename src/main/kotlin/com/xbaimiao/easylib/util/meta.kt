@@ -12,6 +12,11 @@ fun Metadatable.setMeta(key: String, value: Any) {
     setMetadata(key, FixedMetadataValue(plugin, value))
 }
 
+@Suppress("UNCHECKED_CAST")
+fun <T> Metadatable.getMeta(key: String): T {
+    return getMetadata(key).firstOrNull { it.owningPlugin == plugin }?.value() as T
+}
+
 fun Metadatable.removeMeta(key: String) {
     removeMetadata(key, plugin)
 }

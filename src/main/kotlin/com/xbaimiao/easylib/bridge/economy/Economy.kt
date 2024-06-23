@@ -24,4 +24,9 @@ interface Economy {
      */
     fun give(player: OfflinePlayer, amount: Double)
 
+    /**
+     * 设置货币数量
+     */
+    fun set(player: OfflinePlayer, amount: Double)
+
 }
