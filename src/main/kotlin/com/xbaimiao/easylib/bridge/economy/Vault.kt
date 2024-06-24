@@ -52,7 +52,12 @@ class Vault : Economy {
     }
 
     override fun set(player: OfflinePlayer, amount: Double) {
-        take(player, get(player))
+        val has = get(player)
+        if (has > amount) {
+            take(player, has - amount)
+        } else {
+            give(player, amount - has)
+        }
     }
 
 }
