@@ -68,7 +68,8 @@ object MinecraftVersion {
         V1_20_0(20000, 12), V1_20_1(20001, 12), V1_20_2(20002, 12),
         V1_20_3(20003, 12), V1_20_4(20004, 12), V1_20_5(20005, 12),
         V1_20_6(20006, 12), //12
-        UNKNOWN(0, -999);
+        V1_21(21000, 13),
+        UNKNOWN(99999, -999);
 
         companion object {
             fun formString(version: String): Version {

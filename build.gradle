@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '3.8.7'
+    version = '3.9.1'
 
     repositories {
         mavenCentral()
@@ -44,6 +44,7 @@ allprojects {
 }
 
 dependencies {
+    def asmVersion = "9.7"
     compileOnly("net.kyori:adventure-api:4.13.1")
     compileOnly("com.zaxxer:HikariCP:4.0.3")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
@@ -58,9 +59,9 @@ dependencies {
     implementation("org.tabooproject.reflex:reflex:${reflexVersion}") // 需要 analyser 模块
 
     // asm
-    implementation("org.ow2.asm:asm:9.2")
-    implementation("org.ow2.asm:asm-util:9.2")
-    implementation("org.ow2.asm:asm-commons:9.2")
+    implementation("org.ow2.asm:asm:${asmVersion}")
+    implementation("org.ow2.asm:asm-util:${asmVersion}")
+    implementation("org.ow2.asm:asm-commons:${asmVersion}")
     implementation("me.lucko:jar-relocator:1.7") {
         exclude group: "org.ow2.asm", module: "asm-commons"
         exclude group: "org.ow2.asm", module: "asm"

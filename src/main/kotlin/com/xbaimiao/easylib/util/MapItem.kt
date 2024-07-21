@@ -24,7 +24,7 @@ fun buildMap(
     url: URL,
     width: Int = 128,
     height: Int = 128,
-    builder: ItemBuilder.() -> Unit = {}
+    builder: ItemBuilder.() -> Unit = {},
 ): MapItem {
     return MapItem(url.openStream().use { ImageIO.read(it) }.zoomed(width, height), builder)
 }
@@ -40,7 +40,7 @@ fun buildMap(
     file: File,
     width: Int = 128,
     height: Int = 128,
-    builder: ItemBuilder.() -> Unit = {}
+    builder: ItemBuilder.() -> Unit = {},
 ): MapItem {
     return MapItem(ImageIO.read(file).zoomed(width, height), builder)
 }
@@ -56,7 +56,7 @@ fun buildMap(
     image: BufferedImage,
     width: Int = 128,
     height: Int = 128,
-    builder: ItemBuilder.() -> Unit = {}
+    builder: ItemBuilder.() -> Unit = {},
 ): MapItem {
     return MapItem(image.zoomed(width, height), builder)
 }
