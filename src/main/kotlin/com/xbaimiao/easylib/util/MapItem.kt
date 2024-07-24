@@ -3,8 +3,10 @@ package com.xbaimiao.easylib.util
 import com.cryptomorin.xseries.XMaterial
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.map.MapCanvas
+import org.bukkit.map.MapPalette
 import org.bukkit.map.MapRenderer
 import org.bukkit.map.MapView
 import org.tabooproject.reflex.Reflex.Companion.invokeMethod
@@ -82,17 +84,18 @@ class MapItem(val image: BufferedImage, val builder: ItemBuilder.() -> Unit = {}
             if (rendered) {
                 return
             }
-            mapCanvas.drawImage(0, 0, image)
+            mapCanvas.drawImage(0, 0, MapPalette.resizeImage(image))
+            mapView.isTrackingPosition = false
             rendered = true
         }
     }
 
     val mapView by lazy {
         val mapView = Bukkit.createMap(Bukkit.getWorlds()[0])
-//        mapView.renderers.clear()
+        mapView.renderers.clear()
         mapView.addRenderer(mapRenderer)
-//        mapView.isTrackingPosition = false
-//        mapView.scale = MapView.Scale.NORMAL
+        mapView.isTrackingPosition = false
+        mapView.isLocked = false
         mapView
     }
 
