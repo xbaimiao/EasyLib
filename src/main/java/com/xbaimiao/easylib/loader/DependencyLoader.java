@@ -28,7 +28,7 @@ public class DependencyLoader {
 
     private static final Map<String, String> GOAL_RELOCATE = new HashMap<>();
     protected static final List<Dependency> DEPENDENCIES_FOR_PLUGIN = new ArrayList<Dependency>() {{
-        add(Loader.toDependenency("com.github.cryptomorin:XSeries:10.0.0"));
+        add(Loader.toDependenency("com.github.cryptomorin:XSeries:11.2.0.1"));
     }};
     protected static String kotlinVersion = "1.9.20";
 
