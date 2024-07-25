@@ -16,14 +16,6 @@ abstract class Menu(val player: Player) {
 
     private val itemSectionMap = HashMap<Char, ConfigurationSection>()
 
-    fun getItemSection(char: Char): ConfigurationSection? {
-        return itemSectionMap[char]
-    }
-
-    fun setItemSection(char: Char, section: ConfigurationSection) {
-        itemSectionMap[char] = section
-    }
-
     abstract fun build(): Inventory
 
     abstract fun open()
@@ -52,16 +44,26 @@ open class MenuHolder(val menu: Basic) : InventoryHolder {
 
 class Variable(val key: String, val value: String)
 
-fun buildMenu(
-    basic: Basic, configuration: ConfigurationSection, func: Basic.() -> Unit
+fun Basic.buildMenu(
+    configuration: ConfigurationSection,
+    onSetItem: Basic.(Char, ItemStack, ConfigurationSection) -> Unit = { _, _, _ -> },
+    func: Basic.() -> Unit = {},
 ): Basic {
-    return buildMenu(basic, configuration, listOf(), func)
+    return buildMenu(configuration, listOf(), onSetItem, func)
 }
 
-fun buildMenu(
-    basic: Basic, configuration: ConfigurationSection, variables: List<Variable>, func: Basic.() -> Unit
+fun Basic.buildMenu(
+    configuration: ConfigurationSection,
+    variables: List<Variable>,
+    onSetItem: Basic.(Char, ItemStack, ConfigurationSection) -> Unit = { _, _, _ -> },
+    func: Basic.() -> Unit = {},
 ): Basic {
-    val sort = configuration.getStringList("sort").map { it.toCharArray().toList() }
+    val basic = this
+    var list = configuration.getStringList("layout")
+    if (list.isEmpty()) {
+        list = configuration.getStringList("sort")
+    }
+    val sort = list.map { it.toCharArray().toList() }
 
     val items = HashMap<Char, Pair<ItemStack, ConfigurationSection>>()
 
@@ -81,7 +83,7 @@ fun buildMenu(
 
     items.forEach { (k, v) ->
         basic.set(k, v.first)
-        basic.setItemSection(k, v.second)
+        onSetItem(basic, k, v.first, v.second)
     }
 
     func(basic)
