@@ -94,8 +94,6 @@ class MapItem(val image: BufferedImage, val builder: ItemBuilder.() -> Unit = {}
         val mapView = Bukkit.createMap(Bukkit.getWorlds()[0])
         mapView.renderers.clear()
         mapView.addRenderer(mapRenderer)
-        mapView.isTrackingPosition = false
-        mapView.isLocked = false
         mapView
     }
 
