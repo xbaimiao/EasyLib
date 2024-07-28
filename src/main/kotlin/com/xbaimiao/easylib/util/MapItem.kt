@@ -85,7 +85,7 @@ class MapItem(val image: BufferedImage, val builder: ItemBuilder.() -> Unit = {}
                 return
             }
             mapCanvas.drawImage(0, 0, MapPalette.resizeImage(image))
-            mapView.isTrackingPosition = false
+            //mapView.isTrackingPosition = false
             rendered = true
         }
     }
