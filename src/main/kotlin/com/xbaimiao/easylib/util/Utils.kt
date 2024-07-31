@@ -163,5 +163,20 @@ fun <T> lazySupplier(supplier: () -> T): Supplier<T> {
     }
 }
 
+infix fun Double.range(to: Double): ClosedRange<Double> {
+    return this..to
+}
+
+infix fun ClosedRange<Double>.step(step: Double): Iterable<Double> {
+    var start = this.start
+    val end = this.endInclusive
+    val list = HashSet<Double>()
+    while (start <= end) {
+        list.add(start)
+        start += step
+    }
+    list.add(end)
+    return list
+}
 
 val plugin get() = EasyPlugin.getPlugin<EasyPlugin>()
