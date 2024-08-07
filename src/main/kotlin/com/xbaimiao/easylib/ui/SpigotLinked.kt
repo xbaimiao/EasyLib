@@ -11,7 +11,7 @@ import org.bukkit.inventory.Inventory
  * @author xbaimiao
  * @since 2023/10/18 17:35
  */
-open class SpigotBasic(player: Player, val title: String) : Basic(player) {
+open class SpigotLinked<T>(player: Player, val title: String) : Linked<T>(player) {
 
     /**
      * 构建页面

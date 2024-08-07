@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 abstract class Basic(player: Player) : Menu(player) {
 
     /** 行数 **/
-    var rows = -1
+    var rows = 6
         private set
 
     /** 锁定主手 **/
@@ -195,7 +195,15 @@ abstract class Basic(player: Player) : Menu(player) {
         return list
     }
 
-    protected fun handleInventory(inventory: Inventory) {
+    /**
+     * 对菜单上锁 不让玩家拿出和放入物品
+     */
+    fun lock() {
+        onClick { it.isCancelled = true }
+        onDrag { it.isCancelled = true }
+    }
+
+    protected open fun handleInventory(inventory: Inventory) {
         var row = 0
         while (row < slots.size) {
             val line = slots[row]

@@ -134,7 +134,7 @@ fun join(args: Array<String>, start: Int = 0, separator: String = " "): String {
  * @param start 开始位置
  * @param end 结束位置（默认为元素数量）
  */
-fun <T> subList(list: List<T>, start: Int = 0, end: Int = list.size): List<T> {
+fun <T> subList(list: Collection<T>, start: Int = 0, end: Int = list.size): Collection<T> {
     return list.filterIndexed { index, _ -> index in start until end }
 }
 
