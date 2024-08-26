@@ -14,8 +14,6 @@ import org.bukkit.inventory.ItemStack
 
 abstract class Menu(val player: Player) {
 
-    private val itemSectionMap = HashMap<Char, ConfigurationSection>()
-
     abstract fun build(): Inventory
 
     abstract fun open()
@@ -44,18 +42,18 @@ open class MenuHolder(val menu: Basic) : InventoryHolder {
 
 class MenuUpdate(
     val async: Boolean,
-    val period: Long,
-    val getItem: () -> ItemStack,
+    private val period: Long,
+    private val getItem: () -> ItemStack,
 ) {
 
-    private var lastupdate = 0L
+    private var lastUpdate = 0L
 
     fun canUpdate(): Boolean {
-        return System.currentTimeMillis() > (lastupdate + (period * 50))
+        return System.currentTimeMillis() > (lastUpdate + (period * 50))
     }
 
     fun update(): ItemStack {
-        lastupdate = System.currentTimeMillis()
+        lastUpdate = System.currentTimeMillis()
         return getItem.invoke()
     }
 

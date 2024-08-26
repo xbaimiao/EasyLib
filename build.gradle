@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '4.0.0'
+    version = '4.0.1'
 
     repositories {
         mavenCentral()
@@ -131,14 +131,6 @@ publishing {
                 password = project.findProperty("clayPassword").toString()
             }
             url("https://maven.mineclay.com/repository/zhua-release/")
-        }
-        maven {
-            credentials {
-                username = project.findProperty("githubUsername").toString()
-                password = project.findProperty("githubPassword").toString()
-            }
-            name = "GithubPackages"
-            url = uri("https://maven.pkg.github.com/xbaimiao/EasyLib")
         }
         maven {
             credentials {

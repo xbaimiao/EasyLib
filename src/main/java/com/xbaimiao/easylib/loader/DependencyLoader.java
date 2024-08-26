@@ -25,8 +25,7 @@ import java.util.logging.Level;
 public class DependencyLoader {
 
     public static final List<Dependency> DEPENDENCIES = new ArrayList<>();
-
-    private static final Map<String, String> GOAL_RELOCATE = new HashMap<>();
+    public static final Map<String, String> GOAL_RELOCATE = new HashMap<>();
     protected static final List<Dependency> DEPENDENCIES_FOR_PLUGIN = new ArrayList<Dependency>() {{
         add(Loader.toDependenency("com.github.cryptomorin:XSeries:11.2.0.1"));
     }};
