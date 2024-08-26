@@ -15,7 +15,6 @@ abstract class Basic(player: Player) : Menu(player) {
 
     /** 行数 **/
     var rows = 6
-        private set
 
     /** 锁定主手 **/
     internal var handLocked = true
@@ -39,6 +38,12 @@ abstract class Basic(player: Player) : Menu(player) {
     var items = ConcurrentHashMap<Char, ItemStack>()
 
     var slotItems = ConcurrentHashMap<Int, ItemStack>()
+
+    /** 物品刷新关系 **/
+    val itemsUpdate = ConcurrentHashMap<Char, MenuUpdate>()
+
+    val slotUpdate = ConcurrentHashMap<Int, MenuUpdate>()
+
 
     /** 抽象字符布局 **/
     var slots = CopyOnWriteArrayList<List<Char>>()
@@ -150,9 +155,20 @@ abstract class Basic(player: Player) : Menu(player) {
         slotItems[slot] = itemStack
     }
 
+    /**
+     * 设置物品刷新  每秒会从这里取新物品刷新进UI
+     */
+    fun setUpdate(slot: Char, period: Long, async: Boolean = false, newItem: () -> ItemStack) {
+        itemsUpdate[slot] = MenuUpdate(async, period, newItem)
+    }
+
+    fun setUpdate(slot: Int, period: Long, async: Boolean = false, newItem: () -> ItemStack) {
+        slotUpdate[slot] = MenuUpdate(async, period, newItem)
+    }
+
     fun set(slot: List<Int>, itemStack: ItemStack) {
         slot.forEach {
-            slotItems[it] = itemStack
+            set(it, itemStack.clone())
         }
     }
 

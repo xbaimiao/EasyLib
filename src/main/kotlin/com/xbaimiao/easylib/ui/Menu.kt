@@ -42,6 +42,25 @@ open class MenuHolder(val menu: Basic) : InventoryHolder {
     }
 }
 
+class MenuUpdate(
+    val async: Boolean,
+    val period: Long,
+    val getItem: () -> ItemStack,
+) {
+
+    private var lastupdate = 0L
+
+    fun canUpdate(): Boolean {
+        return System.currentTimeMillis() > (lastupdate + (period * 50))
+    }
+
+    fun update(): ItemStack {
+        lastupdate = System.currentTimeMillis()
+        return getItem.invoke()
+    }
+
+}
+
 class Variable(val key: String, val value: String)
 
 fun Basic.buildMenu(

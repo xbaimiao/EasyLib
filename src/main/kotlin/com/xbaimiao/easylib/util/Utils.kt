@@ -7,7 +7,6 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.function.Supplier
-import kotlin.collections.HashSet
 
 /**
  * Utils
@@ -180,6 +179,14 @@ infix fun ClosedRange<Double>.step(step: Double): Iterable<Double> {
     }
     list.add(end)
     return list
+}
+
+infix operator fun String.times(number: Int): String {
+    val builder = StringBuilder()
+    repeat(number) {
+        builder.append(this)
+    }
+    return builder.toString()
 }
 
 val plugin get() = EasyPlugin.getPlugin<EasyPlugin>()

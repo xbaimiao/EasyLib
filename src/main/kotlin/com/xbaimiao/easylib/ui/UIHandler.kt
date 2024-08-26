@@ -1,6 +1,8 @@
 package com.xbaimiao.easylib.ui
 
 import com.xbaimiao.easylib.EasyPlugin
+import com.xbaimiao.easylib.task.EasyLibTask
+import com.xbaimiao.easylib.util.submit
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
@@ -11,13 +13,58 @@ import org.bukkit.event.inventory.InventoryDragEvent
 
 object UIHandler : Listener {
 
+    private var task: EasyLibTask? = null
+
     fun enable(plugin: EasyPlugin) {
+        startUpdateTask()
         Bukkit.getPluginManager().registerEvents(this, plugin)
     }
 
     fun disable() {
+        stopUpdateTask()
         HandlerList.unregisterAll(this)
         Bukkit.getOnlinePlayers().forEach { it.closeInventory() }
+    }
+
+    private fun startUpdateTask() {
+        task = submit(period = 20, async = true) {
+            for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+                val inventory = onlinePlayer.openInventory.topInventory
+                val menu = MenuHolder.fromInventory(inventory) ?: return@submit
+                for ((slot, update) in menu.slotUpdate) {
+                    if (!update.canUpdate()) {
+                        continue
+                    }
+                    if (!update.async) {
+                        submit {
+                            inventory.setItem(slot, update.update())
+                        }
+                        continue
+                    }
+                    inventory.setItem(slot, update.update())
+                }
+                for ((char, update) in menu.itemsUpdate) {
+                    if (!update.canUpdate()) {
+                        continue
+                    }
+                    if (!update.async) {
+                        submit {
+                            for (slot in menu.getSlots(char)) {
+                                inventory.setItem(slot, update.update())
+                            }
+                        }
+                        continue
+                    }
+                    for (slot in menu.getSlots(char)) {
+                        inventory.setItem(slot, update.update())
+                    }
+                }
+            }
+        }
+    }
+
+    private fun stopUpdateTask() {
+        task?.cancel()
     }
 
     @EventHandler
