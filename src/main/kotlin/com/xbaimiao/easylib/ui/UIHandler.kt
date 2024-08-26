@@ -30,7 +30,7 @@ object UIHandler : Listener {
         task = submit(period = 20, async = true) {
             for (onlinePlayer in Bukkit.getOnlinePlayers()) {
                 val inventory = onlinePlayer.openInventory.topInventory
-                val menu = MenuHolder.fromInventory(inventory) ?: return@submit
+                val menu = MenuHolder.fromInventory(inventory) ?: continue
                 for ((slot, update) in menu.slotUpdate) {
                     if (!update.canUpdate()) {
                         continue
