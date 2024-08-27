@@ -26,26 +26,26 @@ val debugCommand = command<CommandSender>("debug") {
 }
 
 inline fun <reified C : CommandSender> mainCommand(
-    block: CommandSpec<C>.() -> Unit
+    block: CommandSpec<C>.() -> Unit,
 ): CommandSpec<C> {
     return mainCommand(EasyPlugin.getPlugin<EasyPlugin>().description.name, block)
 }
 
 inline fun <reified C : CommandSender> mainCommand(
     debug: Boolean,
-    block: CommandSpec<C>.() -> Unit
+    block: CommandSpec<C>.() -> Unit,
 ): CommandSpec<C> {
     return mainCommand(EasyPlugin.getPlugin<EasyPlugin>().description.name, debug, block)
 }
 
 inline fun <reified C : CommandSender> mainCommand(
-    command: String, block: CommandSpec<C>.() -> Unit
+    command: String, block: CommandSpec<C>.() -> Unit,
 ): CommandSpec<C> {
     return mainCommand(command, false, block)
 }
 
 inline fun <reified C : CommandSender> mainCommand(
-    command: String, debug: Boolean, block: CommandSpec<C>.() -> Unit
+    command: String, debug: Boolean, block: CommandSpec<C>.() -> Unit,
 ): CommandSpec<C> {
     val commandSpec = command<C>(command, block)
     if (debug) {
@@ -56,7 +56,7 @@ inline fun <reified C : CommandSender> mainCommand(
 }
 
 inline fun <reified C : CommandSender> command(
-    command: String, block: CommandSpec<C>.() -> Unit
+    command: String, block: CommandSpec<C>.() -> Unit,
 ): CommandSpec<C> {
     val launcher = CommandSpec.newCommandSpec<C>(command)
     block.invoke(launcher)
@@ -66,7 +66,7 @@ inline fun <reified C : CommandSender> command(
 data class ArgNode<T>(
     val usage: String,
     val exec: CommandSender.(String) -> List<String>,
-    val parse: (CommandSender.(String) -> T)
+    val parse: (CommandSender.(String) -> T),
 ) {
 
     var index = 0
@@ -78,6 +78,33 @@ data class ArgNode<T>(
         return ArgNode(usage, exec, parse)
     }
 }
+
+class ArgNodeBuilder<T> {
+    private var usage: String = ""
+    private var exec: CommandSender.(String) -> List<String> = { emptyList() }
+    private var parse: (CommandSender.(String) -> T)? = null
+
+    fun usage(usage: String): ArgNodeBuilder<T> {
+        this.usage = usage
+        return this
+    }
+
+    fun compile(compile: CommandSender.(String) -> List<String>): ArgNodeBuilder<T> {
+        this.exec = compile
+        return this
+    }
+
+    fun parse(parse: (CommandSender.(String) -> T)): ArgNodeBuilder<T> {
+        this.parse = parse
+        return this
+    }
+
+    fun build(): ArgNode<T> {
+        return ArgNode(usage, exec, parse ?: { it as T })
+    }
+}
+
+fun <T> buildArgNode() = ArgNodeBuilder<T>()
 
 fun registerCommand(any: Any): Boolean {
     val header = any::class.java.getAnnotation(ECommandHeader::class.java)
