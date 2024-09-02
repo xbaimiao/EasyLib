@@ -5,7 +5,7 @@ import com.xbaimiao.easylib.util.warn
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 
-class Vault : Economy {
+class Vault : Economy<Double> {
 
     private lateinit var economy: net.milkbowl.vault.economy.Economy
 

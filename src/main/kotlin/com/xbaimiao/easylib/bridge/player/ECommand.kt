@@ -2,6 +2,7 @@ package com.xbaimiao.easylib.bridge.player
 
 import com.xbaimiao.easylib.bridge.player.EPlayerImpl.Companion.easylib
 import com.xbaimiao.easylib.bridge.replacePlaceholder
+import com.xbaimiao.easylib.chat.colored
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -38,6 +39,9 @@ fun Collection<String>.autoParseExec(player: Player) {
             } else if (it.startsWith("[console] ")) {
                 val cmd = it.substring(10)
                 cmd.parseECommand(player).exec(Bukkit.getConsoleSender())
+            } else if (it.startsWith("[tell] ")) {
+                val cmd = it.substring(7)
+                player.sendMessage(cmd.colored())
             }
         }
 }

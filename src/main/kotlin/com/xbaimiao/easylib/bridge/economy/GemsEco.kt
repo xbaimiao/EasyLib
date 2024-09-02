@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer
 
 class GemsEco(
     private val gemsEconomyName: String,
-) : Economy {
+) : Economy<Double> {
 
     private val api: GemsEconomyAPI by lazy { GemsEconomyAPI() }
     private val currency: Currency by lazy { api.getCurrency(gemsEconomyName) }

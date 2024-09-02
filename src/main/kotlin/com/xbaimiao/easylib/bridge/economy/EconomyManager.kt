@@ -6,11 +6,11 @@ package com.xbaimiao.easylib.bridge.economy
  **/
 object EconomyManager {
 
-    val vault: Economy by lazy { Vault() }
+    val vault: Economy<Double> by lazy { Vault() }
 
-    val playerPoints: Economy by lazy { PlayerPoints() }
+    val playerPoints: Economy<Int> by lazy { PlayerPoints() }
 
-    fun createGemsEco(gemsEconomyName: String): Economy {
+    fun createGemsEco(gemsEconomyName: String): Economy<Double> {
         return GemsEco(gemsEconomyName)
     }
 
