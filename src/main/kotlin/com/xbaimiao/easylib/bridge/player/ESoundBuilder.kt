@@ -1,6 +1,6 @@
 package com.xbaimiao.easylib.bridge.player
 
-import com.cryptomorin.xseries.XSound
+import com.xbaimiao.easylib.xseries.XSound
 import org.bukkit.Sound
 
 /**

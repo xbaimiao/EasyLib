@@ -26,9 +26,7 @@ public class DependencyLoader {
 
     public static final List<Dependency> DEPENDENCIES = new ArrayList<>();
     public static final Map<String, String> GOAL_RELOCATE = new HashMap<>();
-    protected static final List<Dependency> DEPENDENCIES_FOR_PLUGIN = new ArrayList<Dependency>() {{
-        add(Loader.toDependenency("com.github.cryptomorin:XSeries:11.2.0.1"));
-    }};
+    protected static final List<Dependency> DEPENDENCIES_FOR_PLUGIN = new ArrayList<>();
     protected static String kotlinVersion = "1.9.20";
 
     public static void loader(EasyPlugin plugin) {

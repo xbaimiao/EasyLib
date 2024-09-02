@@ -1,6 +1,6 @@
 package com.xbaimiao.easylib.util
 
-import com.cryptomorin.xseries.XMaterial
+import com.xbaimiao.easylib.xseries.XMaterial
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack

@@ -1,6 +1,5 @@
 package com.xbaimiao.easylib.bridge.player
 
-import com.cryptomorin.xseries.messages.ActionBar
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -11,7 +10,7 @@ import org.bukkit.entity.Player
 class EPlayerImpl(private val player: Player) : EPlayer {
 
     override fun sendActionBar(string: String) {
-        ActionBar.sendActionBar(player, string)
+        player.sendActionBar(string)
     }
 
     override fun playSound(sound: String) {

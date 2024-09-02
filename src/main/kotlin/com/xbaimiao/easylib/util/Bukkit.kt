@@ -1,6 +1,6 @@
 package com.xbaimiao.easylib.util
 
-import com.cryptomorin.xseries.XMaterial
+import com.xbaimiao.easylib.xseries.XMaterial
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.task.EasyLibBukkitTask
 import com.xbaimiao.easylib.task.EasyLibFoliaTask
