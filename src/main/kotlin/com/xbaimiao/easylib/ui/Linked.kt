@@ -41,15 +41,17 @@ abstract class Linked<T>(player: Player) : Basic(player) {
     /**
      * 设置下一页按钮
      */
-    fun setNextPage(slot: Int, callback: (page: Int, hasNextPage: Boolean) -> ItemStack) {
-        // 设置物品
-        set(slot, callback(page, hasNextPage()))
-        // 点击事件
-        onClick(slot) {
-            if (hasNextPage()) {
-                page++
-                // 刷新页面
-                player.openInventory(build())
+    fun setNextPage(vararg slot: Int, callback: (page: Int, hasNextPage: Boolean) -> ItemStack) {
+        slot.forEach {
+            // 设置物品
+            set(it, callback(page, hasNextPage()))
+            // 点击事件
+            onClick(it) {
+                if (hasNextPage()) {
+                    page++
+                    // 刷新页面
+                    player.openInventory(build())
+                }
             }
         }
     }
@@ -57,15 +59,17 @@ abstract class Linked<T>(player: Player) : Basic(player) {
     /**
      * 设置上一页按钮
      */
-    fun setPreviousPage(slot: Int, callback: (page: Int, hasPreviousPage: Boolean) -> ItemStack) {
-        // 设置物品
-        set(slot, callback(page, hasPreviousPage()))
-        // 点击事件
-        onClick(slot) {
-            if (hasPreviousPage()) {
-                page--
-                // 刷新页面
-                player.openInventory(build())
+    fun setPreviousPage(vararg slot: Int, callback: (page: Int, hasPreviousPage: Boolean) -> ItemStack) {
+        slot.forEach {
+            // 设置物品
+            set(it, callback(page, hasPreviousPage()))
+            // 点击事件
+            onClick(it) {
+                if (hasPreviousPage()) {
+                    page--
+                    // 刷新页面
+                    player.openInventory(build())
+                }
             }
         }
     }
