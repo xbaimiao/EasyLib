@@ -46,8 +46,8 @@ public class DependencyLoader {
 
     public static void load(EasyPlugin plugin, Dependency dependency) {
         if (!dependency.getFile().exists()) {
-            if (!dependency.getFile().getParentFile().exists()) {
-                dependency.getFile().getParentFile().mkdirs();
+            if (!dependency.getFile().getAbsoluteFile().getParentFile().exists()) {
+                dependency.getFile().getAbsoluteFile().getParentFile().mkdirs();
             }
             debug(plugin, "Download " + dependency.getFile().getName());
             if (download(dependency.getUrl(), dependency.getFile(), plugin)) {
@@ -78,7 +78,7 @@ public class DependencyLoader {
                     String fileName = dependency.getFile().getName().substring(0, fileNameIndex);
                     String fileExtension = dependency.getFile().getName().substring(fileNameIndex);
 
-                    File folder = new File(dependency.getFile().getParentFile(), plugin.getName());
+                    File folder = new File(dependency.getFile().getAbsoluteFile().getParentFile(), plugin.getName());
                     if (!folder.exists()) {
                         folder.mkdirs();
                     }

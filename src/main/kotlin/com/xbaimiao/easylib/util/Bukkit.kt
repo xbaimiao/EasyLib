@@ -1,10 +1,10 @@
 package com.xbaimiao.easylib.util
 
-import com.xbaimiao.easylib.xseries.XMaterial
 import com.xbaimiao.easylib.EasyPlugin
 import com.xbaimiao.easylib.task.EasyLibBukkitTask
 import com.xbaimiao.easylib.task.EasyLibFoliaTask
 import com.xbaimiao.easylib.task.EasyLibTask
+import com.xbaimiao.easylib.xseries.XMaterial
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -21,13 +21,15 @@ import java.util.*
  * @param location 位置(仅在folia核心中生效)
  * @param task 任务
  */
+@JvmOverloads
 fun submit(
     delay: Long = 0,
     period: Long = 0,
     async: Boolean = false,
     location: Location? = null,
+    player: Player? = null,
     maxRunningNum: Long = 0,
-    task: EasyLibTask.() -> Unit
+    task: EasyLibTask.() -> Unit,
 ): EasyLibTask {
 
     var currentRunningNum = 0
@@ -44,7 +46,7 @@ fun submit(
 
     val runnable by lazy {
         if (ServerChecker.isFolia) {
-            object : EasyLibFoliaTask(location, EasyPlugin.getPlugin()) {
+            object : EasyLibFoliaTask(location, player, EasyPlugin.getPlugin()) {
                 override fun run() {
                     runningTask(this)
                 }

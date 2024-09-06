@@ -18,8 +18,8 @@ object DefaultMysqlConfiguration {
         if (file.exists()) {
             return@lazy YamlConfiguration.loadConfiguration(file)
         }
-        if (!file.parentFile.exists()) {
-            file.parentFile.mkdirs()
+        if (!file.absoluteFile.parentFile.exists()) {
+            file.absoluteFile.parentFile.mkdirs()
         }
         file.createNewFile()
 

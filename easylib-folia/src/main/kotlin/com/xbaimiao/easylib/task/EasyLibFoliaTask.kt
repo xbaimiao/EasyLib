@@ -3,6 +3,7 @@ package com.xbaimiao.easylib.task
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.TimeUnit
 
@@ -12,7 +13,8 @@ import java.util.concurrent.TimeUnit
  **/
 abstract class EasyLibFoliaTask(
     private val location: Location?,
-    private val plugin: JavaPlugin
+    private val player: Player?,
+    private val plugin: JavaPlugin,
 ) : EasyLibTask {
 
     override var isSync: Boolean? = false

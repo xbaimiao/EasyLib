@@ -8,6 +8,7 @@ import com.xbaimiao.easylib.loader.classpath.ClassPathAppender
 import com.xbaimiao.easylib.loader.classpath.ReflectionClassPathAppender
 import com.xbaimiao.easylib.ui.UIHandler
 import com.xbaimiao.easylib.util.LifeCycle
+import com.xbaimiao.easylib.util.SoftDependTool
 import com.xbaimiao.easylib.util.submit
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -61,6 +62,7 @@ abstract class EasyPlugin : JavaPlugin() {
         UIHandler.enable(this)
         VisitorHandler::class.java.protectionDomain.codeSource.location.visitor()
         DependencyLoader.loader(this)
+        SoftDependTool.load()
         enable()
         pluginEnableLazys.forEach {
             it.init()
@@ -89,6 +91,7 @@ abstract class EasyPlugin : JavaPlugin() {
             }
         }
         UIHandler.disable()
+        SoftDependTool.unload()
         disable()
     }
 
