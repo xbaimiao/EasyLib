@@ -10,7 +10,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/easylib-api" />
             <option value="$PROJECT_DIR$/easylib-bukkit" />
-            <option value="$PROJECT_DIR$/easylib-folia" />
           </set>
         </option>
       </GradleProjectSettings>

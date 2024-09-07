@@ -1735,35 +1735,6 @@ public enum XSound {
     @Nullable
     private final Sound sound;
 
-    public enum Category {
-        MASTER, MUSIC, RECORDS, WEATHER, BLOCKS,
-        HOSTILE, NEUTRAL, PLAYERS, AMBIENT, VOICE;
-
-        private final Object bukkitObject;
-
-        public boolean isSupported() {
-            return this.bukkitObject != null;
-        }
-
-        @SuppressWarnings("unchecked")
-        private static <T> T cast(Object any) {
-            return (T) any;
-        }
-
-        Category() {
-            Object sc = null;
-            try {
-                sc = Enums.getIfPresent(cast(Class.forName("org.bukkit.SoundCategory")), this.name()).orNull();
-            } catch (ClassNotFoundException ignored) {
-            }
-            this.bukkitObject = sc;
-        }
-
-        public Object getBukkitObject() {
-            return bukkitObject;
-        }
-    }
-
     XSound(@Nonnull String... legacies) {
         Sound bukkitSound = Data.BUKKIT_NAMES.get(this.name());
         if (bukkitSound == null) {
@@ -2159,6 +2130,42 @@ public enum XSound {
     }
 
     /**
+     * @since 10.0.0
+     */
+    public Record record() {
+        return new Record().withSound(this);
+    }
+
+    public enum Category {
+        MASTER, MUSIC, RECORDS, WEATHER, BLOCKS,
+        HOSTILE, NEUTRAL, PLAYERS, AMBIENT, VOICE;
+
+        private final Object bukkitObject;
+
+        Category() {
+            Object sc = null;
+            try {
+                sc = Enums.getIfPresent(cast(Class.forName("org.bukkit.SoundCategory")), this.name()).orNull();
+            } catch (ClassNotFoundException ignored) {
+            }
+            this.bukkitObject = sc;
+        }
+
+        @SuppressWarnings("unchecked")
+        private static <T> T cast(Object any) {
+            return (T) any;
+        }
+
+        public boolean isSupported() {
+            return this.bukkitObject != null;
+        }
+
+        public Object getBukkitObject() {
+            return bukkitObject;
+        }
+    }
+
+    /**
      * Used for data that need to be accessed during enum initialization.
      *
      * @version 1.0.0
@@ -2181,13 +2188,6 @@ public enum XSound {
         static {
             for (Sound sound : Sound.values()) BUKKIT_NAMES.put(sound.name(), sound);
         }
-    }
-
-    /**
-     * @since 10.0.0
-     */
-    public Record record() {
-        return new Record().withSound(this);
     }
 
     public static class SoundPlayer {
@@ -2224,6 +2224,46 @@ public enum XSound {
 
         public SoundPlayer(Record record) {
             withRecord(record);
+        }
+
+        /**
+         * Gets a list of players that can hear this sound at the given location and volume.
+         * This method pretty much uses the default algorithm used by Bukkit.
+         *
+         * @param location The location which the sound is going to be played.
+         * @param volume   The volume of the sound being played. Also see {@link Record#volume}
+         */
+        @Nonnull
+        public static Collection<Player> getHearingPlayers(Location location, double volume) {
+            // Increase the amount of blocks for volumes higher than 1
+            volume = volume > 1.0F ? (16.0F * volume) : 16.0;
+            double powerVolume = volume * volume;
+
+            List<Player> playersInWorld = location.getWorld().getPlayers();
+            List<Player> hearing = new ArrayList<>(playersInWorld.size());
+
+            double x = location.getX();
+            double y = location.getY();
+            double z = location.getZ();
+
+            for (Player player : playersInWorld) {
+                Location loc = player.getLocation();
+                double deltaX = x - loc.getX();
+                double deltaY = y - loc.getY();
+                double deltaZ = z - loc.getZ();
+
+                double length = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+                if (length < powerVolume) hearing.add(player);
+            }
+
+            return hearing;
+        }
+
+        private static <A, R> R toOnlinePlayers(Collection<UUID> players, Collector<Player, A, R> collector) {
+            return players.stream()
+                    .map(Bukkit::getPlayer)
+                    .filter(Objects::nonNull)
+                    .collect(collector);
         }
 
         public SoundPlayer withRecord(Record record) {
@@ -2282,39 +2322,6 @@ public enum XSound {
         }
 
         /**
-         * Gets a list of players that can hear this sound at the given location and volume.
-         * This method pretty much uses the default algorithm used by Bukkit.
-         *
-         * @param location The location which the sound is going to be played.
-         * @param volume   The volume of the sound being played. Also see {@link Record#volume}
-         */
-        @Nonnull
-        public static Collection<Player> getHearingPlayers(Location location, double volume) {
-            // Increase the amount of blocks for volumes higher than 1
-            volume = volume > 1.0F ? (16.0F * volume) : 16.0;
-            double powerVolume = volume * volume;
-
-            List<Player> playersInWorld = location.getWorld().getPlayers();
-            List<Player> hearing = new ArrayList<>(playersInWorld.size());
-
-            double x = location.getX();
-            double y = location.getY();
-            double z = location.getZ();
-
-            for (Player player : playersInWorld) {
-                Location loc = player.getLocation();
-                double deltaX = x - loc.getX();
-                double deltaY = y - loc.getY();
-                double deltaZ = z - loc.getZ();
-
-                double length = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-                if (length < powerVolume) hearing.add(player);
-            }
-
-            return hearing;
-        }
-
-        /**
          * Plays the sound with the given options and updating the player's location.
          *
          * @since 3.0.0
@@ -2350,13 +2357,6 @@ public enum XSound {
 
             if (hearing.isEmpty()) return;
             play(hearing, updatedLocation);
-        }
-
-        private static <A, R> R toOnlinePlayers(Collection<UUID> players, Collector<Player, A, R> collector) {
-            return players.stream()
-                    .map(Bukkit::getPlayer)
-                    .filter(Objects::nonNull)
-                    .collect(collector);
         }
 
         public void play(Collection<Player> players, @Nonnull Location updatedLocation) {

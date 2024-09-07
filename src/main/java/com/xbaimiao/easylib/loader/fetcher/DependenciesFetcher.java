@@ -29,8 +29,8 @@ public class DependenciesFetcher {
         List<DependencyLoader.Dependency> dependencies =
                 fetchDependencies("net.kyori:adventure-platform-bukkit:4.3.2",
                         Loader.ALIYUN_REPO_URL,
-                        new HashMap<String,String>(){{
-                            put("nms;l","dsadsa");
+                        new HashMap<String, String>() {{
+                            put("nms;l", "dsadsa");
                         }});
         dependencies.forEach(System.out::println);
         System.out.println((System.currentTimeMillis() - time) + "ms");

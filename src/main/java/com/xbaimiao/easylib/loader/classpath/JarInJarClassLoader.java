@@ -60,25 +60,6 @@ public class JarInJarClassLoader extends URLClassLoader {
         super(new URL[]{extractJar(loaderClassLoader, jarResourcePath)}, loaderClassLoader);
     }
 
-    public void addJarToClasspath(URL url) {
-        addURL(url);
-    }
-
-    public void deleteJarResource() {
-        URL[] urls = getURLs();
-        if (urls.length == 0) {
-            return;
-        }
-
-        try {
-            Path path = Paths.get(urls[0].toURI());
-            Files.deleteIfExists(path);
-        } catch (Exception e) {
-            // ignore
-        }
-    }
-
-
     /**
      * Extracts the "jar-in-jar" from the loader plugin into a temporary file,
      * then returns a URL that can be used by the {@link JarInJarClassLoader}.
@@ -117,6 +98,24 @@ public class JarInJarClassLoader extends URLClassLoader {
             return path.toUri().toURL();
         } catch (MalformedURLException e) {
             throw new LoadingException("Unable to get URL from path", e);
+        }
+    }
+
+    public void addJarToClasspath(URL url) {
+        addURL(url);
+    }
+
+    public void deleteJarResource() {
+        URL[] urls = getURLs();
+        if (urls.length == 0) {
+            return;
+        }
+
+        try {
+            Path path = Paths.get(urls[0].toURI());
+            Files.deleteIfExists(path);
+        } catch (Exception e) {
+            // ignore
         }
     }
 

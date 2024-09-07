@@ -19,6 +19,15 @@ public class FetcherCache {
         this.dependencies = dependencies;
     }
 
+    public static FetcherCache fromJson(JsonObject jsonObject) {
+        String dependency = jsonObject.get("dependency").getAsString();
+        String repoUrl = jsonObject.get("repoUrl").getAsString();
+        List<DependencyLoader.Dependency> dependencies = DependencyLoader.Dependency.fromJsonArray(
+                jsonObject.get("dependencies").getAsJsonArray()
+        );
+        return new FetcherCache(dependency, repoUrl, dependencies);
+    }
+
     @NotNull
     public String getDependency() {
         return dependency;
@@ -44,15 +53,6 @@ public class FetcherCache {
         }
         jsonObject.add("dependencies", jsonArray);
         return jsonObject;
-    }
-
-    public static FetcherCache fromJson(JsonObject jsonObject) {
-        String dependency = jsonObject.get("dependency").getAsString();
-        String repoUrl = jsonObject.get("repoUrl").getAsString();
-        List<DependencyLoader.Dependency> dependencies = DependencyLoader.Dependency.fromJsonArray(
-                jsonObject.get("dependencies").getAsJsonArray()
-        );
-        return new FetcherCache(dependency, repoUrl, dependencies);
     }
 
 }

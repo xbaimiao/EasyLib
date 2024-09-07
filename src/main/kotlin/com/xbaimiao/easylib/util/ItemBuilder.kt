@@ -1,9 +1,9 @@
 package com.xbaimiao.easylib.util
 
-import com.xbaimiao.easylib.xseries.XMaterial
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import com.xbaimiao.easylib.chat.colored
+import com.xbaimiao.easylib.xseries.XMaterial
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
@@ -318,7 +318,8 @@ open class ItemBuilder {
         originMeta = itemMeta
         name = itemMeta.displayName
         lore += itemMeta.lore ?: emptyList()
-        flags += kotlin.runCatching { itemMeta.itemFlags.map { ItemBuilderFlag.valueOf(it.name) } }.getOrElse { emptyList() }
+        flags += kotlin.runCatching { itemMeta.itemFlags.map { ItemBuilderFlag.valueOf(it.name) } }
+            .getOrElse { emptyList() }
         enchants += if (itemMeta is EnchantmentStorageMeta) {
             itemMeta.storedEnchants
         } else {

@@ -23,6 +23,7 @@ allprojects {
         maven { url "https://repo.papermc.io/repository/maven-public/" }
         maven { url "https://repo.papermc.io/repository/maven-snapshots/" }
         maven { url "https://repo.codemc.org/repository/maven-public/" }
+        maven { url 'https://jitpack.io' }
     }
 
     dependencies {
@@ -68,7 +69,6 @@ dependencies {
     }
 
     implementation(project(":easylib-api"))
-    implementation(project(":easylib-folia"))
     implementation(project(":easylib-bukkit"))
 }
 
