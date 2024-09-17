@@ -3,7 +3,7 @@ package com.xbaimiao.easylib.task
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.entity.Player
+import org.bukkit.entity.Entity
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.TimeUnit
 
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
  **/
 abstract class EasyLibFoliaTask(
     private val location: Location?,
-    private val player: Player?,
+    private val entity: Entity?,
     private val plugin: JavaPlugin,
 ) : EasyLibTask {
 
@@ -29,7 +29,9 @@ abstract class EasyLibFoliaTask(
 
     override fun runTask() {
         runCheck()
-        scheduledTask = if (location == null) {
+        scheduledTask = if (entity != null) {
+            entity.scheduler.run(plugin, { this.run() }, null)!!
+        } else if (location == null) {
             Bukkit.getGlobalRegionScheduler().run(plugin) {
                 this.run()
             }
@@ -42,7 +44,9 @@ abstract class EasyLibFoliaTask(
 
     override fun runTaskLater(delay: Long) {
         runCheck()
-        scheduledTask = if (location == null) {
+        scheduledTask = if (entity != null) {
+            entity.scheduler.runDelayed(plugin, { this.run() }, null, delay)!!
+        } else if (location == null) {
             Bukkit.getGlobalRegionScheduler().runDelayed(plugin, {
                 this.run()
             }, delay)
@@ -55,7 +59,9 @@ abstract class EasyLibFoliaTask(
 
     override fun runTaskTimer(delay: Long, period: Long) {
         runCheck()
-        scheduledTask = if (location == null) {
+        scheduledTask = if (entity != null) {
+            entity.scheduler.runAtFixedRate(plugin, { this.run() }, null, delay, period)!!
+        } else if (location == null) {
             Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, {
                 this.run()
             }, delay, period)

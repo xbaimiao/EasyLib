@@ -8,6 +8,7 @@ import com.xbaimiao.easylib.xseries.XMaterial
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
@@ -27,7 +28,7 @@ fun submit(
     period: Long = 0,
     async: Boolean = false,
     location: Location? = null,
-    player: Player? = null,
+    entity: Entity? = null,
     maxRunningNum: Long = 0,
     task: EasyLibTask.() -> Unit,
 ): EasyLibTask {
@@ -46,7 +47,7 @@ fun submit(
 
     val runnable by lazy {
         if (ServerChecker.isFolia) {
-            object : EasyLibFoliaTask(location, player, EasyPlugin.getPlugin()) {
+            object : EasyLibFoliaTask(location, entity, EasyPlugin.getPlugin()) {
                 override fun run() {
                     runningTask(this)
                 }

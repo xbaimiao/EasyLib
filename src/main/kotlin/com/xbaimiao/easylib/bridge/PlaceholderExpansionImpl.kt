@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
  * @date 2023/5/18 11:50
  **/
 class PlaceholderExpansionImpl(
-    private val placeholderExpansion: com.xbaimiao.easylib.bridge.PlaceholderExpansion
+    private val placeholderExpansion: com.xbaimiao.easylib.bridge.PlaceholderExpansion,
 ) : PlaceholderExpansion() {
 
     override fun getIdentifier(): String {

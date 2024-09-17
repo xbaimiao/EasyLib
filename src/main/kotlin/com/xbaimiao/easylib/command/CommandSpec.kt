@@ -101,7 +101,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
     fun onlinePlayers(
         desc: String = "player",
         optional: Boolean = false,
-        block: CommandSpec<S>.(ArgNode<Collection<Player>>) -> Unit = {}
+        block: CommandSpec<S>.(ArgNode<Collection<Player>>) -> Unit = {},
     ): ArgNode<Collection<Player>> {
         return arg(ArgNode(desc, exec = { token ->
             arrayListOf(Bukkit.getOnlinePlayers().map { it.name }, arrayListOf("@a", "@p", "@s", "@r")).flatten()
@@ -126,7 +126,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun players(
-        desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Player?>) -> Unit = {}
+        desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Player?>) -> Unit = {},
     ): ArgNode<Player?> {
         return arg(ArgNode(desc, exec = { token ->
             Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
@@ -137,7 +137,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun offlinePlayers(
-        desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit = {}
+        desc: String = "player", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit = {},
     ): ArgNode<String> {
         return arg(ArgNode(desc, exec = { token ->
             Bukkit.getOnlinePlayers().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
@@ -148,7 +148,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun worlds(
-        desc: String = "world", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<World>) -> Unit = {}
+        desc: String = "world", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<World>) -> Unit = {},
     ): ArgNode<World> {
         return arg(ArgNode(desc, exec = { token ->
             Bukkit.getWorlds().map { it.name }.filter { it.uppercase().startsWith(token.uppercase()) }
@@ -159,7 +159,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun booleans(
-        desc: String = "boolean", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Boolean>) -> Unit = {}
+        desc: String = "boolean", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Boolean>) -> Unit = {},
     ): ArgNode<Boolean> {
         return arg(ArgNode(desc, exec = { token ->
             arrayOf(desc, "true", "false").filter { it.uppercase().startsWith(token.uppercase()) }
@@ -170,7 +170,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun times(
-        desc: String = "time", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Long>) -> Unit = {}
+        desc: String = "time", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Long>) -> Unit = {},
     ): ArgNode<Long> {
         return arg(ArgNode(desc, exec = { token ->
             arrayOf(desc, "1ms", "1s", "1m", "1h", "1d").filter { it.uppercase().startsWith(token.uppercase()) }
@@ -181,7 +181,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun number(
-        desc: String = "number", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}
+        desc: String = "number", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {},
     ): ArgNode<Double> {
         return arg(ArgNode(desc, exec = { token ->
             arrayOf(desc, "1", "2", "3", "4", "5", "number").filter { it.uppercase().startsWith(token.uppercase()) }
@@ -192,7 +192,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun x(
-        desc: String = "x", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}
+        desc: String = "x", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {},
     ): ArgNode<Double> {
         return arg(ArgNode(desc, {
             if (this is Player) {
@@ -207,7 +207,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun y(
-        desc: String = "y", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}
+        desc: String = "y", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {},
     ): ArgNode<Double> {
         return arg(ArgNode(desc, {
             if (this is Player) {
@@ -220,7 +220,7 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun z(
-        desc: String = "z", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {}
+        desc: String = "z", optional: Boolean = false, block: CommandSpec<S>.(ArgNode<Double>) -> Unit = {},
     ): ArgNode<Double> {
         return arg(ArgNode(desc, {
             if (this is Player) {
@@ -233,14 +233,14 @@ abstract class CommandSpec<S : CommandSender> : CommandHandler {
 
     @JvmOverloads
     fun <T> arg(
-        argNode: ArgNode<T>, optional: Boolean = false, block: CommandSpec<S>.(ArgNode<T>) -> Unit
+        argNode: ArgNode<T>, optional: Boolean = false, block: CommandSpec<S>.(ArgNode<T>) -> Unit,
     ): ArgNode<T> {
         return argNodes.append(argNode, optional).also { block.invoke(this, it) }
     }
 
     @JvmOverloads
     fun arg(
-        usage: String, optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit
+        usage: String, optional: Boolean = false, block: CommandSpec<S>.(ArgNode<String>) -> Unit,
     ): ArgNode<String> {
         val argNode = ArgNode(usage, exec = { listOf(usage) }, parse = { it })
         return argNodes.append(argNode, optional).also { block.invoke(this, it) }

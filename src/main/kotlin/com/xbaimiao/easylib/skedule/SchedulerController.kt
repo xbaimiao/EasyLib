@@ -5,9 +5,16 @@ import com.xbaimiao.easylib.util.submit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import org.bukkit.Location
+import org.bukkit.entity.Entity
 import kotlin.coroutines.*
 
-class SchedulerController : Continuation<Unit>, CoroutineScope by CoroutineScope(EmptyCoroutineContext) {
+class SchedulerController(
+    val syncDispatcher: BukkitDispatcher,
+    val asyncDispatcher: BukkitDispatcher,
+    val entity: Entity? = null,
+    val location: Location? = null,
+) : Continuation<Unit>, CoroutineScope by CoroutineScope(EmptyCoroutineContext) {
 
     override val context: CoroutineContext = EmptyCoroutineContext
 
@@ -28,7 +35,7 @@ class SchedulerController : Continuation<Unit>, CoroutineScope by CoroutineScope
      * @return 等待的tick数
      */
     suspend fun waitFor(ticks: Long): Long = suspendCoroutine { cont ->
-        submit(delay = ticks, async = currentContext().isAsync) {
+        submit(delay = ticks, async = currentContext().isAsync, location = location, entity = entity) {
             cont.resume(ticks)
         }
     }
@@ -44,9 +51,9 @@ class SchedulerController : Continuation<Unit>, CoroutineScope by CoroutineScope
             return@suspendCoroutine
         }
         // 不是异步的 先异步执行获取结果 再回到原来的线程执行
-        currentTask = submit(async = true) {
+        currentTask = submit(async = true, location = location, entity = entity) {
             val result = asyncFunc()
-            currentTask = submit {
+            currentTask = submit(location = location, entity = entity) {
                 cont.resume(result)
             }
         }
@@ -63,9 +70,9 @@ class SchedulerController : Continuation<Unit>, CoroutineScope by CoroutineScope
             return@suspendCoroutine
         }
         // 不是同步的 先同步执行获取结果 再回到原来的线程执行
-        currentTask = submit(async = false) {
+        currentTask = submit(async = false, location = location, entity = entity) {
             val result = syncFunc()
-            currentTask = submit(async = context.isAsync) {
+            currentTask = submit(async = context.isAsync, location = location, entity = entity) {
                 cont.resume(result)
             }
         }
@@ -108,7 +115,7 @@ class SchedulerController : Continuation<Unit>, CoroutineScope by CoroutineScope
             cont.resume(false)
             return@suspendCoroutine
         }
-        submit(async = context.isAsync) {
+        submit(async = context.isAsync, location = location, entity = entity) {
             cont.resume(true)
         }
     }

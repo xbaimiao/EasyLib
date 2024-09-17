@@ -13,7 +13,7 @@ class OrmliteMysql(
     private val user: String,
     private val passwd: String,
     private val ssl: Boolean,
-    private val hikariCP: Boolean
+    private val hikariCP: Boolean,
 ) : AbstractOrmliteDatabase() {
 
     override val connectionSource: ConnectionSource by lazy {

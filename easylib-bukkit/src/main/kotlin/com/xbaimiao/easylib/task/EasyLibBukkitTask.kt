@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable
  * @date 2023/4/18 10:41
  **/
 abstract class EasyLibBukkitTask(
-    private val plugin: JavaPlugin
+    private val plugin: JavaPlugin,
 ) : EasyLibTask {
 
     override var isSync: Boolean? = false

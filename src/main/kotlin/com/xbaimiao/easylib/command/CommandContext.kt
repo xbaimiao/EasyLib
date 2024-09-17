@@ -10,7 +10,7 @@ data class CommandContext<S : CommandSender>(
     val sender: S,
     val cmd: String,
     val args: MutableList<String>,
-    val argNodes: List<ArgNode<*>>
+    val argNodes: List<ArgNode<*>>,
 ) {
 
     init {

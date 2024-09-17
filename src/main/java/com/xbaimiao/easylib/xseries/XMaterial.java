@@ -2059,6 +2059,22 @@ public enum XMaterial /* implements com.xbaimiao.easylib.xseries.abstractions.Ma
         return Data.VERSION >= version;
     }
 
+    /**
+     * <b>XMaterial Paradox (Duplication Check)</b>
+     * Checks if the material has any duplicates.
+     * <p>
+     * <b>Example:</b>
+     * <p>{@code MELON, CARROT, POTATO, BEETROOT -> true}
+     *
+     * @param name the name of the material to check.
+     * @return true if there's a duplicated material for this material, otherwise false.
+     * @since 2.0.0
+     */
+    private static boolean isDuplicated(@Nonnull String name) {
+        // Don't use matchXMaterial() since this method is being called from matchXMaterial() itself and will cause a StackOverflowError.
+        return DUPLICATED.contains(name);
+    }
+
     public String[] getLegacy() {
         return this.legacy;
     }
@@ -2242,22 +2258,6 @@ public enum XMaterial /* implements com.xbaimiao.easylib.xseries.abstractions.Ma
     }
 
     /**
-     * <b>XMaterial Paradox (Duplication Check)</b>
-     * Checks if the material has any duplicates.
-     * <p>
-     * <b>Example:</b>
-     * <p>{@code MELON, CARROT, POTATO, BEETROOT -> true}
-     *
-     * @param name the name of the material to check.
-     * @return true if there's a duplicated material for this material, otherwise false.
-     * @since 2.0.0
-     */
-    private static boolean isDuplicated(@Nonnull String name) {
-        // Don't use matchXMaterial() since this method is being called from matchXMaterial() itself and will cause a StackOverflowError.
-        return DUPLICATED.contains(name);
-    }
-
-    /**
      * This method is needed due to Java enum initialization limitations.
      * It's really inefficient yes, but it's only used for initialization.
      * <p>
@@ -2311,6 +2311,12 @@ public enum XMaterial /* implements com.xbaimiao.easylib.xseries.abstractions.Ma
          * @since 1.0.0
          */
         private static final int VERSION;
+        /**
+         * Cached result if the server version is after the v1.13 flattening update.
+         *
+         * @since 3.0.0
+         */
+        private static final boolean ISFLAT = supports(13);
 
         static { // This needs to be right below VERSION because of initialization order.
             String version = Bukkit.getVersion();
@@ -2319,12 +2325,5 @@ public enum XMaterial /* implements com.xbaimiao.easylib.xseries.abstractions.Ma
             if (matcher.find()) VERSION = Integer.parseInt(matcher.group(1));
             else throw new IllegalArgumentException("Failed to parse server version from: " + version);
         }
-
-        /**
-         * Cached result if the server version is after the v1.13 flattening update.
-         *
-         * @since 3.0.0
-         */
-        private static final boolean ISFLAT = supports(13);
     }
 }

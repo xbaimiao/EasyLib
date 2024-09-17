@@ -14,7 +14,7 @@ import org.tabooproject.reflex.Reflex.Companion.invokeMethod
 
 class CommandLauncher<T : CommandSender>(
     override val command: String,
-    private val execClass: Class<out CommandSender>
+    private val execClass: Class<out CommandSender>,
 ) : CommandSpec<T>() {
 
     private companion object {

@@ -14,7 +14,7 @@ class ESound(
     private val xSound: XSound? = null,
     private val rwaSound: String? = null,
     var volume: Float = 100f,
-    var pitch: Float = 1f
+    var pitch: Float = 1f,
 ) {
 
     fun playSound(player: Player) {

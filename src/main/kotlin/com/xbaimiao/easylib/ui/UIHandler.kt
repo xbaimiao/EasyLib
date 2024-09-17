@@ -27,7 +27,7 @@ object UIHandler : Listener {
     }
 
     private fun startUpdateTask() {
-        task = submit(period = 20, async = true) {
+        task = submit(period = 20) {
             for (onlinePlayer in Bukkit.getOnlinePlayers()) {
                 val inventory = onlinePlayer.openInventory.topInventory
                 val menu = MenuHolder.fromInventory(inventory) ?: continue
@@ -35,8 +35,8 @@ object UIHandler : Listener {
                     if (!update.canUpdate()) {
                         continue
                     }
-                    if (!update.async) {
-                        submit {
+                    if (update.async) {
+                        submit(async = true) {
                             inventory.setItem(slot, update.update())
                         }
                         continue
@@ -47,8 +47,8 @@ object UIHandler : Listener {
                     if (!update.canUpdate()) {
                         continue
                     }
-                    if (!update.async) {
-                        submit {
+                    if (update.async) {
+                        submit(async = true) {
                             for (slot in menu.getSlots(char)) {
                                 inventory.setItem(slot, update.update())
                             }

@@ -4,21 +4,27 @@ import com.xbaimiao.easylib.task.EasyLibTask
 import com.xbaimiao.easylib.util.submit
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.entity.Entity
 import java.util.concurrent.Executor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
 
 @OptIn(InternalCoroutinesApi::class)
-internal class BukkitDispatcher(private val async: Boolean) : ExecutorCoroutineDispatcher(), Delay, Executor {
+class BukkitDispatcher(
+    private val async: Boolean,
+    private val location: Location?,
+    private val entity: Entity?,
+) : ExecutorCoroutineDispatcher(), Delay, Executor {
 
     private var closed = false
 
     private val runTaskLater: (Runnable, Long) -> EasyLibTask = { runnable, delay ->
-        submit(delay = delay, async = async) { runnable.run() }
+        submit(delay = delay, async = async, location = location, entity = entity) { runnable.run() }
     }
     private val runTask: (Runnable) -> EasyLibTask = { runnable ->
-        submit(async = async) { runnable.run() }
+        submit(async = async, location = location, entity = entity) { runnable.run() }
     }
 
     @ExperimentalCoroutinesApi
@@ -55,7 +61,7 @@ internal class BukkitDispatcher(private val async: Boolean) : ExecutorCoroutineD
             if (currentContext() == SynchronizationContext.ASYNC) {
                 it.run()
             } else {
-                submit(async = true) {
+                submit(async = true, location = location, entity = entity) {
                     it.run()
                 }
             }
@@ -63,7 +69,7 @@ internal class BukkitDispatcher(private val async: Boolean) : ExecutorCoroutineD
             if (currentContext() == SynchronizationContext.SYNC) {
                 it.run()
             } else {
-                submit { it.run() }
+                submit(location = location, entity = entity) { it.run() }
             }
         }
     }
@@ -91,9 +97,6 @@ internal class BukkitDispatcher(private val async: Boolean) : ExecutorCoroutineD
 
 fun currentContext() = if (Bukkit.isPrimaryThread()) SynchronizationContext.SYNC else SynchronizationContext.ASYNC
 
-val asyncDispatcher: ExecutorCoroutineDispatcher by lazy { BukkitDispatcher(true) }
-val syncDispatcher: ExecutorCoroutineDispatcher by lazy { BukkitDispatcher(false) }
-
 /**
  * 启动一次协程。
  *
@@ -103,9 +106,13 @@ val syncDispatcher: ExecutorCoroutineDispatcher by lazy { BukkitDispatcher(false
  */
 fun launchCoroutine(
     initialContext: SynchronizationContext = currentContext(),
-    co: suspend SchedulerController.() -> Unit
+    location: Location? = null,
+    entity: Entity? = null,
+    co: suspend SchedulerController.() -> Unit,
 ): Job {
-    val controller = SchedulerController()
+    val asyncDispatcher = BukkitDispatcher(true, location, entity)
+    val syncDispatcher = BukkitDispatcher(false, location, entity)
+    val controller = SchedulerController(syncDispatcher, asyncDispatcher)
 
     val block: suspend SchedulerController.() -> Unit = {
         try {
@@ -133,7 +140,7 @@ fun launchCoroutine(
 )
 fun schedule(
     initialContext: SynchronizationContext = SynchronizationContext.SYNC,
-    co: suspend SchedulerController.() -> Unit
+    co: suspend SchedulerController.() -> Unit,
 ): Job {
-    return launchCoroutine(initialContext, co)
+    return launchCoroutine(initialContext, null, null, co)
 }

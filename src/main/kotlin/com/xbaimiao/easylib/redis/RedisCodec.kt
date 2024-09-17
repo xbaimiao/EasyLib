@@ -5,7 +5,7 @@ import redis.clients.jedis.params.SetParams
 
 data class RedisCodec<T>(
     val jedisPool: JedisPool,
-    val dataCodec: DataCodec<T>
+    val dataCodec: DataCodec<T>,
 ) {
 
     fun set(key: String, value: T) {

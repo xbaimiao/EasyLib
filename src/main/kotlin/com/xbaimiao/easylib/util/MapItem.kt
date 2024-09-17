@@ -3,7 +3,6 @@ package com.xbaimiao.easylib.util
 import com.xbaimiao.easylib.xseries.XMaterial
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.map.MapCanvas
 import org.bukkit.map.MapPalette

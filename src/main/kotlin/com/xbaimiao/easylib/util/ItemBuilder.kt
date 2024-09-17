@@ -1,9 +1,9 @@
 package com.xbaimiao.easylib.util
 
-import com.xbaimiao.easylib.xseries.XMaterial
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import com.xbaimiao.easylib.chat.colored
+import com.xbaimiao.easylib.xseries.XMaterial
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
