@@ -17,7 +17,7 @@ class MysqlHikariDatabase(
     ssl: Boolean,
 ) : HikariDatabase(
     String.format(
-        "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true",
+        "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true&characterEncoding=UTF-8",
         host,
         port,
         database,

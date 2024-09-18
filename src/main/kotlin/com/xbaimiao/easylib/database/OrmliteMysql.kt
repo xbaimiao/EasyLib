@@ -18,7 +18,7 @@ class OrmliteMysql(
 
     override val connectionSource: ConnectionSource by lazy {
         val url = String.format(
-            "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true",
+            "jdbc:mysql://%s:%s/%s?useSSL=%s&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true&characterEncoding=UTF-8",
             host,
             port,
             database,
