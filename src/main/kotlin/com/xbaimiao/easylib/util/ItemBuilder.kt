@@ -79,7 +79,7 @@ open class ItemBuilder {
         HIDE_DYE
     }
 
-    class SkullTexture(val textures: String, val uuid: UUID? = UUID.randomUUID())
+    class SkullTexture(val textures: String, val uuid: UUID = UUID.randomUUID())
 
     /**
      * 物品材质
@@ -264,7 +264,7 @@ open class ItemBuilder {
                     itemMeta.owner = skullOwner
                 }
                 if (skullTexture != null) {
-                    itemMeta.setProperty("profile", GameProfile(skullTexture!!.uuid, null).also {
+                    itemMeta.setProperty("profile", GameProfile(skullTexture!!.uuid, randomString(6)).also {
                         it.properties.put("textures", Property("textures", skullTexture!!.textures))
                     })
                 }
@@ -318,7 +318,8 @@ open class ItemBuilder {
         originMeta = itemMeta
         name = itemMeta.displayName
         lore += itemMeta.lore ?: emptyList()
-        flags += kotlin.runCatching { itemMeta.itemFlags.map { ItemBuilderFlag.valueOf(it.name) } }.getOrElse { emptyList() }
+        flags += kotlin.runCatching { itemMeta.itemFlags.map { ItemBuilderFlag.valueOf(it.name) } }
+            .getOrElse { emptyList() }
         enchants += if (itemMeta is EnchantmentStorageMeta) {
             itemMeta.storedEnchants
         } else {

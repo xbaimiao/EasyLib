@@ -206,3 +206,12 @@ fun ByteArray.decodeBase64(): ByteArray {
 fun String.decodeBase64(): ByteArray {
     return Base64.getDecoder().decode(this)
 }
+
+fun randomString(num: Int): String {
+    val range = 'a'..'z'
+    var s = ""
+    repeat(num) {
+        s += range.random()
+    }
+    return s
+}
