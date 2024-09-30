@@ -32,4 +32,8 @@ class BuiltInConfiguration(fileName: String) : YamlConfiguration() {
         super.save(file)
     }
 
+    fun reload() {
+        this.setDefaults(loadConfiguration(file.reader(Charsets.UTF_8)))
+    }
+
 }
