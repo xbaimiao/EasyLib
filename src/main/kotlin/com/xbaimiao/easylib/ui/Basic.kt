@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 abstract class Basic(player: Player) : Menu(player) {
 
     /** 行数 **/
-    var rows = 6
+    var rows = 1
 
     /** 锁定主手 **/
     internal var handLocked = true
