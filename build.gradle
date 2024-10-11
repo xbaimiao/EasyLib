@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     group = 'com.xbaimiao'
-    version = '4.1.2'
+    version = '4.1.4'
 
     repositories {
         mavenCentral()
@@ -51,6 +51,8 @@ dependencies {
     compileOnly("com.google.code.gson:gson:2.10.1")
     compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.mojang:authlib:1.5.25")
+    compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.9.20")
+    compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
 //    compileOnly("com.mojang:authlib:6.0.54")
     compileOnly(fileTree("libs"))
     implementation(fileTree("libs/implementation"))
