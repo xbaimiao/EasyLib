@@ -3,6 +3,7 @@ package com.xbaimiao.easylib.database.dsl.wrapper
 import com.j256.ormlite.dao.Dao
 import com.j256.ormlite.stmt.UpdateBuilder
 import com.j256.ormlite.stmt.Where
+import kotlin.reflect.KProperty
 
 /**
  * @author xbaimiao
@@ -22,3 +23,6 @@ inline fun <reified T, ID> UpdateBuilder<T, ID>.where(wrapper: WhereWrapper<T, I
     whereWrapper.build()
 }
 
+inline fun <reified T, ID> UpdateBuilder<T, ID>.update(column: KProperty<*>, value: Any) {
+    this.updateColumnValue(column.getColumnName(T::class.java), value)
+}
